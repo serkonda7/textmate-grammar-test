@@ -12,10 +12,10 @@
   },
   "scripts": {
     "build": "npx tsc",
-    "coverage": "npx nyc --reporter=html mocha -r ts-node/register 'test/**/*.test.ts'",
-    "format": "prettier --config .prettierrc 'src/**/*.ts' 'test/**/*.ts' --write",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "test": "mocha -r ts-node/register 'test/**/*.test.ts'"
+    "coverage": "npx nyc --reporter=html mocha -r ts-node/register \"test/**/*.test.ts\"",
+    "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
+    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
+    "test": "mocha -r ts-node/register \"test/**/*.test.ts\""
   },
   "bin": {
     "vscode-tmgrammar-test": "./dist/unit.js",
