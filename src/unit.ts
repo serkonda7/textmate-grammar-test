@@ -7,13 +7,15 @@ import glob from 'glob'
 import Bottleneck from 'bottleneck'
 import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase, TestFailure } from './unit/index'
 import {
-  Reporter, CompositeReporter,
-  ConsoleCompactReporter, ConsoleFullReporter,
-  XunitGenericReporter, XunitGitlabReporter
+  Reporter,
+  CompositeReporter,
+  ConsoleCompactReporter,
+  ConsoleFullReporter,
+  XunitGenericReporter,
+  XunitGitlabReporter
 } from './unit/reporter'
 
 import { createRegistry, loadConfiguration, IGrammarConfig } from './common/index'
-
 
 let packageJson = require('../package.json')
 
@@ -31,8 +33,14 @@ program
   )
   .option('--config <configuration.json>', 'Path to the language configuration, package.json by default')
   .option('-c, --compact', 'Display output in the compact format, which is easier to use with VSCode problem matchers')
-  .option('--xunit-report <report.xml>', 'Path to directory where test reports in the XUnit format will be emitted in addition to console output')
-  .option('--xunit-format <generic|gitlab>', 'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI')
+  .option(
+    '--xunit-report <report.xml>',
+    'Path to directory where test reports in the XUnit format will be emitted in addition to console output'
+  )
+  .option(
+    '--xunit-format <generic|gitlab>',
+    'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI'
+  )
   .version(packageJson.version)
   .argument(
     '<testcases...>',
@@ -41,7 +49,6 @@ program
   .parse(process.argv)
 
 const options = program.opts()
-
 
 const TestFailed = -1
 const TestSuccessful = 0
@@ -57,16 +64,14 @@ if (options.validate) {
   }
 }
 
-
-const consoleReporter = options.compact
-  ? new ConsoleCompactReporter()
-  : new ConsoleFullReporter()
+const consoleReporter = options.compact ? new ConsoleCompactReporter() : new ConsoleFullReporter()
 const reporter: Reporter = options.xunitReport
   ? new CompositeReporter(
-    consoleReporter,
-    options.xunitFormat === 'gitlab'
-      ? new XunitGitlabReporter(options.xunitReport)
-      : new XunitGenericReporter(options.xunitReport))
+      consoleReporter,
+      options.xunitFormat === 'gitlab'
+        ? new XunitGitlabReporter(options.xunitReport)
+        : new XunitGenericReporter(options.xunitReport)
+    )
   : consoleReporter
 
 const rawTestCases = program.args.map((x) => glob.sync(x)).flat()
@@ -78,7 +83,7 @@ if (rawTestCases.length === 0) {
 
 const limiter = new Bottleneck({
   maxConcurrent: 8,
-  minTime: 0 
+  minTime: 0
 })
 
 const testResults: Promise<number[]> = Promise.all(
@@ -93,7 +98,8 @@ const testResults: Promise<number[]> = Promise.all(
       })
     }
     let testCase = tc as GrammarTestCase
-    return limiter.schedule(() => runGrammarTestCase(registry, testCase))
+    return limiter
+      .schedule(() => runGrammarTestCase(registry, testCase))
       .then((failures) => {
         reporter.reportTestResult(filename, testCase, failures)
         return failures.length === 0 ? TestSuccessful : TestFailed

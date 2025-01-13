@@ -104,7 +104,10 @@ export function loadConfiguration(
       {},
       ...grammars.filter((x) => x.language).map((x) => ({ [x.language || '']: x.scopeName }))
     )
-    let extToLang = Object.assign({}, ...ys.map((x: any) => (x.extensions || []).map((e: any) => ({ [e]: x.id }))).flat())
+    let extToLang = Object.assign(
+      {},
+      ...ys.map((x: any) => (x.extensions || []).map((e: any) => ({ [e]: x.id }))).flat()
+    )
     extensionToScope = (ext) => scope || langToScope[extToLang[ext]]
   }
   return { grammars, extensionToScope }

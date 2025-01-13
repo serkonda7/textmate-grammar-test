@@ -75,7 +75,7 @@ let { grammars, extensionToScope } = loadConfiguration(options.config, options.s
 
 const limiter = new Bottleneck({
   maxConcurrent: 8,
-  minTime: 0 
+  minTime: 0
 })
 
 const registry = createRegistry(grammars)
@@ -88,7 +88,8 @@ const testResults: Promise<number[]> = Promise.all(
       console.log('No scope is associated with the file.')
       return TestFailed
     }
-    return limiter.schedule(() => getVSCodeTokens(registry, scope, src))
+    return limiter
+      .schedule(() => getVSCodeTokens(registry, scope, src))
       .then((tokens) => {
         if (fs.existsSync(filename + '.snap')) {
           if (options.updateSnapshot) {
