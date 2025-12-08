@@ -67,7 +67,7 @@ importers:
         specifier: ^5.20.1
         version: 5.20.1(typescript@5.9.3)
       typescript:
-        specifier: ^5.1.6
+        specifier: ~5.9.3
         version: 5.9.3
       xml2js:
         specifier: ^0.6.0
