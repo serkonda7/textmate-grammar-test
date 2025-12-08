@@ -1,7 +1,9 @@
 {
   "name": "textmate-grammar-test",
-  "version": "0.2.0",
   "description": "Test runner for VSCode textmate grammars",
+  "version": "0.2.1-dev",
+  "license": "MIT",
+  "author": "serkonda7",
   "homepage": "https://github.com/serkonda7/textmate-grammar-test",
   "repository": {
     "type": "git",
@@ -10,18 +12,7 @@
   "bugs": {
     "url": "https://github.com/serkonda7/textmate-grammar-test/issues"
   },
-  "scripts": {
-    "build": "npx tsc",
-    "coverage": "npx nyc --reporter=html mocha -r ts-node/register \"test/**/*.test.ts\"",
-    "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
-    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
-    "test": "mocha -r ts-node/register \"test/**/*.test.ts\""
-  },
-  "bin": {
-    "textmate-grammar-test": "./dist/unit.js",
-    "textmate-grammar-snap": "./dist/snapshot.js"
-  },
-  "keywords": [
+    "keywords": [
     "test",
     "unit-test",
     "textmate",
@@ -30,8 +21,30 @@
     "studio",
     "code"
   ],
-  "author": "vitalii voloshyn",
-  "license": "MIT",
+  "bin": {
+    "textmate-grammar-test": "./dist/unit.js",
+    "textmate-grammar-snap": "./dist/snapshot.js"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "coverage": "npx nyc --reporter=html mocha -r ts-node/register \"test/**/*.test.ts\"",
+    "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
+    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
+    "test": "mocha -r ts-node/register \"test/**/*.test.ts\""
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a",
+  "dependencies": {
+    "bottleneck": "^2.19.5",
+    "chalk": "^2.4.2",
+    "commander": "^9.2.0",
+    "diff": "^4.0.2",
+    "glob": "^7.1.6",
+    "vscode-oniguruma": "^1.5.1",
+    "vscode-textmate": "^7.0.1"
+  },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/diff": "^4.0.2",
@@ -47,14 +60,5 @@
     "tslint": "^5.20.1",
     "typescript": "^5.1.6",
     "xml2js": "^0.6.0"
-  },
-  "dependencies": {
-    "bottleneck": "^2.19.5",
-    "chalk": "^2.4.2",
-    "commander": "^9.2.0",
-    "diff": "^4.0.2",
-    "glob": "^7.1.6",
-    "vscode-oniguruma": "^1.5.1",
-    "vscode-textmate": "^7.0.1"
   }
 }
