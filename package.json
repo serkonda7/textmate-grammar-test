@@ -27,7 +27,6 @@
   },
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
-    "coverage": "npx nyc --reporter=html mocha -r ts-node/register \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
     "lint": "tslint -c tslint.json \"src/**/*.ts\"",
     "build": "npx tsc"
@@ -49,11 +48,10 @@
     "@types/chai": "^4.2.11",
     "@types/diff": "^4.0.2",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.9",
+    "@types/node": "~20.19.26",
     "@types/xml2js": "^0.4.11",
     "chai": "^4.2.0",
     "mocha": "^11.1.0",
-    "nyc": "^17.1.0",
     "prettier": "^2.1.2",
     "ts-node": "^8.10.2",
     "tslint": "^5.20.1",
