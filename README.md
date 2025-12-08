@@ -1,4 +1,3 @@
-![Node.js CI](https://img.shields.io/github/actions/workflow/status/PanAeon/vscode-tmgrammar-test/nodejs.yml?branch=master&style=for-the-badge) ![NPM Version](https://img.shields.io/npm/v/vscode-tmgrammar-test?style=for-the-badge)
 ## VSCode Textmate grammar test
 
 
@@ -16,14 +15,14 @@ Inspired by [Sublime Text syntax tests](https://www.sublimetext.com/docs/3/synta
 As a project dependency:
 
 ```bash
-npm i --save-dev vscode-tmgrammar-test
+npm i --save-dev textmate-grammar-test
 ```
 
 Or as a standalone command line tool:
 
 ```bash
-npm i -g vscode-tmgrammar-test
-vscode-tmgrammar-test --help
+npm i -g textmate-grammar-test
+textmate-grammar-test --help
 ```
 
 
@@ -87,21 +86,21 @@ So, if required scopes are `'scope1 scope2'`, the test will report an error if a
 
 To run a unit test:
 ```bash
-vscode-tmgrammar-test 'tests/unit/**/*.test.scala'
+textmate-grammar-test 'tests/unit/**/*.test.scala'
 ```
 
 
 ### Snapshot tests
 Snapshot tests are like `functional tests` but you don't have to write outputs explicitly.
 All you have to do is to provide a source files, scopes of which you want to test. Then on
-the first run `vscode-tmgrammar-snap` will generate a set of `.snap` files which are an
+the first run `textmate-grammar-snap` will generate a set of `.snap` files which are an
 instant snapshot of lines of the source files together with corresponding scopes.
 
 Then if you change the grammar and run the test again, the program will output the changes between
 the `.snap` file and the real output.
 If you satisfied with the changes you can `commit` them by running
 ```bash
-vscode-tmgrammar-snap --updateSnapshot .... 
+textmate-grammar-snap --updateSnapshot ....
 ```
 this will overwrite the existing `.snap` files with a new ones.
 After this you should commit them alongside with the source code test cases.
@@ -110,7 +109,7 @@ You can read more about them at [snapshot testing](https://jestjs.io/docs/en/sna
 
 To run snapshot test:
 ```bash
-vscode-tmgrammar-snap 'tests/snap/**/*.scala'
+textmate-grammar-snap 'tests/snap/**/*.scala'
 ```
 
 ### Language configuration via package.json
@@ -150,7 +149,7 @@ Right now only regular grammars and *Injection Grammars* via `injectTo` directiv
 
 Unit tests:
 ```
-Usage: vscode-tmgrammar-test [options] <testcases...>
+Usage: textmate-grammar-test [options] <testcases...>
 
 Run Textmate grammar test cases using vscode-textmate
 
@@ -171,7 +170,7 @@ Options:
 
 Snapshot tests:
 ```
-Usage: vscode-tmgrammar-snap [options] <testcases...>
+Usage: textmate-grammar-snap [options] <testcases...>
 
 Run VSCode textmate grammar snapshot tests
 
@@ -197,14 +196,14 @@ You can setup a vscode unit test task for convenience:
         {
             "label": "Run tests",
             "type": "shell",
-            "command": "vscode-tmgrammar-test -c -g testcase/dhall.tmLanguage.json '**/*.dhall'",
+            "command": "textmate-grammar-test -c -g testcase/dhall.tmLanguage.json '**/*.dhall'",
             "group": "test",
             "presentation": {
                 "reveal": "always",
                 "panel":"new",
             },
             "problemMatcher": {
-                "owner": "vscode-tmgrammar-test",
+                "owner": "textmate-grammar-test",
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}",
@@ -229,4 +228,3 @@ Notice the `-c` option that will output messages in a handy format for the probl
 Result:
 
 ![Error in the editor](images/error.in.editor.png?raw=true "Error in the editor")
-
