@@ -24,11 +24,11 @@ importers:
         specifier: ^7.1.6
         version: 7.2.3
       vscode-oniguruma:
-        specifier: ^1.5.1
-        version: 1.7.0
+        specifier: ~2.0.1
+        version: 2.0.1
       vscode-textmate:
-        specifier: ^7.0.1
-        version: 7.0.4
+        specifier: ~9.3.0
+        version: 9.3.0
     devDependencies:
       '@types/chai':
         specifier: ^4.2.11
@@ -937,11 +937,11 @@ packages:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
-  vscode-oniguruma@1.7.0:
-    resolution: {integrity: sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==}
+  vscode-oniguruma@2.0.1:
+    resolution: {integrity: sha512-poJU8iHIWnC3vgphJnrLZyI3YdqRlR27xzqDmpPXYzA93R4Gk8z7T6oqDzDoHjoikA2aS82crdXFkjELCdJsjQ==}
 
-  vscode-textmate@7.0.4:
-    resolution: {integrity: sha512-9hJp0xL7HW1Q5OgGe03NACo7yiCTMEk3WU/rtKXUbncLtdg6rVVNJnHwD88UhbIYU2KoxY0Dih0x+kIsmUKn2A==}
+  vscode-textmate@9.3.0:
+    resolution: {integrity: sha512-zHiZZOdb9xqj5/X1C4a29sbgT2HngdWxPLSl3PyHRQF+5visI4uNM020OHiLJjsMxUssyk/pGVAg/9LCIobrVg==}
 
   which-module@2.0.1:
     resolution: {integrity: sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==}
@@ -1903,9 +1903,9 @@ snapshots:
 
   uuid@8.3.2: {}
 
-  vscode-oniguruma@1.7.0: {}
+  vscode-oniguruma@2.0.1: {}
 
-  vscode-textmate@7.0.4: {}
+  vscode-textmate@9.3.0: {}
 
   which-module@2.0.1: {}
 
