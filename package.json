@@ -28,7 +28,7 @@
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
-    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
+    "lint": "pnpm eslint .",
     "build": "npx tsc"
   },
   "engines": {
@@ -45,17 +45,19 @@
     "vscode-textmate": "~9.3.0"
   },
   "devDependencies": {
+    "@eslint/js": "~9.39.1",
     "@types/chai": "^4.2.11",
     "@types/diff": "^4.0.2",
     "@types/mocha": "^10.0.1",
     "@types/node": "~20.19.26",
     "@types/xml2js": "^0.4.11",
     "chai": "^4.2.0",
+    "eslint": "~9.39.1",
     "mocha": "^11.1.0",
     "prettier": "^2.1.2",
     "ts-node": "^8.10.2",
-    "tslint": "^5.20.1",
     "typescript": "~5.9.3",
+    "typescript-eslint": "~8.49.0",
     "xml2js": "^0.6.0"
   }
 }
