@@ -41,14 +41,13 @@
     "chalk": "^2.4.2",
     "commander": "^9.2.0",
     "diff": "^4.0.2",
-    "glob": "^7.1.6",
+    "glob": "~13.0.0",
     "vscode-oniguruma": "~2.0.1",
     "vscode-textmate": "~9.3.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/diff": "^4.0.2",
-    "@types/glob": "^7.1.1",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.9",
     "@types/xml2js": "^0.4.11",

@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import * as tty from 'tty'
 import chalk from 'chalk'
 import { program } from 'commander'
-import glob from 'glob'
+import { globSync } from 'glob'
 import { createRegistry, loadConfiguration } from './common/index'
 import { EOL } from 'os'
 import { getVSCodeTokens, renderSnap, parseSnap, AnnotatedLine } from './snapshot/index'
@@ -62,7 +62,7 @@ const TestFailed = -1
 const TestSuccessful = 0
 const Padding = '  '
 
-const rawTestCases = program.args.map((x) => glob.sync(x)).flat()
+const rawTestCases = program.args.map((x) => globSync(x)).flat()
 
 const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 

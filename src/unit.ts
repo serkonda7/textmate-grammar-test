@@ -3,7 +3,7 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
 import { program } from 'commander'
-import glob from 'glob'
+import { globSync } from 'glob'
 import Bottleneck from 'bottleneck'
 import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase, TestFailure } from './unit/index'
 import {
@@ -74,7 +74,7 @@ const reporter: Reporter = options.xunitReport
     )
   : consoleReporter
 
-const rawTestCases = program.args.map((x) => glob.sync(x)).flat()
+const rawTestCases = program.args.map((x) => globSync(x)).flat()
 
 if (rawTestCases.length === 0) {
   console.log(chalk.red('ERROR') + ' no test cases found')

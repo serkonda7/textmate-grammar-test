@@ -1,13 +1,7 @@
-## VSCode Textmate grammar test
+# VS Code TextMate Grammar Unit Testing
 
 
 Provides a way to test textmate grammars against a vscode engine using user-friendly plaintext files.
-
-Demo:
-
-[![asciicast](https://asciinema.org/a/QoGS5fPsxDOHl1T43zzmFxJAU.svg)](https://asciinema.org/a/QoGS5fPsxDOHl1T43zzmFxJAU)
-
-Inspired by [Sublime Text syntax tests](https://www.sublimetext.com/docs/3/syntax.html#testing)
 
 
 ### Installation
@@ -224,7 +218,3 @@ You can setup a vscode unit test task for convenience:
 ```
 
 Notice the `-c` option that will output messages in a handy format for the problemMatcher.
-
-Result:
-
-![Error in the editor](images/error.in.editor.png?raw=true "Error in the editor")
