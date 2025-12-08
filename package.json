@@ -26,11 +26,11 @@
     "textmate-grammar-snap": "./dist/snapshot.js"
   },
   "scripts": {
-    "build": "npx tsc",
+    "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
     "coverage": "npx nyc --reporter=html mocha -r ts-node/register \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
     "lint": "tslint -c tslint.json \"src/**/*.ts\"",
-    "test": "mocha -r ts-node/register \"test/**/*.test.ts\""
+    "build": "npx tsc"
   },
   "engines": {
     "node": ">=20"
