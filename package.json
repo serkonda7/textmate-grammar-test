@@ -28,7 +28,7 @@
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
-    "lint": "pnpm eslint src",
+    "lint": "pnpm eslint .",
     "build": "npx tsc"
   },
   "engines": {

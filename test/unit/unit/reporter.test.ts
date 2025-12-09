@@ -186,7 +186,8 @@ describe('XUnit reporters', () => {
       )
 
       expect(xmlCase2.$.name).eq('file:4')
-      expect(xmlCase2.failure).is.undefined
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(xmlCase2.failure).to.be.undefined
 
       expect(xmlCase3.$.name).eq('file:6')
       expect(xmlCase3.failure).length(2)
@@ -197,7 +198,8 @@ describe('XUnit reporters', () => {
       expect(xmlFailure32._).eq(['6: 6  source3', '      ^^', 'prohibited scopes: u1', 'actual: a1'].join('\n'))
 
       expect(xmlCase4.$.name).eq('file:9')
-      expect(xmlCase4.failure).is.undefined
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(xmlCase4.failure).to.be.undefined
     })
 
     it('should create report for test file which fails to parse', async () => {
@@ -238,7 +240,8 @@ describe('XUnit reporters', () => {
 
       const xmlCase = xml.testsuite.testcase[0]
       expect(xmlCase.$.name).eq('Parse test file')
-      expect(xmlCase.failure).is.undefined
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(xmlCase.failure).to.be.undefined
       expect(xmlCase.error).length(1)
       expect(xmlCase.error[0].$.message).eq('Failed to parse test file')
       expect(xmlCase.error[0]._).satisfy((m: string) =>
@@ -291,7 +294,8 @@ describe('XUnit reporters', () => {
 
       const xmlCase = xml.testsuite.testcase[0]
       expect(xmlCase.$.name).eq('Run grammar tests')
-      expect(xmlCase.failure).is.undefined
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(xmlCase.failure).to.be.undefined
       expect(xmlCase.error).length(1)
       expect(xmlCase.error[0].$.message).eq('Error when running grammar tests')
       expect(xmlCase.error[0]._).satisfy((m: string) =>
@@ -398,7 +402,8 @@ describe('XUnit reporters', () => {
       )
 
       expect(xmlCase2.$.name).eq('file:4')
-      expect(xmlCase2.failure).is.undefined
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(xmlCase2.failure).to.be.undefined
 
       expect(xmlCase3.$.name).eq('file:6')
       expect(xmlCase3.failure).length(1)
@@ -422,7 +427,8 @@ describe('XUnit reporters', () => {
       )
 
       expect(xmlCase4.$.name).eq('file:9')
-      expect(xmlCase4.failure).is.undefined
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(xmlCase4.failure).to.be.undefined
     })
   })
 

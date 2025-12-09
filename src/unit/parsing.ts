@@ -64,9 +64,9 @@ export function parseScopeAssertion(testCaseLineNumber: number, commentLength: n
 
 const headerErrorMessage =
   `Expecting the first line in the syntax test file to be in the following format:${EOL}` +
-  `<comment character(s)> SYNTAX TEST \"<language identifier>\"  (\"description\")?${EOL}`
+  `<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?${EOL}`
 
-const headerRegex = /^([^\s]+)\s+SYNTAX\s+TEST\s+"([^"]+)"(?:\s+\"([^"]+)\")?\s*$/
+const headerRegex = /^([^\s]+)\s+SYNTAX\s+TEST\s+"([^"]+)"(?:\s+"([^"]+)")?\s*$/
 
 /**
  * parse the first line with the format:
