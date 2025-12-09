@@ -1,10 +1,12 @@
-# VS Code TextMate Grammar Unit Testing
+# TextMate Grammar Test
+[![CI][ci-badge]][ci-status]
+[![npm version][npm-badge]][npm-link]
+[![npm updated][npm-date-badge]][npm-link]
+
+Write unit or snapshot tests for TextMate grammars validated against the VS Code TextMate engine.
 
 
-Provides a way to test textmate grammars against a vscode engine using user-friendly plaintext files.
-
-
-### Installation
+## Installation
 
 As a project dependency:
 
@@ -20,7 +22,7 @@ textmate-grammar-test --help
 ```
 
 
-### Unit tests
+## Unit tests
 
 ```scala
 // SYNTAX TEST "source.scala" "sample testcase"
@@ -84,7 +86,7 @@ textmate-grammar-test 'tests/unit/**/*.test.scala'
 ```
 
 
-### Snapshot tests
+## Snapshot tests
 Snapshot tests are like `functional tests` but you don't have to write outputs explicitly.
 All you have to do is to provide a source files, scopes of which you want to test. Then on
 the first run `textmate-grammar-snap` will generate a set of `.snap` files which are an
@@ -106,7 +108,7 @@ To run snapshot test:
 textmate-grammar-snap 'tests/snap/**/*.scala'
 ```
 
-### Language configuration via package.json
+## Language configuration via package.json
 
 The configuration follows the format of vscode:
 
@@ -139,7 +141,7 @@ It is optional, though. If the configuration is missing it is necessary to speci
 Right now only regular grammars and *Injection Grammars* via `injectTo` directive are supported.
 
 
-### Command Line Options
+## Command Line Options
 
 Unit tests:
 ```
@@ -182,7 +184,7 @@ Options:
   -h, --help                     display help for command
 ```
 
-### Setup VSCode unit test task
+## Setup VSCode unit test task
 
 You can setup a vscode unit test task for convenience:
 
@@ -218,3 +220,11 @@ You can setup a vscode unit test task for convenience:
 ```
 
 Notice the `-c` option that will output messages in a handy format for the problemMatcher.
+
+
+<!-- links -->
+[ci-badge]: https://github.com/serkonda7/textmate-grammar-test/actions/workflows/ci.yml/badge.svg
+[ci-status]: https://github.com/serkonda7/textmate-grammar-test/actions/workflows/ci.yml
+[npm-badge]: https://nodei.co/npm/textmate-grammar-test.png?style=shields&data=v&color=blue
+[npm-date-badge]: https://nodei.co/npm/textmate-grammar-test.png?style=shields&data=u&color=blue
+[npm-link]: https://www.npmjs.com/package/textmate-grammar-test

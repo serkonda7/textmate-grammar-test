@@ -7,6 +7,7 @@ _unreleased_
 - build(ci): Check linting
 - build: Replace tslint with eslint
 - test: Remove nyc coverage reports
+- docs: Readd readme badges
 
 
 ## 0.2.0
