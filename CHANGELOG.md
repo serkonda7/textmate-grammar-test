@@ -1,6 +1,6 @@
 # Changelog
 ## 0.2.1
-_unreleased_
+_2025-12-09_
 
 - build: Replace npm with pnpm
 - build(deps): Upgrade glob, TypeScript, Node and VS Code dependencies
