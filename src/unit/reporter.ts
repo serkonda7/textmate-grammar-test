@@ -144,7 +144,7 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
 
   private renderSuite(s: XunitSuite): string {
     return `
-<testsuite 
+<testsuite
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd"
     name="${s.name}"
@@ -222,7 +222,7 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
     }
   }
 
-  protected caseClassname(filename: string): undefined {
+  protected caseClassname(): undefined {
     return undefined
   }
   protected suiteFailuresCount(s: XunitSuite): number {
@@ -299,7 +299,7 @@ if (process.platform === 'win32') {
 
 const Padding = '  '
 
-let isatty = tty.isatty(1) && tty.isatty(2)
+const isatty = tty.isatty(1) && tty.isatty(2)
 let terminalWidth = 75
 
 if (isatty) {

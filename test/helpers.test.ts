@@ -11,7 +11,7 @@ export function normalize(text: string) {
   return (
     text
       //normalize path separators
-      .replace(/[\/\\]+/g, '/')
+      .replace(/[/\\]+/g, '/')
       //normalize line endings
       .replace(/\r?\n/g, '\n')
       //checkmark

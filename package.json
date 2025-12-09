@@ -1,7 +1,9 @@
 {
   "name": "textmate-grammar-test",
-  "version": "0.2.0",
   "description": "Test runner for VSCode textmate grammars",
+  "version": "0.2.1-dev",
+  "license": "MIT",
+  "author": "serkonda7",
   "homepage": "https://github.com/serkonda7/textmate-grammar-test",
   "repository": {
     "type": "git",
@@ -9,17 +11,6 @@
   },
   "bugs": {
     "url": "https://github.com/serkonda7/textmate-grammar-test/issues"
-  },
-  "scripts": {
-    "build": "npx tsc",
-    "coverage": "npx nyc --reporter=html mocha -r ts-node/register \"test/**/*.test.ts\"",
-    "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
-    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
-    "test": "mocha -r ts-node/register \"test/**/*.test.ts\""
-  },
-  "bin": {
-    "textmate-grammar-test": "./dist/unit.js",
-    "textmate-grammar-snap": "./dist/snapshot.js"
   },
   "keywords": [
     "test",
@@ -30,31 +21,43 @@
     "studio",
     "code"
   ],
-  "author": "vitalii voloshyn",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/diff": "^4.0.2",
-    "@types/glob": "^7.1.1",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.9",
-    "@types/xml2js": "^0.4.11",
-    "chai": "^4.2.0",
-    "mocha": "^11.1.0",
-    "nyc": "^17.1.0",
-    "prettier": "^2.1.2",
-    "ts-node": "^8.10.2",
-    "tslint": "^5.20.1",
-    "typescript": "^5.1.6",
-    "xml2js": "^0.6.0"
+  "bin": {
+    "textmate-grammar-test": "./dist/unit.js",
+    "textmate-grammar-snap": "./dist/snapshot.js"
   },
+  "scripts": {
+    "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
+    "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
+    "lint": "pnpm eslint .",
+    "build": "npx tsc"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
   "dependencies": {
     "bottleneck": "^2.19.5",
     "chalk": "^2.4.2",
     "commander": "^9.2.0",
     "diff": "^4.0.2",
-    "glob": "^7.1.6",
-    "vscode-oniguruma": "^1.5.1",
-    "vscode-textmate": "^7.0.1"
+    "glob": "~13.0.0",
+    "vscode-oniguruma": "~2.0.1",
+    "vscode-textmate": "~9.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "~9.39.1",
+    "@types/chai": "^4.2.11",
+    "@types/diff": "^4.0.2",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "~20.19.26",
+    "@types/xml2js": "^0.4.11",
+    "chai": "^4.2.0",
+    "eslint": "~9.39.1",
+    "mocha": "^11.1.0",
+    "prettier": "^2.1.2",
+    "ts-node": "^8.10.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "~8.49.0",
+    "xml2js": "^0.6.0"
   }
 }

@@ -1,15 +1,15 @@
 import { AnnotatedLine, IToken } from './model'
 
 export function parseSnap(s: string): AnnotatedLine[] {
-  let result: AnnotatedLine[] = []
-  let ls = s.split(/\r\n|\n/)
+  const result: AnnotatedLine[] = []
+  const ls = s.split(/\r\n|\n/)
   let i = 0
   while (i < ls.length) {
-    let l = ls[i]
+    const l = ls[i]
     if (l.startsWith('>')) {
       const src = l.substring(1)
       i++
-      let tokens: IToken[] = []
+      const tokens: IToken[] = []
       while (i < ls.length && ls[i].startsWith('#')) {
         const startIndex = ls[i].indexOf('^')
         const endIndex = ls[i].indexOf(' ', startIndex)
@@ -37,7 +37,7 @@ export function parseSnap(s: string): AnnotatedLine[] {
 }
 
 export function renderSnap(xs: AnnotatedLine[]): string {
-  let result: string[] = []
+  const result: string[] = []
   xs.forEach((line) => {
     result.push('>' + line.src)
     if (line.src.trim().length > 0) {

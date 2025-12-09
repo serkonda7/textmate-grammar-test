@@ -3,9 +3,9 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
 import { program } from 'commander'
-import glob from 'glob'
+import { globSync } from 'glob'
 import Bottleneck from 'bottleneck'
-import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase, TestFailure } from './unit/index'
+import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase } from './unit/index'
 import {
   Reporter,
   CompositeReporter,
@@ -15,11 +15,11 @@ import {
   XunitGitlabReporter
 } from './unit/reporter'
 
-import { createRegistry, loadConfiguration, IGrammarConfig } from './common/index'
+import { createRegistry, loadConfiguration } from './common/index'
+import { VERSION } from './common/version'
 
-let packageJson = require('../package.json')
 
-function collectGrammarOpts(value: String, previous: String[]): String[] {
+function collectGrammarOpts(value: string, previous: string[]): string[] {
   return previous.concat([value])
 }
 
@@ -41,7 +41,7 @@ program
     '--xunit-format <generic|gitlab>',
     'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI'
   )
-  .version(packageJson.version)
+  .version(VERSION)
   .argument(
     '<testcases...>',
     'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!'
@@ -53,7 +53,7 @@ const options = program.opts()
 const TestFailed = -1
 const TestSuccessful = 0
 
-let { grammars } = loadConfiguration(options.config, options.scope, options.grammar)
+const { grammars } = loadConfiguration(options.config, options.scope, options.grammar)
 const registry = createRegistry(grammars)
 
 if (options.validate) {
@@ -74,7 +74,7 @@ const reporter: Reporter = options.xunitReport
     )
   : consoleReporter
 
-const rawTestCases = program.args.map((x) => glob.sync(x)).flat()
+const rawTestCases = program.args.map((x) => globSync(x)).flat()
 
 if (rawTestCases.length === 0) {
   console.log(chalk.red('ERROR') + ' no test cases found')
@@ -93,11 +93,11 @@ const testResults: Promise<number[]> = Promise.all(
       tc = parseGrammarTestCase(fs.readFileSync(filename).toString())
     } catch (error) {
       reporter.reportParseError(filename, error)
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         resolve(TestFailed)
       })
     }
-    let testCase = tc as GrammarTestCase
+    const testCase = tc as GrammarTestCase
     return limiter
       .schedule(() => runGrammarTestCase(registry, testCase))
       .then((failures) => {

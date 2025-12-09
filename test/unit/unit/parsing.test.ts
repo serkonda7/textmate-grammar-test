@@ -7,7 +7,7 @@ import { EOL } from 'os'
 
 describe('parseHeader', () => {
   it('should parse one character comment token', () => {
-    var result = parseHeader(['# SYNTAX TEST "scala"', '#'])
+    const result = parseHeader(['# SYNTAX TEST "scala"', '#'])
     expect(result).to.eql({
       commentToken: '#',
       description: '',
@@ -16,7 +16,7 @@ describe('parseHeader', () => {
   })
 
   it('should parse description', () => {
-    var result = parseHeader(['-- SYNTAX TEST "sql" "some description"'])
+    const result = parseHeader(['-- SYNTAX TEST "sql" "some description"'])
     expect(result).to.eql({
       commentToken: '--',
       description: 'some description',
@@ -176,13 +176,13 @@ describe('parseScopeAssertion', () => {
 
 describe('parseGrammarTestCase', () => {
   it('should parse a valid test case', () => {
-    let testFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
+    const testFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
     expect(parseGrammarTestCase(testFile)).to.eql(parserTestDhallExpectedResult)
   })
 
   it('should parse a test case with a windows line endings', () => {
-    let originalFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
-    let crlfFile = originalFile.replace(/\r?\n/g, '\n')
+    const originalFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
+    const crlfFile = originalFile.replace(/\r?\n/g, '\n')
     expect(parseGrammarTestCase(crlfFile)).to.eql(parserTestDhallExpectedResult)
   })
 })

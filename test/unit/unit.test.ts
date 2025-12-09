@@ -5,7 +5,7 @@ import * as fs from 'fs'
 import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/index'
 import { createRegistry } from '../../src/common/index'
 
-var registry = createRegistry([
+const registry = createRegistry([
   {
     scopeName: 'source.dhall',
     path: './test/resources/dhall.tmLanguage.json'

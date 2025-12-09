@@ -40,9 +40,7 @@ describe('snap test', () => {
       .then(() => {
         throw new Error('should have failed')
       })
-      .catch(({ stdout, stderr }) => {
-        // fs.writeFileSync('stderr.txt', stderr)
-        //  fs.writeFileSync('stdout.txt', stdout)
+      .catch(({ stdout }) => {
         expect(normalize(stdout)).to.eq(
           normalize(
             fs

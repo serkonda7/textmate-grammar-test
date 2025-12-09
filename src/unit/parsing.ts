@@ -4,13 +4,13 @@ import { EOL } from 'os'
 const leftArrowAssertRegex = /^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
 const upArrowAssertRegex = /^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
 
-export function parseScopeAssertion(testCaseLineNumber: number, commentLength: number, as: String): ScopeAssertion[] {
-  let s = as.slice(commentLength)
+export function parseScopeAssertion(testCaseLineNumber: number, commentLength: number, as: string): ScopeAssertion[] {
+  const s = as.slice(commentLength)
 
   if (s.trim().startsWith('^')) {
-    let upArrowMatch = upArrowAssertRegex.exec(s)
+    const upArrowMatch = upArrowAssertRegex.exec(s)
     if (upArrowMatch !== null) {
-      let [, , scopes = '', exclusions = ''] = upArrowMatch
+      const [, , scopes = '', exclusions = ''] = upArrowMatch
 
       if (scopes === '' && exclusions === '') {
         throw new Error(
@@ -39,10 +39,10 @@ export function parseScopeAssertion(testCaseLineNumber: number, commentLength: n
     }
   }
 
-  let leftArrowMatch = leftArrowAssertRegex.exec(s)
+  const leftArrowMatch = leftArrowAssertRegex.exec(s)
 
   if (leftArrowMatch !== null) {
-    let [, , tildas, dashes, scopes = '', exclusions = ''] = leftArrowMatch
+    const [, , tildas, dashes, scopes = '', exclusions = ''] = leftArrowMatch
     if (scopes === '' && exclusions === '') {
       throw new Error(
         `Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`
@@ -62,11 +62,11 @@ export function parseScopeAssertion(testCaseLineNumber: number, commentLength: n
   return []
 }
 
-let headerErrorMessage =
+const headerErrorMessage =
   `Expecting the first line in the syntax test file to be in the following format:${EOL}` +
-  `<comment character(s)> SYNTAX TEST \"<language identifier>\"  (\"description\")?${EOL}`
+  `<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?${EOL}`
 
-let headerRegex = /^([^\s]+)\s+SYNTAX\s+TEST\s+"([^"]+)"(?:\s+\"([^"]+)\")?\s*$/
+const headerRegex = /^([^\s]+)\s+SYNTAX\s+TEST\s+"([^"]+)"(?:\s+"([^"]+)")?\s*$/
 
 /**
  * parse the first line with the format:
@@ -77,12 +77,12 @@ export function parseHeader(as: string[]): TestCaseMetadata {
     throw new Error(headerErrorMessage)
   }
 
-  let matchResult = headerRegex.exec(as[0])
+  const matchResult = headerRegex.exec(as[0])
 
   if (matchResult === null) {
     throw new Error(headerErrorMessage)
   } else {
-    let [, commentToken, scope, description = ''] = matchResult
+    const [, commentToken, scope, description = ''] = matchResult
     return <TestCaseMetadata>{
       commentToken: commentToken,
       scope: scope,
@@ -92,12 +92,12 @@ export function parseHeader(as: string[]): TestCaseMetadata {
 }
 
 export function parseGrammarTestCase(str: string): GrammarTestCase {
-  let headerLength = 1
-  let lines = str.split(/\r\n|\n/)
-  let metadata = parseHeader(lines)
-  let { commentToken } = metadata
-  let rest = lines.slice(headerLength)
-  let commentTokenLength = commentToken.length
+  const headerLength = 1
+  const lines = str.split(/\r\n|\n/)
+  const metadata = parseHeader(lines)
+  const { commentToken } = metadata
+  const rest = lines.slice(headerLength)
+  const commentTokenLength = commentToken.length
 
   function isLineAssertion(s: string): boolean {
     return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
@@ -111,15 +111,15 @@ export function parseGrammarTestCase(str: string): GrammarTestCase {
     }
   }
 
-  var sourceLineNumber = 0
-  let lineAssertions = <Array<LineAssertion>>[]
-  var currentLineAssertion = emptyLineAssertion(headerLength, 0)
-  let source = <Array<string>>[]
+  let sourceLineNumber = 0
+  const lineAssertions = <Array<LineAssertion>>[]
+  let currentLineAssertion = emptyLineAssertion(headerLength, 0)
+  const source = <Array<string>>[]
   rest.forEach((s: string, i: number) => {
-    let tcLineNumber = headerLength + i
+    const tcLineNumber = headerLength + i
 
     if (s.startsWith(commentToken) && isLineAssertion(s)) {
-      let as = parseScopeAssertion(tcLineNumber, commentToken.length, s)
+      const as = parseScopeAssertion(tcLineNumber, commentToken.length, s)
       currentLineAssertion.scopeAssertions = [...currentLineAssertion.scopeAssertions, ...as]
     } else {
       if (currentLineAssertion.scopeAssertions.length !== 0) {
