@@ -18,17 +18,17 @@ export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 }
 
 export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarConfig; content: string }>): tm.Registry {
-  let grammarIndex: { [key: string]: tm.IRawGrammar } = {}
+  const grammarIndex: { [key: string]: tm.IRawGrammar } = {}
 
-  let _injections: { [scopeName: string]: string[] } = {}
+  const _injections: { [scopeName: string]: string[] } = {}
 
   for (const g of grammars) {
     const { grammar, content } = g
-    let rawGrammar = tm.parseRawGrammar(content, grammar.path)
+    const rawGrammar = tm.parseRawGrammar(content, grammar.path)
 
     grammarIndex[grammar.scopeName || rawGrammar.scopeName] = rawGrammar
     if (grammar.injectTo) {
-      for (let injectScope of grammar.injectTo) {
+      for (const injectScope of grammar.injectTo) {
         let injections = _injections[injectScope]
         if (!injections) {
           _injections[injectScope] = injections = []
@@ -42,10 +42,10 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
   const wasmBin = fs.readFileSync(wasmPath).buffer
   const vscodeOnigurumaLib = oniguruma.loadWASM(wasmBin).then(() => {
     return {
-      createOnigScanner(patterns: any) {
+      createOnigScanner(patterns: string[]) {
         return new oniguruma.OnigScanner(patterns)
       },
-      createOnigString(s: any) {
+      createOnigString(s: string) {
         return new oniguruma.OnigString(s)
       }
     }
@@ -55,7 +55,7 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
     onigLib: vscodeOnigurumaLib,
     loadGrammar: (scopeName) => {
       if (grammarIndex[scopeName] !== undefined) {
-        return new Promise((fulfill, _) => {
+        return new Promise((fulfill) => {
           fulfill(grammarIndex[scopeName])
         })
       }
@@ -75,14 +75,14 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
 }
 
 export function loadConfiguration(
-  config: any,
-  scope: any,
-  grammar: any
+  config: string,
+  scope: string | undefined,
+  grammar: string[] | undefined
 ): { grammars: IGrammarConfig[]; extensionToScope: (ext: string) => string | undefined } {
   const configPath = config || 'package.json'
 
-  let grammars: IGrammarConfig[] = []
-  let extensionToScope: (ext: string) => string | undefined = (_) => scope || undefined
+  const grammars: IGrammarConfig[] = []
+  let extensionToScope: (ext: string) => string | undefined = () => scope || undefined
 
   if (grammar) {
     const xs = grammar.map((path: string) => ({ path, scopeName: '' }))
@@ -91,20 +91,20 @@ export function loadConfiguration(
 
   if (fs.existsSync(configPath)) {
     const json = JSON.parse(fs.readFileSync(configPath).toString())
-    let xs: [IGrammarConfig] = json?.contributes?.grammars || []
+    const xs: [IGrammarConfig] = json?.contributes?.grammars || []
     const dirPath = path.dirname(configPath)
     xs.forEach((x) => {
       x.path = path.join(dirPath, x.path)
     })
     grammars.push(...xs)
 
-    let ys = json?.contributes?.languages || []
+    const ys = json?.contributes?.languages || []
 
-    let langToScope = Object.assign(
+    const langToScope = Object.assign(
       {},
       ...grammars.filter((x) => x.language).map((x) => ({ [x.language || '']: x.scopeName }))
     )
-    let extToLang = Object.assign(
+    const extToLang = Object.assign(
       {},
       ...ys.map((x: any) => (x.extensions || []).map((e: any) => ({ [e]: x.id }))).flat()
     )

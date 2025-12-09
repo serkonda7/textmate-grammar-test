@@ -14,14 +14,14 @@ export async function runGrammarTestCase(registry: tm.Registry, testCase: Gramma
 
     let ruleStack = tm.INITIAL
 
-    let failures: TestFailure[] = []
+    const failures: TestFailure[] = []
 
     testCase.source.forEach((line: string, n: number) => {
-      var { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
+      const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
       ruleStack = ruleStack1
 
       if (assertions[n] !== undefined) {
-        let { testCaseLineNumber, scopeAssertions } = assertions[n]
+        const { testCaseLineNumber, scopeAssertions } = assertions[n]
 
         scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
           const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)

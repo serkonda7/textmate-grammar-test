@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import * as fs from 'fs'
-import * as tty from 'tty'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
@@ -11,8 +10,7 @@ import { getVSCodeTokens, renderSnap, parseSnap, AnnotatedLine } from './snapsho
 import * as diff from 'diff'
 import * as path from 'path'
 import Bottleneck from 'bottleneck'
-
-let packageJson = require('../package.json')
+import { VERSION } from './common/version'
 
 program
   .description('Run VSCode textmate grammar snapshot tests')
@@ -27,7 +25,7 @@ program
     []
   )
   .option('-s, --scope <scope>', 'Explicitly specify scope of testcases, e.g. source.dhall')
-  .version(packageJson.version)
+  .version(VERSION)
   .argument(
     '<testcases...>',
     'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!'
@@ -35,8 +33,6 @@ program
   .parse(process.argv)
 
 const options = program.opts()
-
-let isatty = tty.isatty(1) && tty.isatty(2)
 
 const symbols = {
   ok: '✓',
@@ -52,12 +48,6 @@ if (process.platform === 'win32') {
   symbols.dot = '.'
 }
 
-let terminalWidth = 75
-
-if (isatty) {
-  terminalWidth = (process.stdout as tty.WriteStream).getWindowSize()[0]
-}
-
 const TestFailed = -1
 const TestSuccessful = 0
 const Padding = '  '
@@ -71,7 +61,7 @@ if (testCases.length === 0) {
   process.exit(-1)
 }
 
-let { grammars, extensionToScope } = loadConfiguration(options.config, options.scope, options.grammar)
+const { grammars, extensionToScope } = loadConfiguration(options.config, options.scope, options.grammar)
 
 const limiter = new Bottleneck({
   maxConcurrent: 8,
@@ -150,8 +140,8 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 
   // renderSnap won't produce assertions for empty lines, so we'll remove them here
   // for both actual end expected
-  let actual1 = actual.filter((a) => a.src.trim().length > 0)
-  let expected1 = expected.filter((a) => a.src.trim().length > 0)
+  const actual1 = actual.filter((a) => a.src.trim().length > 0)
+  const expected1 = expected.filter((a) => a.src.trim().length > 0)
 
   const wrongLines = flatten(
     expected1.map((exp, i) => {
@@ -199,7 +189,7 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
             }
 
             const tchanges = changes.map((change) => {
-              let changeType = change.added ? Added : change.removed ? Removed : NotModified
+              const changeType = change.added ? Added : change.removed ? Removed : NotModified
               return <TChange>{
                 text: change.value.join(' '),
                 changeType: changeType
@@ -257,7 +247,7 @@ function printDiffInline(wrongLines: [TChanges[], string, number][]) {
       const change = tchanges.changes
         .filter((c) => options.printNotModified || c.changeType !== NotModified)
         .map((c) => {
-          let color = c.changeType === Added ? chalk.green : c.changeType === Removed ? chalk.red : chalk.gray
+          const color = c.changeType === Added ? chalk.green : c.changeType === Removed ? chalk.red : chalk.gray
           return color(c.text)
         })
         .join(' ')
@@ -316,7 +306,7 @@ const NotModified = 0
 const Removed = 1
 const Added = 2
 
-function printSourceLine(line: String, n: number): number {
+function printSourceLine(line: string, n: number): number {
   const pos = n + 1 + ': '
 
   console.log(Padding + chalk.gray(pos) + line)
@@ -329,8 +319,8 @@ function printAccents(offset: number, from: number, to: number, diff: string) {
 }
 
 function printAccents1(offset: number, from: number, to: number, diff: string, change: number) {
-  let color = change === Added ? chalk.green : change === Removed ? chalk.red : chalk.gray
-  let prefix = change === Added ? '++' : change === Removed ? '--' : '  '
+  const color = change === Added ? chalk.green : change === Removed ? chalk.red : chalk.gray
+  const prefix = change === Added ? '++' : change === Removed ? '--' : '  '
   const accents = color(' '.repeat(from) + '^'.repeat(to - from))
   console.log(color(prefix) + ' '.repeat(offset) + accents + ' ' + diff)
 }

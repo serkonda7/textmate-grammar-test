@@ -12,8 +12,8 @@ export async function getVSCodeTokens(registry: tm.Registry, scope: string, sour
 
     let ruleStack = tm.INITIAL
 
-    return source.split(/\r\n|\n/).map((line: string, n: number) => {
-      var { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
+    return source.split(/\r\n|\n/).map((line: string) => {
+      const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
       ruleStack = ruleStack1
 
       return <AnnotatedLine>{
