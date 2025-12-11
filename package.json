@@ -30,7 +30,8 @@
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
     "lint": "bunx eslint .",
-    "build": "bunx tsc"
+    "check": "bunx tsc",
+    "build": "bun run check && bun build src/*.ts --outdir dist"
   },
   "engines": {
     "node": ">=20"

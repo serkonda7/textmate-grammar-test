@@ -18,7 +18,6 @@ import {
 import { createRegistry, loadConfiguration } from './common/index'
 import { VERSION } from './common/version'
 
-
 function collectGrammarOpts(value: string, previous: string[]): string[] {
   return previous.concat([value])
 }
