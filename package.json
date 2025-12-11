@@ -1,7 +1,7 @@
 {
   "name": "textmate-grammar-test",
   "description": "Test runner for VSCode textmate grammars",
-  "version": "0.2.1",
+  "version": "0.2.2-dev",
   "license": "MIT",
   "author": "serkonda7",
   "homepage": "https://github.com/serkonda7/textmate-grammar-test",
@@ -29,13 +29,13 @@
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
-    "lint": "pnpm eslint .",
-    "build": "npx tsc"
+    "lint": "bunx eslint .",
+    "build": "bunx tsc"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
+  "packageManager": "bun@1.3.4",
   "dependencies": {
     "bottleneck": "^2.19.5",
     "chalk": "^2.4.2",

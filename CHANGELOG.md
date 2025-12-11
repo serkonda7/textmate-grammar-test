@@ -1,4 +1,10 @@
 # Changelog
+## 0.2.2
+_unreleased_
+
+- build: Replace pnpm with bun
+
+
 ## 0.2.1
 _2025-12-09_
 

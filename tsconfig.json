@@ -1,12 +1,17 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES2021",
+"compilerOptions": {
+    "target": "es2021",
     "outDir": "./dist",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "sourceMap": true,
-    "declaration": true,
-    "strict": true
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*",
+  ],
 }
