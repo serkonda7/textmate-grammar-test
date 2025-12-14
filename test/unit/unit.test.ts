@@ -2,8 +2,8 @@
 import { expect } from 'chai'
 import * as fs from 'fs'
 
-import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/index'
-import { createRegistry } from '../../src/common/index'
+import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/index.ts'
+import { createRegistry } from '../../src/common/index.ts'
 
 const registry = createRegistry([
   {

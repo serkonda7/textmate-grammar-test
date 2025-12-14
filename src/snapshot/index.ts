@@ -1,8 +1,8 @@
 import * as tm from 'vscode-textmate'
-import { AnnotatedLine } from './model'
-import { parseSnap, renderSnap } from './parsing'
+import { AnnotatedLine } from './model.ts'
+import { parseSnap, renderSnap } from './parsing.ts'
 
-export { parseSnap, renderSnap, AnnotatedLine }
+export { parseSnap, renderSnap }
 
 export async function getVSCodeTokens(registry: tm.Registry, scope: string, source: string): Promise<AnnotatedLine[]> {
   return registry.loadGrammar(scope).then((grammar: tm.IGrammar | null) => {

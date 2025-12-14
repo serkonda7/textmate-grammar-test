@@ -1,4 +1,4 @@
-import { AnnotatedLine, IToken } from './model'
+import { AnnotatedLine, IToken } from './model.ts'
 
 export function parseSnap(s: string): AnnotatedLine[] {
   const result: AnnotatedLine[] = []

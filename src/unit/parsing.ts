@@ -1,4 +1,4 @@
-import { ScopeAssertion, TestCaseMetadata, LineAssertion, GrammarTestCase } from './model'
+import type { ScopeAssertion, TestCaseMetadata, LineAssertion, GrammarTestCase } from './model.ts'
 import { EOL } from 'os'
 
 const leftArrowAssertRegex = /^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
@@ -24,12 +24,12 @@ export function parseScopeAssertion(testCaseLineNumber: number, commentLength: n
           while (s[endIndx + 1] === '^') {
             endIndx++
           }
-          result.push(<ScopeAssertion>{
+          result.push({
             from: commentLength + startIdx,
             to: commentLength + endIndx + 1,
             scopes: scopes.split(/\s+/).filter((x) => x),
             exclude: exclusions.split(/\s+/).filter((x) => x)
-          })
+          } as ScopeAssertion)
           startIdx = s.indexOf('^', endIndx + 1)
         }
         return result
@@ -83,11 +83,11 @@ export function parseHeader(as: string[]): TestCaseMetadata {
     throw new Error(headerErrorMessage)
   } else {
     const [, commentToken, scope, description = ''] = matchResult
-    return <TestCaseMetadata>{
+    return {
       commentToken: commentToken,
       scope: scope,
       description: description
-    }
+    } as TestCaseMetadata
   }
 }
 
@@ -104,17 +104,17 @@ export function parseGrammarTestCase(str: string): GrammarTestCase {
   }
 
   function emptyLineAssertion(tcLineNumber: number, srcLineNumber: number): LineAssertion {
-    return <LineAssertion>{
+    return {
       testCaseLineNumber: tcLineNumber,
       sourceLineNumber: srcLineNumber,
       scopeAssertions: []
-    }
+    } as LineAssertion
   }
 
   let sourceLineNumber = 0
-  const lineAssertions = <Array<LineAssertion>>[]
+  const lineAssertions = [] as LineAssertion[]
   let currentLineAssertion = emptyLineAssertion(headerLength, 0)
-  const source = <Array<string>>[]
+  const source = [] as string[]
   rest.forEach((s: string, i: number) => {
     const tcLineNumber = headerLength + i
 
@@ -134,9 +134,9 @@ export function parseGrammarTestCase(str: string): GrammarTestCase {
     lineAssertions.push(currentLineAssertion)
   }
 
-  return <GrammarTestCase>{
+  return {
     metadata: metadata,
     source: source,
     assertions: lineAssertions
-  }
+  } as GrammarTestCase
 }

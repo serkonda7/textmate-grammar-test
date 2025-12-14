@@ -2,7 +2,7 @@ import child_process from 'child_process'
 import { expect } from 'chai'
 import fs from 'fs'
 import util from 'util'
-import { normalize } from '../helpers.test'
+import { normalize } from '../helpers.test.ts'
 
 const exec = util.promisify(child_process.exec)
 

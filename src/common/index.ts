@@ -1,10 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import * as tm from 'vscode-textmate'
-import * as oniguruma from 'vscode-oniguruma'
-import { IGrammarConfig } from './model'
-
-export { IGrammarConfig }
+import tm from 'vscode-textmate'
+import oniguruma from 'vscode-oniguruma'
+import type { IGrammarConfig } from './model.ts'
 
 export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
   return createRegistryFromGrammars(
@@ -38,7 +36,8 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
     }
   }
 
-  const wasmPath = require.resolve('vscode-oniguruma').replace(/main\.js$/, 'onig.wasm')
+  const wasmUrl = new URL(import.meta.resolve('vscode-oniguruma'))
+  const wasmPath = wasmUrl.pathname.replace(/main\.js$/, 'onig.wasm')
   const wasmBin = fs.readFileSync(wasmPath).buffer
   const vscodeOnigurumaLib = oniguruma.loadWASM(wasmBin).then(() => {
     return {
@@ -51,7 +50,7 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
     }
   })
 
-  return new tm.Registry(<tm.RegistryOptions>{
+  return new tm.Registry({
     onigLib: vscodeOnigurumaLib,
     loadGrammar: (scopeName) => {
       if (grammarIndex[scopeName] !== undefined) {
@@ -71,7 +70,7 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
       }
       return injections
     }
-  })
+  } as tm.RegistryOptions)
 }
 
 export function loadConfiguration(

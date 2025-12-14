@@ -27,7 +27,7 @@
     "textmate-grammar-snap": "./dist/snapshot.js"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
+    "test": "mocha \"test/**/*.test.ts\"",
     "format": "prettier --config .prettierrc \"src/**/*.ts\" \"test/**/*.ts\" --write",
     "lint": "bunx eslint .",
     "check": "bunx tsc",

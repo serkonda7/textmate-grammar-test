@@ -4,13 +4,13 @@ import * as fs from 'fs'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
-import { createRegistry, loadConfiguration } from './common/index'
+import { createRegistry, loadConfiguration } from './common/index.ts'
 import { EOL } from 'os'
-import { getVSCodeTokens, renderSnap, parseSnap, AnnotatedLine } from './snapshot/index'
+import { getVSCodeTokens, renderSnap, parseSnap, AnnotatedLine } from './snapshot/index.ts'
 import * as diff from 'diff'
 import * as path from 'path'
 import Bottleneck from 'bottleneck'
-import { VERSION } from './common/version'
+import { VERSION } from './common/version.ts'
 
 program
   .description('Run VSCode textmate grammar snapshot tests')
@@ -153,30 +153,30 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
       const removed = exp.tokens
         .filter((t) => actTokenMap[`${t.startIndex}:${t.startIndex}`] === undefined)
         .map((t) => {
-          return <TChanges>{
+          return {
             changes: [
-              <TChange>{
+              {
                 text: t.scopes.join(' '),
                 changeType: Removed
               }
             ],
             from: t.startIndex,
             to: t.endIndex
-          }
+          } as TChanges
         })
       const added = act.tokens
         .filter((t) => expTokenMap[`${t.startIndex}:${t.startIndex}`] === undefined)
         .map((t) => {
-          return <TChanges>{
+          return {
             changes: [
-              <TChange>{
+              {
                 text: t.scopes.join(' '),
                 changeType: Added
               }
             ],
             from: t.startIndex,
             to: t.endIndex
-          }
+          } as TChanges
         })
 
       const modified = flatten(
@@ -190,17 +190,17 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 
             const tchanges = changes.map((change) => {
               const changeType = change.added ? Added : change.removed ? Removed : NotModified
-              return <TChange>{
+              return {
                 text: change.value.join(' '),
                 changeType: changeType
               }
             })
             return [
-              <TChanges>{
+              {
                 changes: tchanges,
                 from: a.startIndex,
                 to: a.endIndex
-              }
+              } as TChanges
             ]
           } else {
             return []

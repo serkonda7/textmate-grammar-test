@@ -4,7 +4,7 @@ import * as p from 'path'
 import * as tty from 'tty'
 import { EOL } from 'os'
 import { sep } from 'path'
-import { GrammarTestCase, LineAssertion, TestFailure } from './model'
+import type { GrammarTestCase, LineAssertion, TestFailure } from './model.ts'
 
 export interface Reporter {
   reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void

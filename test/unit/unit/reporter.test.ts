@@ -6,8 +6,8 @@ import * as p from 'path'
 import * as os from 'os'
 import { parseStringPromise } from 'xml2js'
 
-import { Reporter, XunitGenericReporter, XunitGitlabReporter } from '../../../src/unit/reporter'
-import { LineAssertion, TestCaseMetadata, TestFailure } from '../../../src/unit/model'
+import { Reporter, XunitGenericReporter, XunitGitlabReporter } from '../../../src/unit/reporter.ts'
+import { LineAssertion, TestCaseMetadata, TestFailure } from '../../../src/unit/model.ts'
 
 const sep = p.sep
 

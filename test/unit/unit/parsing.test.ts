@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import * as fs from 'fs'
 
-import { parseHeader, parseScopeAssertion, parseGrammarTestCase } from '../../../src/unit/parsing'
+import { parseHeader, parseScopeAssertion, parseGrammarTestCase } from '../../../src/unit/parsing.ts'
 import { EOL } from 'os'
 
 describe('parseHeader', () => {

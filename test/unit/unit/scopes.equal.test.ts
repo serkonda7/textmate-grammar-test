@@ -1,7 +1,7 @@
 'use strict'
 import { expect } from 'chai'
 
-import { missingScopes_ } from '../../../src/unit/index'
+import { missingScopes_ } from '../../../src/unit/index.ts'
 
 // FIXME: move somewhere..
 describe('scopesEqual_', () => {

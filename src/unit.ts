@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import Bottleneck from 'bottleneck'
-import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase } from './unit/index'
+import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase } from './unit/index.ts'
 import {
   Reporter,
   CompositeReporter,
@@ -13,10 +13,10 @@ import {
   ConsoleFullReporter,
   XunitGenericReporter,
   XunitGitlabReporter
-} from './unit/reporter'
+} from './unit/reporter.ts'
 
-import { createRegistry, loadConfiguration } from './common/index'
-import { VERSION } from './common/version'
+import { createRegistry, loadConfiguration } from './common/index.ts'
+import { VERSION } from './common/version.ts'
 
 function collectGrammarOpts(value: string, previous: string[]): string[] {
   return previous.concat([value])
