@@ -3,6 +3,7 @@
 _unreleased_
 
 - refac(deps): Replace Bottleneck with p-limit
+- test(deps): Replace xml2js with fast-xml-parser
 - build: Replace pnpm with bun
 - build: Replace eslint and prettier with biome
 - chore(deps): Update chalk, diff
