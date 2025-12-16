@@ -1,8 +1,8 @@
-import * as tm from 'vscode-textmate'
-import { GrammarTestCase, TestFailure } from './model'
-import { parseGrammarTestCase } from './parsing'
+import tm from 'vscode-textmate'
+import type { GrammarTestCase, TestFailure } from './model.ts'
+import { parseGrammarTestCase } from './parsing.ts'
 
-export { parseGrammarTestCase, GrammarTestCase, TestFailure, missingScopes_ }
+export { parseGrammarTestCase, missingScopes_ }
 
 export async function runGrammarTestCase(registry: tm.Registry, testCase: GrammarTestCase): Promise<TestFailure[]> {
   return registry.loadGrammar(testCase.metadata.scope).then((grammar: tm.IGrammar | null) => {
@@ -26,7 +26,7 @@ export async function runGrammarTestCase(registry: tm.Registry, testCase: Gramma
         scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
           const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
           if (xs.length === 0 && requiredScopes.length > 0) {
-            failures.push(<TestFailure>{
+            failures.push({
               missing: requiredScopes,
               unexpected: [],
               actual: [],
@@ -34,7 +34,7 @@ export async function runGrammarTestCase(registry: tm.Registry, testCase: Gramma
               srcLine: n,
               start: from,
               end: to
-            })
+            } as TestFailure)
           } else {
             xs.forEach((token) => {
               const unexpected = excludedScopes.filter((s) => {
@@ -43,7 +43,7 @@ export async function runGrammarTestCase(registry: tm.Registry, testCase: Gramma
               const missing = missingScopes_(requiredScopes, token.scopes)
 
               if (missing.length || unexpected.length) {
-                failures.push(<TestFailure>{
+                failures.push({
                   missing: missing,
                   actual: token.scopes,
                   unexpected: unexpected,
@@ -51,7 +51,7 @@ export async function runGrammarTestCase(registry: tm.Registry, testCase: Gramma
                   srcLine: n,
                   start: token.startIndex,
                   end: token.endIndex
-                })
+                } as TestFailure)
               }
             })
           }

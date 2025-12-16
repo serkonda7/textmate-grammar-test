@@ -1,4 +1,5 @@
-import { AnnotatedLine, IToken } from './model'
+import type { AnnotatedLine } from './model.ts'
+import tm from 'vscode-textmate'
 
 export function parseSnap(s: string): AnnotatedLine[] {
   const result: AnnotatedLine[] = []
@@ -9,7 +10,7 @@ export function parseSnap(s: string): AnnotatedLine[] {
     if (l.startsWith('>')) {
       const src = l.substring(1)
       i++
-      const tokens: IToken[] = []
+      const tokens: tm.IToken[] = []
       while (i < ls.length && ls[i].startsWith('#')) {
         const startIndex = ls[i].indexOf('^')
         const endIndex = ls[i].indexOf(' ', startIndex)
@@ -17,7 +18,7 @@ export function parseSnap(s: string): AnnotatedLine[] {
           .substring(endIndex + 1)
           .split(/\s+/)
           .filter((x) => x !== '')
-        tokens.push(<IToken>{
+        tokens.push({
           startIndex: startIndex - 1,
           endIndex: endIndex - 1,
           scopes: scopes
