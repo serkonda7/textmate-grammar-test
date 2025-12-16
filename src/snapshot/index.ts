@@ -1,5 +1,5 @@
-import * as tm from 'vscode-textmate'
-import { AnnotatedLine } from './model.ts'
+import tm from 'vscode-textmate'
+import type { AnnotatedLine } from './model.ts'
 import { parseSnap, renderSnap } from './parsing.ts'
 
 export { parseSnap, renderSnap }

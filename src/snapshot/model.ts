@@ -1,6 +1,6 @@
-import { IToken } from 'vscode-textmate'
+import tm from 'vscode-textmate'
 
 export interface AnnotatedLine {
   src: string
-  tokens: [IToken]
+  tokens: [tm.IToken]
 }

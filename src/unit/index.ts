@@ -1,4 +1,4 @@
-import * as tm from 'vscode-textmate'
+import tm from 'vscode-textmate'
 import type { GrammarTestCase, TestFailure } from './model.ts'
 import { parseGrammarTestCase } from './parsing.ts'
 

@@ -5,7 +5,8 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import Bottleneck from 'bottleneck'
-import { runGrammarTestCase, parseGrammarTestCase, GrammarTestCase } from './unit/index.ts'
+import { runGrammarTestCase, parseGrammarTestCase } from './unit/index.ts'
+import type { GrammarTestCase } from './unit/model.ts'
 import {
   Reporter,
   CompositeReporter,

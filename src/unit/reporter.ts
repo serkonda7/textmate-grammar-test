@@ -58,8 +58,11 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
   // follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd
   // produces report in a way which looks nice when viewed in GitLab CI/CD web GUI, but is not neccesarily semantically correct
   private suites: XunitSuite[] = []
+  private reportPath: string
 
-  constructor(private reportPath: string) {}
+  constructor(reportPath: string) {
+    this.reportPath = reportPath
+  }
 
   abstract reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void
 
