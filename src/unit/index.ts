@@ -5,81 +5,81 @@ import { parseGrammarTestCase } from './parsing.ts'
 export { parseGrammarTestCase, missingScopes_ }
 
 export async function runGrammarTestCase(registry: tm.Registry, testCase: GrammarTestCase): Promise<TestFailure[]> {
-  return registry.loadGrammar(testCase.metadata.scope).then((grammar: tm.IGrammar | null) => {
-    if (!grammar) {
-      throw new Error(`Could not load scope ${testCase.metadata.scope}`)
-    }
+	return registry.loadGrammar(testCase.metadata.scope).then((grammar: tm.IGrammar | null) => {
+		if (!grammar) {
+			throw new Error(`Could not load scope ${testCase.metadata.scope}`)
+		}
 
-    const assertions = toMap((x) => x.sourceLineNumber, testCase.assertions)
+		const assertions = toMap((x) => x.sourceLineNumber, testCase.assertions)
 
-    let ruleStack = tm.INITIAL
+		let ruleStack = tm.INITIAL
 
-    const failures: TestFailure[] = []
+		const failures: TestFailure[] = []
 
-    testCase.source.forEach((line: string, n: number) => {
-      const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
-      ruleStack = ruleStack1
+		testCase.source.forEach((line: string, n: number) => {
+			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
+			ruleStack = ruleStack1
 
-      if (assertions[n] !== undefined) {
-        const { testCaseLineNumber, scopeAssertions } = assertions[n]
+			if (assertions[n] !== undefined) {
+				const { testCaseLineNumber, scopeAssertions } = assertions[n]
 
-        scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
-          const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
-          if (xs.length === 0 && requiredScopes.length > 0) {
-            failures.push({
-              missing: requiredScopes,
-              unexpected: [],
-              actual: [],
-              line: testCaseLineNumber,
-              srcLine: n,
-              start: from,
-              end: to
-            } as TestFailure)
-          } else {
-            xs.forEach((token) => {
-              const unexpected = excludedScopes.filter((s) => {
-                return token.scopes.includes(s)
-              })
-              const missing = missingScopes_(requiredScopes, token.scopes)
+				scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
+					const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
+					if (xs.length === 0 && requiredScopes.length > 0) {
+						failures.push({
+							missing: requiredScopes,
+							unexpected: [],
+							actual: [],
+							line: testCaseLineNumber,
+							srcLine: n,
+							start: from,
+							end: to,
+						} as TestFailure)
+					} else {
+						xs.forEach((token) => {
+							const unexpected = excludedScopes.filter((s) => {
+								return token.scopes.includes(s)
+							})
+							const missing = missingScopes_(requiredScopes, token.scopes)
 
-              if (missing.length || unexpected.length) {
-                failures.push({
-                  missing: missing,
-                  actual: token.scopes,
-                  unexpected: unexpected,
-                  line: testCaseLineNumber,
-                  srcLine: n,
-                  start: token.startIndex,
-                  end: token.endIndex
-                } as TestFailure)
-              }
-            })
-          }
-        })
-      }
-    })
-    return failures
-  })
+							if (missing.length || unexpected.length) {
+								failures.push({
+									missing: missing,
+									actual: token.scopes,
+									unexpected: unexpected,
+									line: testCaseLineNumber,
+									srcLine: n,
+									start: token.startIndex,
+									end: token.endIndex,
+								} as TestFailure)
+							}
+						})
+					}
+				})
+			}
+		})
+		return failures
+	})
 }
 
 function missingScopes_(rs: string[], as: string[]): string[] {
-  let i = 0,
-    j = 0
-  while (i < as.length && j < rs.length) {
-    if (as[i] === rs[j]) {
-      i++
-      j++
-    } else {
-      i++
-    }
-  }
+	let i = 0,
+		j = 0
+	while (i < as.length && j < rs.length) {
+		if (as[i] === rs[j]) {
+			i++
+			j++
+		} else {
+			i++
+		}
+	}
 
-  return j === rs.length ? [] : rs.slice(j)
+	return j === rs.length ? [] : rs.slice(j)
 }
 
 function toMap<T>(f: (x: T) => number, xs: T[]): { [key: number]: T } {
-  return xs.reduce((m: { [key: number]: T }, x: T) => {
-    m[f(x)] = x
-    return m
-  }, {})
+	return xs.reduce((m: { [key: number]: T }, x: T) => {
+		m[f(x)] = x
+		return m
+	}, {})
 }
