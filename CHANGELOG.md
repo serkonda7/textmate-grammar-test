@@ -2,7 +2,7 @@
 ## 0.2.2
 _unreleased_
 
-- build/refac: Replace Bottleneck with p-limit
+- refac(deps): Replace Bottleneck with p-limit
 - build: Replace pnpm with bun
 - build: Replace eslint and prettier with biome
 - chore(deps): Update chalk, diff
