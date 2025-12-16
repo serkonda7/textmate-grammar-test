@@ -1,12 +1,10 @@
-#!/usr/bin/env node
-
-import Bottleneck from 'bottleneck'
 import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
 import * as fs from 'fs'
 import { globSync } from 'glob'
 import { EOL } from 'os'
+import pLimit from 'p-limit'
 import * as path from 'path'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
@@ -52,6 +50,7 @@ if (process.platform === 'win32') {
 const TestFailed = -1
 const TestSuccessful = 0
 const Padding = '  '
+const MAX_CONCURRENT_TESTS = 8
 
 const rawTestCases = program.args.flatMap((x) => globSync(x))
 
@@ -64,10 +63,7 @@ if (testCases.length === 0) {
 
 const { grammars, extensionToScope } = loadConfiguration(options.config, options.scope, options.grammar)
 
-const limiter = new Bottleneck({
-	maxConcurrent: 8,
-	minTime: 0,
-})
+const limit = pLimit(MAX_CONCURRENT_TESTS)
 
 const registry = createRegistry(grammars)
 const testResults: Promise<number[]> = Promise.all(
@@ -79,8 +75,7 @@ const testResults: Promise<number[]> = Promise.all(
 			console.log('No scope is associated with the file.')
 			return TestFailed
 		}
-		return limiter
-			.schedule(() => getVSCodeTokens(registry, scope, src))
+		return limit(() => getVSCodeTokens(registry, scope, src))
 			.then((tokens) => {
 				if (fs.existsSync(filename + '.snap')) {
 					if (options.updateSnapshot) {

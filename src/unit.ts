@@ -1,10 +1,8 @@
-#!/usr/bin/env node
-
-import Bottleneck from 'bottleneck'
 import chalk from 'chalk'
 import { program } from 'commander'
 import * as fs from 'fs'
 import { globSync } from 'glob'
+import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { parseGrammarTestCase, runGrammarTestCase } from './unit/index.ts'
@@ -51,6 +49,7 @@ const options = program.opts()
 
 const TestFailed = -1
 const TestSuccessful = 0
+const MAX_CONCURRENT_TESTS = 8
 
 const { grammars } = loadConfiguration(options.config, options.scope, options.grammar)
 const registry = createRegistry(grammars)
@@ -80,10 +79,7 @@ if (rawTestCases.length === 0) {
 	process.exit(-1)
 }
 
-const limiter = new Bottleneck({
-	maxConcurrent: 8,
-	minTime: 0,
-})
+const limit = pLimit(MAX_CONCURRENT_TESTS)
 
 const testResults: Promise<number[]> = Promise.all(
 	rawTestCases.map((filename): Promise<number> => {
@@ -97,8 +93,7 @@ const testResults: Promise<number[]> = Promise.all(
 			})
 		}
 		const testCase = tc as GrammarTestCase
-		return limiter
-			.schedule(() => runGrammarTestCase(registry, testCase))
+		return limit(() => runGrammarTestCase(registry, testCase))
 			.then((failures) => {
 				reporter.reportTestResult(filename, testCase, failures)
 				return failures.length === 0 ? TestSuccessful : TestFailed
