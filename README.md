@@ -6,6 +6,11 @@
 Write unit or snapshot tests for TextMate grammars validated against the VS Code TextMate engine.
 
 
+## Why this fork exists
+The original [vscode-tmgrammar-test](https://github.com/PanAeon/vscode-tmgrammar-test) seems no longer maintained.
+This fork addresses key points like dependency updates, technical debt and reported bugs.
+
+
 ## Installation
 
 As a project dependency:
