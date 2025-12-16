@@ -1,6 +1,6 @@
-import tm from 'vscode-textmate'
+import type tm from 'vscode-textmate'
 
 export interface AnnotatedLine {
-  src: string
-  tokens: [tm.IToken]
+	src: string
+	tokens: [tm.IToken]
 }
