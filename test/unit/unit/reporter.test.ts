@@ -2,12 +2,24 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as p from 'node:path'
 import { expect } from 'chai'
-import { parseStringPromise } from 'xml2js'
+import { XMLParser } from 'fast-xml-parser'
 import type { LineAssertion, TestCaseMetadata, TestFailure } from '../../../src/unit/model.ts'
 import type { Reporter } from '../../../src/unit/reporter.ts'
 import { XunitGenericReporter, XunitGitlabReporter } from '../../../src/unit/reporter.ts'
 
 const sep = p.sep
+
+const xmlParser = new XMLParser({
+	ignoreAttributes: false,
+	attributeNamePrefix: '',
+	textNodeName: '_',
+	attributesGroupName: '$',
+	parseAttributeValue: false,
+	parseTagValue: false,
+	preserveOrder: false,
+	trimValues: false,
+	isArray: (tagName, jPath, isLeafNode, isAttribute) => ['testcase', 'failure', 'error'].includes(tagName),
+})
 
 describe('XUnit reporters', () => {
 	let reportsDir: string
@@ -50,7 +62,7 @@ describe('XUnit reporters', () => {
 
 			assertReportFiles('TEST-file1.xml', 'TEST-file2.xml')
 
-			const xml1 = await readReport('TEST-file1.xml')
+			const xml1 = readReport('TEST-file1.xml')
 			expect(xml1.testsuite.$.name).eq('case 1 description')
 			expect(xml1.testsuite.$.tests).eq('2')
 			expect(xml1.testsuite.$.failures).eq('0')
@@ -58,7 +70,7 @@ describe('XUnit reporters', () => {
 			expect(xml1.testsuite.testcase[0].$.name).eq('file1:1')
 			expect(xml1.testsuite.testcase[1].$.name).eq('file1:2')
 
-			const xml2 = await readReport('TEST-file2.xml')
+			const xml2 = readReport('TEST-file2.xml')
 			expect(xml2.testsuite.$.name).eq('file2')
 			expect(xml2.testsuite.$.tests).eq('1')
 			expect(xml2.testsuite.$.failures).eq('0')
@@ -98,15 +110,15 @@ describe('XUnit reporters', () => {
 
 			assertReportFiles('TEST-file1.xml', 'TEST-dir1.file2.xml', 'TEST-dir1.dir2.file3.xml')
 
-			const xml1 = await readReport('TEST-file1.xml')
+			const xml1 = readReport('TEST-file1.xml')
 			expect(xml1.testsuite.$.name).eq('file1')
 			expect(xml1.testsuite.testcase[0].$.name).eq('file1:1')
 
-			const xml2 = await readReport('TEST-dir1.file2.xml')
+			const xml2 = readReport('TEST-dir1.file2.xml')
 			expect(xml2.testsuite.$.name).eq('case 2 description')
 			expect(xml2.testsuite.testcase[0].$.name).eq(`dir1${sep}file2:2`)
 
-			const xml3 = await readReport('TEST-dir1.dir2.file3.xml')
+			const xml3 = readReport('TEST-dir1.dir2.file3.xml')
 			expect(xml3.testsuite.$.name).eq(`dir1${sep}dir2${sep}file3`)
 			expect(xml3.testsuite.testcase[0].$.name).eq(`dir1${sep}dir2${sep}file3:3`)
 		})
@@ -126,7 +138,7 @@ describe('XUnit reporters', () => {
 			)
 			reporter.reportSuiteResult()
 
-			const xml = await readReport('TEST-file.xml')
+			const xml = readReport('TEST-file.xml')
 			expect(xml.testsuite.testcase[0].failure[0]._).eq(
 				[
 					'1: xml hell " \' < > &', // the escapes were converted back to regular chars by the xml lib when parsing
@@ -166,7 +178,7 @@ describe('XUnit reporters', () => {
 
 			assertReportFiles('TEST-file.xml')
 
-			const xml = await readReport('TEST-file.xml')
+			const xml = readReport('TEST-file.xml')
 			expect(xml.testsuite.$.tests).eq('4')
 			expect(xml.testsuite.$.failures).eq('3')
 			expect(xml.testsuite.testcase).length(4)
@@ -230,7 +242,7 @@ describe('XUnit reporters', () => {
 
 			assertReportFiles('TEST-file1.xml', 'TEST-file2.xml', 'TEST-file3.xml')
 
-			const xml = await readReport('TEST-file2.xml')
+			const xml = readReport('TEST-file2.xml')
 			expect(xml.testsuite.$.tests).eq('1')
 			expect(xml.testsuite.$.failures).eq('0')
 			expect(xml.testsuite.$.errors).eq('1')
@@ -284,7 +296,7 @@ describe('XUnit reporters', () => {
 
 			assertReportFiles('TEST-file1.xml', 'TEST-file2.xml', 'TEST-file3.xml')
 
-			const xml = await readReport('TEST-file2.xml')
+			const xml = readReport('TEST-file2.xml')
 			expect(xml.testsuite.$.tests).eq('1')
 			expect(xml.testsuite.$.failures).eq('0')
 			expect(xml.testsuite.$.errors).eq('1')
@@ -337,13 +349,13 @@ describe('XUnit reporters', () => {
 			)
 			reporter.reportSuiteResult()
 
-			const xml1 = await readReport('TEST-file1.xml')
+			const xml1 = readReport('TEST-file1.xml')
 			expect(xml1.testsuite.testcase[0].$.classname).eq('file1')
 
-			const xml2 = await readReport('TEST-file2.xml')
+			const xml2 = readReport('TEST-file2.xml')
 			expect(xml2.testsuite.testcase[0].$.classname).eq('file2')
 
-			const xml3 = await readReport('TEST-file3.xml')
+			const xml3 = readReport('TEST-file3.xml')
 			expect(xml3.testsuite.testcase[0].$.classname).eq('file3')
 		})
 
@@ -376,7 +388,7 @@ describe('XUnit reporters', () => {
 
 			assertReportFiles('TEST-file.xml')
 
-			const xml = await readReport('TEST-file.xml')
+			const xml = readReport('TEST-file.xml')
 			expect(xml.testsuite.$.tests).eq('4')
 			expect(xml.testsuite.$.failures).eq('2')
 			expect(xml.testsuite.testcase).length(4)
@@ -435,8 +447,10 @@ describe('XUnit reporters', () => {
 		expect(reportFiles).members(expected).length(expected.length)
 	}
 
-	const readReport: (filename: string) => any = async (filename: string) => {
-		return await parseStringPromise(fs.readFileSync(p.resolve(reportsDir, filename)))
+	const readReport = (filename: string) => {
+		const fpath = p.resolve(reportsDir, filename)
+		const xmlContent = fs.readFileSync(fpath, 'utf-8')
+		return xmlParser.parse(xmlContent)
 	}
 })
 
