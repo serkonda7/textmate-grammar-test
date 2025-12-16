@@ -4,6 +4,7 @@ _unreleased_
 
 - build: Replace pnpm with bun
 - build: Replace eslint and prettier with biome
+- chore: Update various dependencies
 
 
 ## 0.2.1
