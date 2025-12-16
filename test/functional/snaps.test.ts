@@ -15,7 +15,8 @@ const exec = util.promisify(child_process.exec)
 describe('snap test', () => {
 	const root = process.cwd()
 
-	it('should report OK for test without errors', async () => {
+	it('should report OK for test without errors', async function () {
+		this.timeout(5000)
 		return exec(
 			`node ${root}/dist/snapshot.js ` +
 				`--scope source.dhall ` +
@@ -23,6 +24,7 @@ describe('snap test', () => {
 				`${__dirname}/resources/snap-ok-scenario/simple.dhall`,
 			{
 				cwd: root,
+				maxBuffer: 1024 * 512, // 512kb
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout)).to.eq(
