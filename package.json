@@ -39,7 +39,8 @@
     "lint:ci": "biome ci",
     "check": "bunx tsc",
     "build:dev": "bun run check && bun run scripts/build.ts --dev",
-    "build": "bun run check && bun run scripts/build.ts --prod"
+    "build": "bun run check && bun run scripts/build.ts --prod",
+    "prepack": "bun run build"
   },
   "engines": {
     "node": ">=20"
