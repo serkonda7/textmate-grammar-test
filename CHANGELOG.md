@@ -1,6 +1,6 @@
 # Changelog
 ## 0.2.2
-_unreleased_
+_2025-12-17_
 
 - refac(deps): Replace Bottleneck with p-limit
 - test(deps): Replace xml2js with fast-xml-parser
