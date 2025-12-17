@@ -27,6 +27,11 @@
     "textmate-grammar-test": "./dist/unit.js",
     "textmate-grammar-snap": "./dist/snapshot.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE.txt"
+  ],
   "scripts": {
     "test": "mocha \"test/**/*.test.ts\"",
     "lint": "biome check",
