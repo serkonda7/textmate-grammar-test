@@ -1,7 +1,7 @@
 {
   "name": "textmate-grammar-test",
   "description": "Test runner for VSCode textmate grammars",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "license": "MIT",
   "author": "serkonda7",
   "homepage": "https://github.com/serkonda7/textmate-grammar-test",
@@ -40,8 +40,7 @@
     "check": "bunx tsc",
     "build:dev": "bun run check && bun run scripts/build.ts --dev",
     "build": "bun run check && bun run scripts/build.ts --prod",
-    "prepack": "bun run build",
-    "publish": "bun pm pack --filename textmate-grammar-test.tgz && npm publish ./textmate-grammar-test.tgz"
+    "prepack": "bun run build"
   },
   "engines": {
     "node": ">=20"
