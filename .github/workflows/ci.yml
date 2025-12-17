@@ -10,8 +10,8 @@ on:
 
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: read
+  id-token: write # For OIDC
+  contents: write # For creating releases
 
 jobs:
   test:
