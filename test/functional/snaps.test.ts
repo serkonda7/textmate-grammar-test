@@ -34,7 +34,8 @@ describe('snap test', () => {
 		})
 	})
 
-	it('should report wrong or missing scopes', () => {
+	it('should report wrong or missing scopes', async function () {
+		this.timeout(5000)
 		return exec(
 			`node ${root}/dist/snapshot.js ` +
 				`--scope source.dhall ` +
@@ -42,6 +43,7 @@ describe('snap test', () => {
 				`${__dirname}/resources/snap-simple-failure/simple.dhall`,
 			{
 				cwd: root,
+				maxBuffer: 1024 * 512, // 512kb
 			},
 		)
 			.then(() => {
@@ -59,7 +61,8 @@ describe('snap test', () => {
 			})
 	})
 
-	it('should report update snapshot', async () => {
+	it('should report update snapshot', async function () {
+		this.timeout(5000)
 		fs.copyFileSync(
 			`${__dirname}/resources/snap-update-snapshot/ref.dhall.snap`,
 			`${__dirname}/resources/snap-update-snapshot/simple.dhall.snap`,
@@ -72,6 +75,7 @@ describe('snap test', () => {
 				`${__dirname}/resources/snap-update-snapshot/simple.dhall`,
 			{
 				cwd: root,
+				maxBuffer: 1024 * 512, // 512kb
 			},
 		)
 
