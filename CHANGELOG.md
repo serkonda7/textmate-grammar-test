@@ -1,5 +1,5 @@
 # Changelog
-## 0.2.2 - 0.2.4.1
+## 0.2.2 - 0.2.5
 _2025-12-17_
 
 - refac(deps): Replace Bottleneck with p-limit
