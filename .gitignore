@@ -2,6 +2,7 @@
 dist/
 coverage/
 .nyc_output/
+*.tgz
 
 # editor files
 *.code-workspace
