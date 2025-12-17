@@ -40,7 +40,8 @@
     "check": "bunx tsc",
     "build:dev": "bun run check && bun run scripts/build.ts --dev",
     "build": "bun run check && bun run scripts/build.ts --prod",
-    "prepack": "bun run build"
+    "prepack": "bun run build",
+    "publish": "bun pm pack --filename textmate-grammar-test.tgz && bunx npm publish ./textmate-grammar-test.tgz"
   },
   "engines": {
     "node": ">=20"
