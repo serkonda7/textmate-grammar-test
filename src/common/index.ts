@@ -3,6 +3,7 @@ import * as path from 'path'
 import oniguruma from 'vscode-oniguruma'
 import tm from 'vscode-textmate'
 import type { IGrammarConfig } from './model.ts'
+import { fileURLToPath } from 'bun'
 
 export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 	return createRegistryFromGrammars(
@@ -37,7 +38,7 @@ export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarCo
 	}
 
 	const wasmUrl = new URL(import.meta.resolve('vscode-oniguruma'))
-	const wasmPath = wasmUrl.pathname.replace(/main\.js$/, 'onig.wasm')
+	const wasmPath = fileURLToPath(wasmUrl).replace(/main\.js$/, 'onig.wasm')
 	const wasmBin = fs.readFileSync(wasmPath).buffer
 	const vscodeOnigurumaLib = oniguruma.loadWASM(wasmBin).then(() => {
 		return {
