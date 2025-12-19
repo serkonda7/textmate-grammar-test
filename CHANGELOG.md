@@ -1,6 +1,11 @@
 # Changelog
-## 0.2.8
+## 0.2.8 - 0.2.9
 _2025-12-19_
+
+- Fix execution with npx/bunx
+- ci: Enable windows testing
+- fix: Windows-related fixes
+
 
 ## 0.2.2 - 0.2.7
 _2025-12-17_
