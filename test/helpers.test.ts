@@ -1,3 +1,7 @@
+import path from 'node:path'
+
+const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/')
+
 /**
  * Normalize various items in the unit tests, such as:
  *  - line endings
@@ -8,17 +12,23 @@ export function normalize(text: string) {
 	if (!text) {
 		return text
 	}
+
 	return (
 		text
-			//normalize path separators
+			// Path separators
 			.replace(/[/\\]+/g, '/')
-			//normalize line endings
+
+			// Trim absolute paths
+			.replaceAll(root, '')
+
+			// Line endings
 			.replace(/\r?\n/g, '\n')
-			//checkmark
+
+			// Symbols
 			.replace(/\u221A/g, '✓')
-			//x
 			.replace(/\u00D7/g, '✖')
-			//remove excess leading and trailing whitespace (including newlines)
+
+			// Trim whitespace
 			.trim()
 	)
 }
