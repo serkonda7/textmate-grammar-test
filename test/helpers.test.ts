@@ -9,7 +9,7 @@ const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
  *  - ascii symbols (checkmark, x, etc...).
  */
 export function normalize(text: string): string {
-	if (text === "") {
+	if (text === '') {
 		return text
 	}
 
