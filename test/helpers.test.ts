@@ -1,6 +1,6 @@
 import path from 'node:path'
 
-const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/')
+const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
 
 /**
  * Normalize various items in the unit tests, such as:
@@ -8,8 +8,8 @@ const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/')
  *  - path separators
  *  - ascii symbols (checkmark, x, etc...).
  */
-export function normalize(text: string) {
-	if (!text) {
+export function normalize(text: string): string {
+	if (text === "") {
 		return text
 	}
 
