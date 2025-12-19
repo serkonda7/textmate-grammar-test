@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
