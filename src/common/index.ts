@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
 import oniguruma from 'vscode-oniguruma'
 import tm from 'vscode-textmate'
 import type { IGrammarConfig } from './model.ts'
-import { fileURLToPath } from 'bun'
 
 export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 	return createRegistryFromGrammars(
