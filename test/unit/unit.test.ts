@@ -1,5 +1,5 @@
+import * as fs from 'node:fs'
 import { expect } from 'chai'
-import * as fs from 'fs'
 import { createRegistry } from '../../src/common/index.ts'
 import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/index.ts'
 

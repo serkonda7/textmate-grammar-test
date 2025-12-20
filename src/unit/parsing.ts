@@ -1,4 +1,4 @@
-import { EOL } from 'os'
+import { EOL } from 'node:os'
 import type { GrammarTestCase, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
 
 const leftArrowAssertRegex =

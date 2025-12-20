@@ -1,9 +1,9 @@
+import * as fs from 'node:fs'
+import { EOL } from 'node:os'
+import * as p from 'node:path'
+import { sep } from 'node:path'
+import * as tty from 'node:tty'
 import chalk from 'chalk'
-import * as fs from 'fs'
-import { EOL } from 'os'
-import * as p from 'path'
-import { sep } from 'path'
-import * as tty from 'tty'
 import type { GrammarTestCase, LineAssertion, TestFailure } from './model.ts'
 
 // export needed for test

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
+import * as fs from 'node:fs'
+import { EOL } from 'node:os'
+import * as path from 'node:path'
 import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
-import * as fs from 'fs'
 import { globSync } from 'glob'
-import { EOL } from 'os'
 import pLimit from 'p-limit'
-import * as path from 'path'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'

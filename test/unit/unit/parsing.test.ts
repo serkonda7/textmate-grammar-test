@@ -1,6 +1,6 @@
+import * as fs from 'node:fs'
+import { EOL } from 'node:os'
 import { expect } from 'chai'
-import * as fs from 'fs'
-import { EOL } from 'os'
 import {
 	parseGrammarTestCase,
 	parseHeader,

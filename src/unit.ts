@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
-import * as fs from 'fs'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'

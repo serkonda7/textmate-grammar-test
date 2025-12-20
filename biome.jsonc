@@ -15,11 +15,10 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      // TODO: reduce disabled rules over time
       "style": {
-        "useTemplate": "off",
-        "useNodejsImportProtocol": "off"
+        "useTemplate": "off" // Concat is often used after complex calls
       },
+      // TODO: reduce disabled rules over time
       "suspicious": {
         "noExplicitAny": "off",
         "noTemplateCurlyInString": "off",
