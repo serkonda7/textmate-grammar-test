@@ -27,9 +27,6 @@
       },
       "correctness": {
         "noUnusedFunctionParameters": "off"
-      },
-      "complexity": {
-        "noUselessConstructor": "off"
       }
     }
   },

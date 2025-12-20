@@ -192,10 +192,6 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
 	// follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd and produces one report file per test file
 	// if some CI requires single report file may also implement reporter for this format https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd
 
-	constructor(reportPath: string) {
-		super(reportPath)
-	}
-
 	reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void {
 		const suite = this.getSuite(filename, parsedFile)
 
@@ -243,10 +239,6 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
 export class XunitGitlabReporter extends XunitReportPerTestReporter {
 	// follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd
 	// produces report in a way which looks nice when viewed in GitLab CI/CD web GUI, but is not neccesarily semantically correct
-
-	constructor(reportPath: string) {
-		super(reportPath)
-	}
 
 	reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void {
 		const suite = this.getSuite(filename, parsedFile)
