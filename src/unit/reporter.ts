@@ -6,6 +6,7 @@ import { sep } from 'path'
 import * as tty from 'tty'
 import type { GrammarTestCase, LineAssertion, TestFailure } from './model.ts'
 
+// export needed for test
 export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void
 	reportParseError(filename: string, error: any): void
@@ -13,7 +14,7 @@ export interface Reporter {
 	reportSuiteResult(): void
 }
 
-export class CompositeReporter implements Reporter {
+class CompositeReporter implements Reporter {
 	private reporters: Reporter[]
 
 	constructor(...reporters: Reporter[]) {
@@ -186,6 +187,7 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
 	}
 }
 
+// export needed for test
 export class XunitGenericReporter extends XunitReportPerTestReporter {
 	// follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd and produces one report file per test file
 	// if some CI requires single report file may also implement reporter for this format https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd
@@ -237,6 +239,7 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
 	}
 }
 
+// export needed for test
 export class XunitGitlabReporter extends XunitReportPerTestReporter {
 	// follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd
 	// produces report in a way which looks nice when viewed in GitLab CI/CD web GUI, but is not neccesarily semantically correct
@@ -314,7 +317,7 @@ function handleParseError(filename: string, error: any): void {
 	console.log(error)
 }
 
-export class ConsoleCompactReporter implements Reporter {
+class ConsoleCompactReporter implements Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void {
 		if (failures.length === 0) {
 			console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
@@ -348,7 +351,7 @@ export class ConsoleCompactReporter implements Reporter {
 	reportSuiteResult(): void {}
 }
 
-export class ConsoleFullReporter implements Reporter {
+class ConsoleFullReporter implements Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void {
 		if (failures.length === 0) {
 			console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
@@ -440,4 +443,18 @@ interface Colorizer {
 	red(text: string): string
 	gray(text: string): string
 	whiteBright(text: string): string
+}
+
+function createConsoleReporter(compact: boolean) {
+	return compact ? new ConsoleCompactReporter() : new ConsoleFullReporter()
+}
+
+export function createReporter(compact: boolean, xunitFormat: 'generic' | 'gitlab', xunitReport?: string) {
+	if (xunitReport) {
+		const xunitReporter =
+			xunitFormat === 'gitlab' ? new XunitGitlabReporter(xunitReport) : new XunitGenericReporter(xunitReport)
+		return new CompositeReporter(createConsoleReporter(compact), xunitReporter)
+	}
+
+	return createConsoleReporter(compact)
 }

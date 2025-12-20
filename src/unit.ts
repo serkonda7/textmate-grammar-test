@@ -9,14 +9,7 @@ import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { parseGrammarTestCase, runGrammarTestCase } from './unit/index.ts'
 import type { GrammarTestCase } from './unit/model.ts'
-import {
-	CompositeReporter,
-	ConsoleCompactReporter,
-	ConsoleFullReporter,
-	type Reporter,
-	XunitGenericReporter,
-	XunitGitlabReporter,
-} from './unit/reporter.ts'
+import { createReporter } from './unit/reporter.ts'
 
 function collectGrammarOpts(value: string, previous: string[]): string[] {
 	return previous.concat([value])
@@ -67,15 +60,7 @@ enum ExitCode {
 const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
 const registry = createRegistry(grammars)
 
-const consoleReporter = options.compact ? new ConsoleCompactReporter() : new ConsoleFullReporter()
-const reporter: Reporter = options.xunitReport
-	? new CompositeReporter(
-			consoleReporter,
-			options.xunitFormat === 'gitlab'
-				? new XunitGitlabReporter(options.xunitReport)
-				: new XunitGenericReporter(options.xunitReport),
-		)
-	: consoleReporter
+const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
 const rawTestCases = program.args.flatMap((x) => globSync(x))
 
