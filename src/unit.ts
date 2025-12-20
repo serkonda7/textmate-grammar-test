@@ -76,7 +76,8 @@ async function main(): Promise<ExitCode> {
 		)
 		.option(
 			'--config <configuration.json>',
-			'Path to the language configuration, package.json by default',
+			'Path to language configuration. Default: `package.json`',
+			'package.json',
 		)
 		.option(
 			'-c, --compact',

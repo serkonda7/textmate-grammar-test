@@ -77,15 +77,13 @@ export function createRegistryFromGrammars(
 }
 
 export function loadConfiguration(
-	config: string,
+	configPath: string,
 	scope: string | undefined,
 	grammar: string[] | undefined,
 ): {
 	grammars: IGrammarConfig[]
 	extensionToScope: (ext: string) => string | undefined
 } {
-	const configPath = config || 'package.json'
-
 	const grammars: IGrammarConfig[] = []
 	let extensionToScope: (ext: string) => string | undefined = () => scope || undefined
 
