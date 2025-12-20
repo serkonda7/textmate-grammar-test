@@ -30,6 +30,41 @@ function collectGrammarOpts(value: string, previous: string[]): string[] {
 	return previous.concat([value])
 }
 
+class TestCaseRunner {
+	constructor(
+		private readonly registry: ReturnType<typeof createRegistry>,
+		private readonly reporter: ReturnType<typeof createReporter>,
+	) {}
+
+	async runSingleTest(filename: string): Promise<ExitCode> {
+		let testCase: GrammarTestCase
+
+		// Read and parse test case
+		try {
+			testCase = parseGrammarTestCase(fs.readFileSync(filename, 'utf8'))
+		} catch (error) {
+			this.reporter.reportParseError(filename, error)
+			return ExitCode.Failure
+		}
+
+		// Execute test case
+		try {
+			const failures = await runGrammarTestCase(this.registry, testCase)
+			this.reporter.reportTestResult(filename, testCase, failures)
+			return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
+		} catch (error: any) {
+			this.reporter.reportGrammarTestError(filename, testCase, error)
+			return ExitCode.Failure
+		}
+	}
+
+	async runTests(testFiles: string[]): Promise<ExitCode[]> {
+		const limit = pLimit(MAX_CONCURRENT_TESTS)
+		const tasks = testFiles.map((filename) => limit(() => this.runSingleTest(filename)))
+
+		return Promise.all(tasks)
+	}
+}
 async function main(): Promise<ExitCode> {
 	program
 		.description('Run Textmate grammar test cases using vscode-textmate')
@@ -65,52 +100,23 @@ async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 
 	const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
-	const registry = createRegistry(grammars)
-
-	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
 	const rawTestCases = program.args.flatMap((x) => globSync(x))
 
 	// Early exit if no test cases found
 	if (rawTestCases.length === 0) {
-		console.log(chalk.red('ERROR') + ' no test cases found')
+		console.error(chalk.red('ERROR') + ' no test cases found')
 		process.exit(ExitCode.Failure)
 	}
 
-	const limit = pLimit(MAX_CONCURRENT_TESTS)
+	const registry = createRegistry(grammars)
+	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
-	// Run tests in parallel
-	const testResults: Promise<number[]> = Promise.all(
-		rawTestCases.map(async (filename): Promise<number> => {
-			let testCase: GrammarTestCase
+	const runner = new TestCaseRunner(registry, reporter)
+	const results = await runner.runTests(rawTestCases)
 
-			// Read and parse test case
-			try {
-				testCase = parseGrammarTestCase(fs.readFileSync(filename, 'utf8'))
-			} catch (error) {
-				reporter.reportParseError(filename, error)
-				return ExitCode.Failure
-			}
-
-			// Execute test case
-			try {
-				const failures = await limit(() => runGrammarTestCase(registry, testCase))
-				reporter.reportTestResult(filename, testCase, failures)
-				return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
-			} catch (error: any) {
-				reporter.reportGrammarTestError(filename, testCase, error)
-				return ExitCode.Failure
-			}
-		}),
-	)
-
-	let success = false
-	testResults.then((xs) => {
-		reporter.reportSuiteResult()
-		success = xs.every((x) => x === ExitCode.Success)
-	})
-
-	return success ? ExitCode.Success : ExitCode.Failure
+	reporter.reportSuiteResult()
+	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure
 }
 
 main().then((code) => {
