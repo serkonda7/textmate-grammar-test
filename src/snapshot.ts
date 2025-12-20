@@ -13,6 +13,15 @@ import { VERSION } from './common/version.ts'
 import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
 import type { AnnotatedLine } from './snapshot/model.ts'
 
+interface CliOptions {
+	updateSnapshot: boolean
+	config: string
+	printNotModified: boolean
+	expandDiff: boolean
+	grammar: string[]
+	scope?: string
+}
+
 program
 	.description('Run VSCode textmate grammar snapshot tests')
 	.option('-u, --updateSnapshot', 'overwrite all snap files with new changes')
@@ -33,7 +42,7 @@ program
 	)
 	.parse(process.argv)
 
-const options = program.opts()
+const options = program.opts<CliOptions>()
 
 const symbols = {
 	ok: '✓',

@@ -22,6 +22,14 @@ function collectGrammarOpts(value: string, previous: string[]): string[] {
 	return previous.concat([value])
 }
 
+interface CliOptions {
+	grammar: string[]
+	config: string
+	compact: boolean
+	xunitReport?: string
+	xunitFormat: 'generic' | 'gitlab'
+}
+
 program
 	.description('Run Textmate grammar test cases using vscode-textmate')
 	.option(
@@ -47,22 +55,14 @@ program
 	)
 	.parse(process.argv)
 
-const options = program.opts()
+const options = program.opts<CliOptions>()
 
 const TestFailed = -1
 const TestSuccessful = 0
 const MAX_CONCURRENT_TESTS = 8
 
-const { grammars } = loadConfiguration(options.config, options.scope, options.grammar)
+const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
 const registry = createRegistry(grammars)
-
-if (options.validate) {
-	if (!!registry && typeof registry === 'object') {
-		process.exit(0)
-	} else {
-		process.exit(1)
-	}
-}
 
 const consoleReporter = options.compact ? new ConsoleCompactReporter() : new ConsoleFullReporter()
 const reporter: Reporter = options.xunitReport
