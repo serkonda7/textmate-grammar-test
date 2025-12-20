@@ -58,18 +58,22 @@ if (process.platform === 'win32') {
 	symbols.dot = '.'
 }
 
-const TestFailed = -1
-const TestSuccessful = 0
 const Padding = '  '
 const MAX_CONCURRENT_TESTS = 8
+
+enum ExitCode {
+	Success = 0,
+	Failure = 1,
+}
 
 const rawTestCases = program.args.flatMap((x) => globSync(x))
 
 const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 
+// Early exit if no test cases found
 if (testCases.length === 0) {
 	console.log(chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'")
-	process.exit(-1)
+	process.exit(ExitCode.Failure)
 }
 
 const { grammars, extensionToScope } = loadConfiguration(options.config, options.scope, options.grammar)
@@ -84,7 +88,7 @@ const testResults: Promise<number[]> = Promise.all(
 		if (scope === undefined) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
 			console.log('No scope is associated with the file.')
-			return TestFailed
+			return ExitCode.Failure
 		}
 		return limit(() => getVSCodeTokens(registry, scope, src))
 			.then((tokens) => {
@@ -92,7 +96,7 @@ const testResults: Promise<number[]> = Promise.all(
 					if (options.updateSnapshot) {
 						console.log(chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'))
 						fs.writeFileSync(filename + '.snap', renderSnap(tokens), 'utf8')
-						return TestSuccessful
+						return ExitCode.Success
 					} else {
 						const expectedTokens = parseSnap(fs.readFileSync(filename + '.snap').toString())
 						return renderTestResult(filename, expectedTokens, tokens)
@@ -100,23 +104,23 @@ const testResults: Promise<number[]> = Promise.all(
 				} else {
 					console.log(chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'))
 					fs.writeFileSync(filename + '.snap', renderSnap(tokens))
-					return TestSuccessful
+					return ExitCode.Success
 				}
 			})
 			.catch((error) => {
 				console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
 				console.log(error)
-				return TestFailed
+				return ExitCode.Failure
 			})
 	}),
 )
 
 testResults.then((xs) => {
 	const result = xs.reduce((a, b) => a + b, 0)
-	if (result === TestSuccessful) {
-		process.exit(0)
+	if (result === ExitCode.Success) {
+		process.exit(ExitCode.Success)
 	} else {
-		process.exit(-1)
+		process.exit(ExitCode.Failure)
 	}
 })
 
@@ -127,7 +131,7 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 				chalk.whiteBright(filename) +
 				chalk.red(` snapshot and actual file contain different number of lines.${EOL}`),
 		)
-		return TestFailed
+		return ExitCode.Failure
 	}
 
 	for (let i = 0; i < expected.length; i++) {
@@ -141,7 +145,7 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 						` source different snapshot at line ${i + 1}.${EOL} expected: ${exp.src}${EOL} actual: ${act.src}${EOL}`,
 					),
 			)
-			return TestFailed
+			return ExitCode.Failure
 		}
 	}
 
@@ -240,10 +244,10 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 		}
 
 		console.log()
-		return TestFailed
+		return ExitCode.Failure
 	} else {
 		console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ' run successfully.')
-		return TestSuccessful
+		return ExitCode.Success
 	}
 }
 

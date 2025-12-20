@@ -57,9 +57,12 @@ program
 
 const options = program.opts<CliOptions>()
 
-const TestFailed = -1
-const TestSuccessful = 0
 const MAX_CONCURRENT_TESTS = 8
+
+enum ExitCode {
+	Success = 0,
+	Failure = 1,
+}
 
 const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
 const registry = createRegistry(grammars)
@@ -76,9 +79,10 @@ const reporter: Reporter = options.xunitReport
 
 const rawTestCases = program.args.flatMap((x) => globSync(x))
 
+// Early exit if no test cases found
 if (rawTestCases.length === 0) {
 	console.log(chalk.red('ERROR') + ' no test cases found')
-	process.exit(-1)
+	process.exit(ExitCode.Failure)
 }
 
 const limit = pLimit(MAX_CONCURRENT_TESTS)
@@ -91,18 +95,18 @@ const testResults: Promise<number[]> = Promise.all(
 		} catch (error) {
 			reporter.reportParseError(filename, error)
 			return new Promise((resolve) => {
-				resolve(TestFailed)
+				resolve(ExitCode.Failure)
 			})
 		}
 		const testCase = tc as GrammarTestCase
 		return limit(() => runGrammarTestCase(registry, testCase))
 			.then((failures) => {
 				reporter.reportTestResult(filename, testCase, failures)
-				return failures.length === 0 ? TestSuccessful : TestFailed
+				return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
 			})
 			.catch((error: any) => {
 				reporter.reportGrammarTestError(filename, testCase, error)
-				return TestFailed
+				return ExitCode.Failure
 			})
 	}),
 )
@@ -110,9 +114,9 @@ const testResults: Promise<number[]> = Promise.all(
 testResults.then((xs) => {
 	reporter.reportSuiteResult()
 	const result = xs.reduce((a, b) => a + b, 0)
-	if (result === TestSuccessful) {
-		process.exit(0)
+	if (result === ExitCode.Success) {
+		process.exit(ExitCode.Success)
 	} else {
-		process.exit(-1)
+		process.exit(ExitCode.Failure)
 	}
 })
