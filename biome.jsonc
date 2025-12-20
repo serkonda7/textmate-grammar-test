@@ -24,9 +24,6 @@
         "noExplicitAny": "off",
         "noTemplateCurlyInString": "off",
         "useIterableCallbackReturn": "off"
-      },
-      "correctness": {
-        "noUnusedFunctionParameters": "off"
       }
     }
   },

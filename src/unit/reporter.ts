@@ -311,7 +311,7 @@ if (isatty) {
 	terminalWidth = (process.stdout as tty.WriteStream).getWindowSize()[0]
 }
 
-function handleGrammarTestError(filename: string, testCase: GrammarTestCase, reason: any): void {
+function handleGrammarTestError(filename: string, _testCase: GrammarTestCase, reason: any): void {
 	console.log(
 		chalk.red(symbols.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error',
 	)
@@ -336,7 +336,7 @@ class ConsoleCompactReporter implements Reporter {
 		}
 	}
 
-	private renderCompactErrorMsg(testCase: GrammarTestCase, failure: TestFailure): string {
+	private renderCompactErrorMsg(_testCase: GrammarTestCase, failure: TestFailure): string {
 		let res = ''
 		if (failure.missing && failure.missing.length > 0) {
 			res += `Missing required scopes: [ ${failure.missing.join(' ')} ] `
@@ -428,7 +428,7 @@ function printSourceLine(
 }
 
 function printReason(
-	testCase: GrammarTestCase,
+	_testCase: GrammarTestCase,
 	failure: TestFailure,
 	padding: string,
 	sink: (message: string) => void,

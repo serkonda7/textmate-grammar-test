@@ -18,7 +18,7 @@ const xmlParser = new XMLParser({
 	parseTagValue: false,
 	preserveOrder: false,
 	trimValues: false,
-	isArray: (tagName, jPath, isLeafNode, isAttribute) =>
+	isArray: (tagName, _jPath, _isLeafNode, _isAttribute) =>
 		['testcase', 'failure', 'error'].includes(tagName),
 })
 
