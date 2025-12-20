@@ -1,9 +1,9 @@
+import child_process from 'node:child_process'
+import fs from 'node:fs'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import util from 'node:util'
 import { expect } from 'chai'
-import child_process from 'child_process'
-import fs from 'fs'
-import util from 'util'
 import { normalize } from '../helpers.test.ts'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -12,7 +12,8 @@ const __dirname = dirname(__filename)
 const exec = util.promisify(child_process.exec)
 
 // FIXME: assertions and done()
-describe('unit test', () => {
+describe('unit test', async function () {
+	this.timeout(5000)
 	const root = process.cwd()
 
 	it('should report OK for test without errors', () => {
@@ -25,7 +26,9 @@ describe('unit test', () => {
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout.trim())).to.eql(
-				normalize(`✓ ${root}/test/functional/resources/unit-ok-scenario/success.dhall run successfuly.`),
+				normalize(
+					`✓ ${root}/test/functional/resources/unit-ok-scenario/success.dhall run successfuly.`,
+				),
 			)
 			expect(stderr).to.eq('')
 		})

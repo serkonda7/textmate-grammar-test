@@ -4,7 +4,11 @@ import { parseSnap, renderSnap } from './parsing.ts'
 
 export { parseSnap, renderSnap }
 
-export async function getVSCodeTokens(registry: tm.Registry, scope: string, source: string): Promise<AnnotatedLine[]> {
+export async function getVSCodeTokens(
+	registry: tm.Registry,
+	scope: string,
+	source: string,
+): Promise<AnnotatedLine[]> {
 	return registry.loadGrammar(scope).then((grammar: tm.IGrammar | null) => {
 		if (!grammar) {
 			throw new Error(`Could not load scope ${scope}`)

@@ -15,21 +15,12 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      // TODO: reduce disabled rules over time
       "style": {
-        "useTemplate": "off",
-        "useNodejsImportProtocol": "off"
+        "useTemplate": "off" // Concat is often used after complex calls
       },
       "suspicious": {
-        "noExplicitAny": "off",
-        "noTemplateCurlyInString": "off",
-        "useIterableCallbackReturn": "off"
-      },
-      "correctness": {
-        "noUnusedFunctionParameters": "off"
-      },
-      "complexity": {
-        "noUselessConstructor": "off"
+        "noExplicitAny": "off", // Used for flexible error reporting
+        "useIterableCallbackReturn": "off" // FIXME: I don't really understand this yet
       }
     }
   },
@@ -38,13 +29,13 @@
       "indentStyle": "tab",
       "semicolons": "asNeeded",
       "quoteStyle": "single",
-      "lineWidth": 120
+      "lineWidth": 100
     }
   },
   "json": {
     "formatter": {
       "indentStyle": "space",
-      "lineWidth": 180
+      "lineWidth": 100
     }
   }
 }

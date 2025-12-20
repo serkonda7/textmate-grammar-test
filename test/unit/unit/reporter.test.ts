@@ -18,7 +18,8 @@ const xmlParser = new XMLParser({
 	parseTagValue: false,
 	preserveOrder: false,
 	trimValues: false,
-	isArray: (tagName, jPath, isLeafNode, isAttribute) => ['testcase', 'failure', 'error'].includes(tagName),
+	isArray: (tagName, _jPath, _isLeafNode, _isAttribute) =>
+		['testcase', 'failure', 'error'].includes(tagName),
 })
 
 describe('XUnit reporters', () => {
@@ -166,7 +167,12 @@ describe('XUnit reporters', () => {
 						//   '10 assertion6',
 					],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1), lineAssertion(1, 4), lineAssertion(2, 6), lineAssertion(3, 9)],
+					assertions: [
+						lineAssertion(0, 1),
+						lineAssertion(1, 4),
+						lineAssertion(2, 6),
+						lineAssertion(3, 9),
+					],
 				},
 				[
 					assertionFailure(0, 1, 0, 1, ['a1', 'a2', 'a3'], ['m1', 'm2'], ['u1']),
@@ -190,9 +196,13 @@ describe('XUnit reporters', () => {
 			const [xmlFailure11] = xmlCase1.failure
 			expect(xmlFailure11.$.message).eq('Assertion failed at 1:1:2')
 			expect(xmlFailure11._).eq(
-				['1: 1  source1', '   ^', 'missing required scopes: m1 m2', 'prohibited scopes: u1', 'actual: a1 a2 a3'].join(
-					'\n',
-				),
+				[
+					'1: 1  source1',
+					'   ^',
+					'missing required scopes: m1 m2',
+					'prohibited scopes: u1',
+					'actual: a1 a2 a3',
+				].join('\n'),
 			)
 
 			expect(xmlCase2.$.name).eq('file:4')
@@ -203,9 +213,13 @@ describe('XUnit reporters', () => {
 			expect(xmlCase3.failure).length(2)
 			const [xmlFailure31, xmlFailure32] = xmlCase3.failure
 			expect(xmlFailure31.$.message).eq('Assertion failed at 6:1:4')
-			expect(xmlFailure31._).eq(['6: 6  source3', '   ^^^', 'missing required scopes: m1', 'actual: a1 a2'].join('\n'))
+			expect(xmlFailure31._).eq(
+				['6: 6  source3', '   ^^^', 'missing required scopes: m1', 'actual: a1 a2'].join('\n'),
+			)
 			expect(xmlFailure32.$.message).eq('Assertion failed at 6:4:6')
-			expect(xmlFailure32._).eq(['6: 6  source3', '      ^^', 'prohibited scopes: u1', 'actual: a1'].join('\n'))
+			expect(xmlFailure32._).eq(
+				['6: 6  source3', '      ^^', 'prohibited scopes: u1', 'actual: a1'].join('\n'),
+			)
 
 			expect(xmlCase4.$.name).eq('file:9')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -376,7 +390,12 @@ describe('XUnit reporters', () => {
 						// '10 assertion6',
 					],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1), lineAssertion(1, 4), lineAssertion(2, 6), lineAssertion(3, 9)],
+					assertions: [
+						lineAssertion(0, 1),
+						lineAssertion(1, 4),
+						lineAssertion(2, 6),
+						lineAssertion(3, 9),
+					],
 				},
 				[
 					assertionFailure(0, 1, 0, 1, ['a1', 'a2', 'a3'], ['m1', 'm2'], ['u1']),

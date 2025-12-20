@@ -1,9 +1,9 @@
+import child_process from 'node:child_process'
+import fs from 'node:fs'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import util from 'node:util'
 import { expect } from 'chai'
-import child_process from 'child_process'
-import fs from 'fs'
-import util from 'util'
 import { normalize } from '../helpers.test.ts'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -28,7 +28,9 @@ describe('snap test', () => {
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout)).to.eq(
-				normalize(`✓ ${root}/test/functional/resources/snap-ok-scenario/simple.dhall run successfully.`),
+				normalize(
+					`✓ ${root}/test/functional/resources/snap-ok-scenario/simple.dhall run successfully.`,
+				),
 			)
 			expect(stderr).to.eq('')
 		})
@@ -89,7 +91,9 @@ describe('snap test', () => {
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout)).to.eq(
-				normalize(`✓ ${root}/test/functional/resources/snap-update-snapshot/simple.dhall run successfully.\n`),
+				normalize(
+					`✓ ${root}/test/functional/resources/snap-update-snapshot/simple.dhall run successfully.\n`,
+				),
 			)
 			expect(stderr).to.eq('')
 		})

@@ -1,4 +1,11 @@
 # Changelog
+## 0.3.0
+_unreleased_
+
+**Breaking Changed**
+- Failure exit code is now `1` (before: `-1`)
+
+
 ## 0.2.8 - 0.2.9
 _2025-12-19_
 

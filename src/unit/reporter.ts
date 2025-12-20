@@ -1,11 +1,12 @@
+import * as fs from 'node:fs'
+import { EOL } from 'node:os'
+import * as p from 'node:path'
+import { sep } from 'node:path'
+import * as tty from 'node:tty'
 import chalk from 'chalk'
-import * as fs from 'fs'
-import { EOL } from 'os'
-import * as p from 'path'
-import { sep } from 'path'
-import * as tty from 'tty'
 import type { GrammarTestCase, LineAssertion, TestFailure } from './model.ts'
 
+// export needed for test
 export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void
 	reportParseError(filename: string, error: any): void
@@ -13,7 +14,7 @@ export interface Reporter {
 	reportSuiteResult(): void
 }
 
-export class CompositeReporter implements Reporter {
+class CompositeReporter implements Reporter {
 	private reporters: Reporter[]
 
 	constructor(...reporters: Reporter[]) {
@@ -64,7 +65,11 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
 		this.reportPath = reportPath
 	}
 
-	abstract reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void
+	abstract reportTestResult(
+		filename: string,
+		parsedFile: GrammarTestCase,
+		failures: TestFailure[],
+	): void
 
 	protected abstract caseClassname(filename: string): string | undefined
 
@@ -186,13 +191,10 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
 	}
 }
 
+// export needed for test
 export class XunitGenericReporter extends XunitReportPerTestReporter {
 	// follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd and produces one report file per test file
 	// if some CI requires single report file may also implement reporter for this format https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd
-
-	constructor(reportPath: string) {
-		super(reportPath)
-	}
 
 	reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void {
 		const suite = this.getSuite(filename, parsedFile)
@@ -225,25 +227,24 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
 	}
 	protected suiteFailuresCount(s: XunitSuite): number {
 		return s.cases.reduce(
-			(accSuite, c) => accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'failure' ? 1 : 0), 0),
+			(accSuite, c) =>
+				accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'failure' ? 1 : 0), 0),
 			0,
 		)
 	}
 	protected suiteErrorsCount(s: XunitSuite): number {
 		return s.cases.reduce(
-			(accSuite, c) => accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'error' ? 1 : 0), 0),
+			(accSuite, c) =>
+				accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'error' ? 1 : 0), 0),
 			0,
 		)
 	}
 }
 
+// export needed for test
 export class XunitGitlabReporter extends XunitReportPerTestReporter {
 	// follows this schema https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd
 	// produces report in a way which looks nice when viewed in GitLab CI/CD web GUI, but is not neccesarily semantically correct
-
-	constructor(reportPath: string) {
-		super(reportPath)
-	}
 
 	reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void {
 		const suite = this.getSuite(filename, parsedFile)
@@ -274,10 +275,16 @@ export class XunitGitlabReporter extends XunitReportPerTestReporter {
 		return filename
 	}
 	protected suiteFailuresCount(s: XunitSuite): number {
-		return s.cases.reduce((accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'failure') ? 1 : 0), 0)
+		return s.cases.reduce(
+			(accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'failure') ? 1 : 0),
+			0,
+		)
 	}
 	protected suiteErrorsCount(s: XunitSuite): number {
-		return s.cases.reduce((accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'error') ? 1 : 0), 0)
+		return s.cases.reduce(
+			(accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'error') ? 1 : 0),
+			0,
+		)
 	}
 }
 
@@ -304,8 +311,10 @@ if (isatty) {
 	terminalWidth = (process.stdout as tty.WriteStream).getWindowSize()[0]
 }
 
-function handleGrammarTestError(filename: string, testCase: GrammarTestCase, reason: any): void {
-	console.log(chalk.red(symbols.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error')
+function handleGrammarTestError(filename: string, _testCase: GrammarTestCase, reason: any): void {
+	console.log(
+		chalk.red(symbols.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error',
+	)
 	console.log(reason)
 }
 
@@ -314,7 +323,7 @@ function handleParseError(filename: string, error: any): void {
 	console.log(error)
 }
 
-export class ConsoleCompactReporter implements Reporter {
+class ConsoleCompactReporter implements Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void {
 		if (failures.length === 0) {
 			console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
@@ -327,7 +336,7 @@ export class ConsoleCompactReporter implements Reporter {
 		}
 	}
 
-	private renderCompactErrorMsg(testCase: GrammarTestCase, failure: TestFailure): string {
+	private renderCompactErrorMsg(_testCase: GrammarTestCase, failure: TestFailure): string {
 		let res = ''
 		if (failure.missing && failure.missing.length > 0) {
 			res += `Missing required scopes: [ ${failure.missing.join(' ')} ] `
@@ -348,7 +357,7 @@ export class ConsoleCompactReporter implements Reporter {
 	reportSuiteResult(): void {}
 }
 
-export class ConsoleFullReporter implements Reporter {
+class ConsoleFullReporter implements Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestCase, failures: TestFailure[]): void {
 		if (failures.length === 0) {
 			console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
@@ -419,17 +428,22 @@ function printSourceLine(
 }
 
 function printReason(
-	testCase: GrammarTestCase,
+	_testCase: GrammarTestCase,
 	failure: TestFailure,
 	padding: string,
 	sink: (message: string) => void,
 	colorizer: Colorizer,
 ) {
 	if (failure.missing && failure.missing.length > 0) {
-		sink(colorizer.red(padding + 'missing required scopes: ') + colorizer.gray(failure.missing.join(' ')))
+		sink(
+			colorizer.red(padding + 'missing required scopes: ') +
+				colorizer.gray(failure.missing.join(' ')),
+		)
 	}
 	if (failure.unexpected && failure.unexpected.length > 0) {
-		sink(colorizer.red(padding + 'prohibited scopes: ') + colorizer.gray(failure.unexpected.join(' ')))
+		sink(
+			colorizer.red(padding + 'prohibited scopes: ') + colorizer.gray(failure.unexpected.join(' ')),
+		)
 	}
 	if (failure.actual !== undefined) {
 		sink(colorizer.red(padding + 'actual: ') + colorizer.gray(failure.actual.join(' ')))
@@ -440,4 +454,24 @@ interface Colorizer {
 	red(text: string): string
 	gray(text: string): string
 	whiteBright(text: string): string
+}
+
+function createConsoleReporter(compact: boolean) {
+	return compact ? new ConsoleCompactReporter() : new ConsoleFullReporter()
+}
+
+export function createReporter(
+	compact: boolean,
+	xunitFormat: 'generic' | 'gitlab',
+	xunitReport?: string,
+) {
+	if (xunitReport) {
+		const xunitReporter =
+			xunitFormat === 'gitlab'
+				? new XunitGitlabReporter(xunitReport)
+				: new XunitGenericReporter(xunitReport)
+		return new CompositeReporter(createConsoleReporter(compact), xunitReporter)
+	}
+
+	return createConsoleReporter(compact)
 }

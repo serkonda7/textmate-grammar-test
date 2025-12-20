@@ -1,22 +1,34 @@
 #!/usr/bin/env node
 
+import * as fs from 'node:fs'
+import { EOL } from 'node:os'
+import * as path from 'node:path'
 import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
-import * as fs from 'fs'
 import { globSync } from 'glob'
-import { EOL } from 'os'
 import pLimit from 'p-limit'
-import * as path from 'path'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
 import type { AnnotatedLine } from './snapshot/model.ts'
 
+interface CliOptions {
+	updateSnapshot: boolean
+	config: string
+	printNotModified: boolean
+	expandDiff: boolean
+	grammar: string[]
+	scope?: string
+}
+
 program
 	.description('Run VSCode textmate grammar snapshot tests')
 	.option('-u, --updateSnapshot', 'overwrite all snap files with new changes')
-	.option('--config <configuration.json>', 'Path to the language configuration, package.json by default')
+	.option(
+		'--config <configuration.json>',
+		'Path to the language configuration, package.json by default',
+	)
 	.option('--printNotModified', 'include not modified scopes in the output', false)
 	.option('--expandDiff', 'produce each diff on two lines prefixed with "++" and "--"', false)
 	.option(
@@ -33,7 +45,7 @@ program
 	)
 	.parse(process.argv)
 
-const options = program.opts()
+const options = program.opts<CliOptions>()
 
 const symbols = {
 	ok: '✓',
@@ -49,21 +61,31 @@ if (process.platform === 'win32') {
 	symbols.dot = '.'
 }
 
-const TestFailed = -1
-const TestSuccessful = 0
 const Padding = '  '
 const MAX_CONCURRENT_TESTS = 8
+
+enum ExitCode {
+	Success = 0,
+	Failure = 1,
+}
 
 const rawTestCases = program.args.flatMap((x) => globSync(x))
 
 const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 
+// Early exit if no test cases found
 if (testCases.length === 0) {
-	console.log(chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'")
-	process.exit(-1)
+	console.log(
+		chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'",
+	)
+	process.exit(ExitCode.Failure)
 }
 
-const { grammars, extensionToScope } = loadConfiguration(options.config, options.scope, options.grammar)
+const { grammars, extensionToScope } = loadConfiguration(
+	options.config,
+	options.scope,
+	options.grammar,
+)
 
 const limit = pLimit(MAX_CONCURRENT_TESTS)
 
@@ -75,50 +97,58 @@ const testResults: Promise<number[]> = Promise.all(
 		if (scope === undefined) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
 			console.log('No scope is associated with the file.')
-			return TestFailed
+			return ExitCode.Failure
 		}
 		return limit(() => getVSCodeTokens(registry, scope, src))
 			.then((tokens) => {
 				if (fs.existsSync(filename + '.snap')) {
 					if (options.updateSnapshot) {
-						console.log(chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'))
+						console.log(
+							chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
+						)
 						fs.writeFileSync(filename + '.snap', renderSnap(tokens), 'utf8')
-						return TestSuccessful
+						return ExitCode.Success
 					} else {
 						const expectedTokens = parseSnap(fs.readFileSync(filename + '.snap').toString())
 						return renderTestResult(filename, expectedTokens, tokens)
 					}
 				} else {
-					console.log(chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'))
+					console.log(
+						chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
+					)
 					fs.writeFileSync(filename + '.snap', renderSnap(tokens))
-					return TestSuccessful
+					return ExitCode.Success
 				}
 			})
 			.catch((error) => {
 				console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
 				console.log(error)
-				return TestFailed
+				return ExitCode.Failure
 			})
 	}),
 )
 
 testResults.then((xs) => {
 	const result = xs.reduce((a, b) => a + b, 0)
-	if (result === TestSuccessful) {
-		process.exit(0)
+	if (result === ExitCode.Success) {
+		process.exit(ExitCode.Success)
 	} else {
-		process.exit(-1)
+		process.exit(ExitCode.Failure)
 	}
 })
 
-function renderTestResult(filename: string, expected: AnnotatedLine[], actual: AnnotatedLine[]): number {
+function renderTestResult(
+	filename: string,
+	expected: AnnotatedLine[],
+	actual: AnnotatedLine[],
+): number {
 	if (expected.length !== actual.length) {
 		console.log(
 			chalk.red('ERROR running testcase ') +
 				chalk.whiteBright(filename) +
 				chalk.red(` snapshot and actual file contain different number of lines.${EOL}`),
 		)
-		return TestFailed
+		return ExitCode.Failure
 	}
 
 	for (let i = 0; i < expected.length; i++) {
@@ -132,7 +162,7 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 						` source different snapshot at line ${i + 1}.${EOL} expected: ${exp.src}${EOL} actual: ${act.src}${EOL}`,
 					),
 			)
-			return TestFailed
+			return ExitCode.Failure
 		}
 	}
 
@@ -231,10 +261,10 @@ function renderTestResult(filename: string, expected: AnnotatedLine[], actual: A
 		}
 
 		console.log()
-		return TestFailed
+		return ExitCode.Failure
 	} else {
 		console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ' run successfully.')
-		return TestSuccessful
+		return ExitCode.Success
 	}
 }
 
@@ -245,7 +275,8 @@ function printDiffInline(wrongLines: [TChanges[], string, number][]) {
 			const change = tchanges.changes
 				.filter((c) => options.printNotModified || c.changeType !== NotModified)
 				.map((c) => {
-					const color = c.changeType === Added ? chalk.green : c.changeType === Removed ? chalk.red : chalk.gray
+					const color =
+						c.changeType === Added ? chalk.green : c.changeType === Removed ? chalk.red : chalk.gray
 					return color(c.text)
 				})
 				.join(' ')
@@ -260,18 +291,30 @@ function printDiffOnTwoLines(wrongLines: [TChanges[], string, number][]) {
 		const lineNumberOffset = printSourceLine(src, i)
 		changes.forEach((tchanges) => {
 			const removed = tchanges.changes
-				.filter((c) => c.changeType === Removed || (c.changeType === NotModified && options.printNotModified))
+				.filter(
+					(c) =>
+						c.changeType === Removed || (c.changeType === NotModified && options.printNotModified),
+				)
 				.map((c) => {
 					return chalk.red(c.text)
 				})
 				.join(' ')
 			const added = tchanges.changes
-				.filter((c) => c.changeType === Added || (c.changeType === NotModified && options.printNotModified))
+				.filter(
+					(c) =>
+						c.changeType === Added || (c.changeType === NotModified && options.printNotModified),
+				)
 				.map((c) => {
 					return chalk.green(c.text)
 				})
 				.join(' ')
-			printAccents1(lineNumberOffset, tchanges.from, tchanges.to, chalk.red('-- ') + removed, Removed)
+			printAccents1(
+				lineNumberOffset,
+				tchanges.from,
+				tchanges.to,
+				chalk.red('-- ') + removed,
+				Removed,
+			)
 			printAccents1(lineNumberOffset, tchanges.from, tchanges.to, chalk.green('++ ') + added, Added)
 		})
 		console.log()

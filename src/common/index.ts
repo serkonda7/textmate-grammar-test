@@ -1,6 +1,6 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import oniguruma from 'vscode-oniguruma'
 import tm from 'vscode-textmate'
 import type { IGrammarConfig } from './model.ts'
@@ -16,7 +16,9 @@ export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 	)
 }
 
-export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarConfig; content: string }>): tm.Registry {
+export function createRegistryFromGrammars(
+	grammars: Array<{ grammar: IGrammarConfig; content: string }>,
+): tm.Registry {
 	const grammarIndex: { [key: string]: tm.IRawGrammar } = {}
 
 	const _injections: { [scopeName: string]: string[] } = {}

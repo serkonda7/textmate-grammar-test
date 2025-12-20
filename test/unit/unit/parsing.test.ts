@@ -1,7 +1,11 @@
+import * as fs from 'node:fs'
+import { EOL } from 'node:os'
 import { expect } from 'chai'
-import * as fs from 'fs'
-import { EOL } from 'os'
-import { parseGrammarTestCase, parseHeader, parseScopeAssertion } from '../../../src/unit/parsing.ts'
+import {
+	parseGrammarTestCase,
+	parseHeader,
+	parseScopeAssertion,
+} from '../../../src/unit/parsing.ts'
 
 describe('parseHeader', () => {
 	it('should parse one character comment token', () => {
@@ -162,12 +166,16 @@ describe('parseScopeAssertion', () => {
 	})
 	it('should throw an error for an empty <- ', () => {
 		expect(() => parseScopeAssertion(0, 1, '#<-- - ')).to.throw(
-			`Invalid assertion at line 0:${EOL}` + `#<-- - ${EOL}` + ` Missing both required and prohibited scopes`,
+			`Invalid assertion at line 0:${EOL}` +
+				`#<-- - ${EOL}` +
+				` Missing both required and prohibited scopes`,
 		)
 	})
 	it('should throw an error on empty ^ ', () => {
 		expect(() => parseScopeAssertion(0, 1, '# ^^^ ')).to.throw(
-			`Invalid assertion at line 0:${EOL}` + `# ^^^ ${EOL}` + ` Missing both required and prohibited scopes`,
+			`Invalid assertion at line 0:${EOL}` +
+				`# ^^^ ${EOL}` +
+				` Missing both required and prohibited scopes`,
 		)
 	})
 })
@@ -202,8 +210,11 @@ const parserTestDhallExpectedResult = {
 		'',
 		'',
 		'let user = "bill"',
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
 		'in  { home       = "/home/${user}"',
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
 		'    , privateKey = "/home/${user}/id_ed25519"',
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
 		'    , publicKey  = "/home/${user}/id_ed25519.pub"',
 		'}',
 		'',
@@ -232,7 +243,11 @@ const parserTestDhallExpectedResult = {
 				{
 					from: 6,
 					to: 16,
-					scopes: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'variable.object.property.dhall'],
+					scopes: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'variable.object.property.dhall',
+					],
 					exclude: [],
 				},
 				{
