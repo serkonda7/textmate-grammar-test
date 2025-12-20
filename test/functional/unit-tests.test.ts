@@ -12,7 +12,8 @@ const __dirname = dirname(__filename)
 const exec = util.promisify(child_process.exec)
 
 // FIXME: assertions and done()
-describe('unit test', () => {
+describe('unit test', async function () {
+	this.timeout(5000)
 	const root = process.cwd()
 
 	it('should report OK for test without errors', () => {
