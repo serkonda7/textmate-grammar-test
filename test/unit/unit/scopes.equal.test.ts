@@ -14,10 +14,14 @@ describe('scopesEqual_', () => {
 		expect(missingScopes_(['b', 'd', 'e'], ['a', 'b', 'c', 'd', 'e', 'f'])).to.eql([])
 	})
 	it('should work with duplicate elements', () => {
-		expect(missingScopes_(['a', 'b', 'd', 'e'], ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f'])).to.eql([])
+		expect(missingScopes_(['a', 'b', 'd', 'e'], ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f'])).to.eql(
+			[],
+		)
 	})
 	it('should work with duplicate elements in requirements', () => {
-		expect(missingScopes_(['a', 'a', 'a', 'b', 'd', 'e'], ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f'])).to.eql([])
+		expect(
+			missingScopes_(['a', 'a', 'a', 'b', 'd', 'e'], ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f']),
+		).to.eql([])
 	})
 	it('should return [] when elements a bit misaligned', () => {
 		expect(missingScopes_(['b', 'c', 'a'], ['a', 'a', 'b', 'c', 'd', 'a', 'a', 'f'])).to.eql([])

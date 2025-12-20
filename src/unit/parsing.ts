@@ -1,10 +1,16 @@
 import { EOL } from 'os'
 import type { GrammarTestCase, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
 
-const leftArrowAssertRegex = /^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
-const upArrowAssertRegex = /^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
+const leftArrowAssertRegex =
+	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
+const upArrowAssertRegex =
+	/^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
 
-export function parseScopeAssertion(testCaseLineNumber: number, commentLength: number, as: string): ScopeAssertion[] {
+export function parseScopeAssertion(
+	testCaseLineNumber: number,
+	commentLength: number,
+	as: string,
+): ScopeAssertion[] {
 	const s = as.slice(commentLength)
 
 	if (s.trim().startsWith('^')) {

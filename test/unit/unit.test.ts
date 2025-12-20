@@ -20,11 +20,12 @@ function loadFile(filename: string): string {
 
 describe('Grammar test case', () => {
 	it('should report no errors on correct grammar test', () => {
-		return runGrammarTestCase(registry, parseGrammarTestCase(loadFile('./test/resources/successful.test.dhall'))).then(
-			(result) => {
-				expect(result).to.eql([])
-			},
-		)
+		return runGrammarTestCase(
+			registry,
+			parseGrammarTestCase(loadFile('./test/resources/successful.test.dhall')),
+		).then((result) => {
+			expect(result).to.eql([])
+		})
 	})
 	it('should report missing scopes', () => {
 		return runGrammarTestCase(
@@ -34,7 +35,11 @@ describe('Grammar test case', () => {
 			expect(result).to.eql([
 				{
 					missing: ['m1', 'keyword.operator.record.begin.dhall', 'm2.foo'],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'keyword.operator.record.begin.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'keyword.operator.record.begin.dhall',
+					],
 					unexpected: [],
 					line: 11,
 					srcLine: 10,
@@ -43,7 +48,11 @@ describe('Grammar test case', () => {
 				},
 				{
 					missing: ['m3.foo', 'variable.object.property.dhall'],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'variable.object.property.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'variable.object.property.dhall',
+					],
 					unexpected: [],
 					line: 13,
 					srcLine: 11,
@@ -170,7 +179,11 @@ describe('Grammar test case', () => {
 				},
 				{
 					missing: ['m6.foo'],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'keyword.operator.record.end.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'keyword.operator.record.end.dhall',
+					],
 					unexpected: [],
 					line: 20,
 					srcLine: 13,
@@ -188,7 +201,11 @@ describe('Grammar test case', () => {
 			expect(result).to.eql([
 				{
 					missing: [],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'keyword.operator.record.begin.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'keyword.operator.record.begin.dhall',
+					],
 					unexpected: ['source.dhall'],
 					line: 11,
 					srcLine: 10,
@@ -197,7 +214,11 @@ describe('Grammar test case', () => {
 				},
 				{
 					missing: [],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'variable.object.property.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'variable.object.property.dhall',
+					],
 					unexpected: ['variable.object.property.dhall', 'source.dhall'],
 					line: 13,
 					srcLine: 11,
@@ -326,8 +347,15 @@ describe('Grammar test case', () => {
 				},
 				{
 					missing: [],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'keyword.operator.record.end.dhall'],
-					unexpected: ['meta.declaration.data.record.block.dhall', 'keyword.operator.record.end.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'keyword.operator.record.end.dhall',
+					],
+					unexpected: [
+						'meta.declaration.data.record.block.dhall',
+						'keyword.operator.record.end.dhall',
+					],
 					line: 20,
 					srcLine: 13,
 					start: 0,
@@ -462,7 +490,11 @@ describe('Grammar test case', () => {
 				},
 				{
 					missing: ['meta.declaration.data.record.block.dhall'],
-					actual: ['source.dhall', 'meta.declaration.data.record.block.dhall', 'keyword.operator.record.end.dhall'],
+					actual: [
+						'source.dhall',
+						'meta.declaration.data.record.block.dhall',
+						'keyword.operator.record.end.dhall',
+					],
 					unexpected: [],
 					line: 20,
 					srcLine: 13,
@@ -491,10 +523,11 @@ describe('Grammar test case', () => {
 		})
 	})
 	it('should count line with comment token and no assertions as a source line', () => {
-		return runGrammarTestCase(registry, parseGrammarTestCase(loadFile('./test/resources/sourceLineA.tf'))).then(
-			(result) => {
-				expect(result).to.eql([])
-			},
-		)
+		return runGrammarTestCase(
+			registry,
+			parseGrammarTestCase(loadFile('./test/resources/sourceLineA.tf')),
+		).then((result) => {
+			expect(result).to.eql([])
+		})
 	})
 })

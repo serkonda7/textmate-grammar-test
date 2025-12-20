@@ -31,8 +31,14 @@ program
 		collectGrammarOpts,
 		[],
 	)
-	.option('--config <configuration.json>', 'Path to the language configuration, package.json by default')
-	.option('-c, --compact', 'Display output in the compact format, which is easier to use with VSCode problem matchers')
+	.option(
+		'--config <configuration.json>',
+		'Path to the language configuration, package.json by default',
+	)
+	.option(
+		'-c, --compact',
+		'Display output in the compact format, which is easier to use with VSCode problem matchers',
+	)
 	.option(
 		'--xunit-report <report.xml>',
 		'Path to directory where test reports in the XUnit format will be emitted in addition to console output',

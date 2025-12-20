@@ -35,13 +35,13 @@
       "indentStyle": "tab",
       "semicolons": "asNeeded",
       "quoteStyle": "single",
-      "lineWidth": 120
+      "lineWidth": 100
     }
   },
   "json": {
     "formatter": {
       "indentStyle": "space",
-      "lineWidth": 180
+      "lineWidth": 100
     }
   }
 }

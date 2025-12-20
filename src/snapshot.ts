@@ -25,7 +25,10 @@ interface CliOptions {
 program
 	.description('Run VSCode textmate grammar snapshot tests')
 	.option('-u, --updateSnapshot', 'overwrite all snap files with new changes')
-	.option('--config <configuration.json>', 'Path to the language configuration, package.json by default')
+	.option(
+		'--config <configuration.json>',
+		'Path to the language configuration, package.json by default',
+	)
 	.option('--printNotModified', 'include not modified scopes in the output', false)
 	.option('--expandDiff', 'produce each diff on two lines prefixed with "++" and "--"', false)
 	.option(
@@ -72,11 +75,17 @@ const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 
 // Early exit if no test cases found
 if (testCases.length === 0) {
-	console.log(chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'")
+	console.log(
+		chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'",
+	)
 	process.exit(ExitCode.Failure)
 }
 
-const { grammars, extensionToScope } = loadConfiguration(options.config, options.scope, options.grammar)
+const { grammars, extensionToScope } = loadConfiguration(
+	options.config,
+	options.scope,
+	options.grammar,
+)
 
 const limit = pLimit(MAX_CONCURRENT_TESTS)
 
@@ -94,7 +103,9 @@ const testResults: Promise<number[]> = Promise.all(
 			.then((tokens) => {
 				if (fs.existsSync(filename + '.snap')) {
 					if (options.updateSnapshot) {
-						console.log(chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'))
+						console.log(
+							chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
+						)
 						fs.writeFileSync(filename + '.snap', renderSnap(tokens), 'utf8')
 						return ExitCode.Success
 					} else {
@@ -102,7 +113,9 @@ const testResults: Promise<number[]> = Promise.all(
 						return renderTestResult(filename, expectedTokens, tokens)
 					}
 				} else {
-					console.log(chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'))
+					console.log(
+						chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
+					)
 					fs.writeFileSync(filename + '.snap', renderSnap(tokens))
 					return ExitCode.Success
 				}
@@ -124,7 +137,11 @@ testResults.then((xs) => {
 	}
 })
 
-function renderTestResult(filename: string, expected: AnnotatedLine[], actual: AnnotatedLine[]): number {
+function renderTestResult(
+	filename: string,
+	expected: AnnotatedLine[],
+	actual: AnnotatedLine[],
+): number {
 	if (expected.length !== actual.length) {
 		console.log(
 			chalk.red('ERROR running testcase ') +
@@ -258,7 +275,8 @@ function printDiffInline(wrongLines: [TChanges[], string, number][]) {
 			const change = tchanges.changes
 				.filter((c) => options.printNotModified || c.changeType !== NotModified)
 				.map((c) => {
-					const color = c.changeType === Added ? chalk.green : c.changeType === Removed ? chalk.red : chalk.gray
+					const color =
+						c.changeType === Added ? chalk.green : c.changeType === Removed ? chalk.red : chalk.gray
 					return color(c.text)
 				})
 				.join(' ')
@@ -273,18 +291,30 @@ function printDiffOnTwoLines(wrongLines: [TChanges[], string, number][]) {
 		const lineNumberOffset = printSourceLine(src, i)
 		changes.forEach((tchanges) => {
 			const removed = tchanges.changes
-				.filter((c) => c.changeType === Removed || (c.changeType === NotModified && options.printNotModified))
+				.filter(
+					(c) =>
+						c.changeType === Removed || (c.changeType === NotModified && options.printNotModified),
+				)
 				.map((c) => {
 					return chalk.red(c.text)
 				})
 				.join(' ')
 			const added = tchanges.changes
-				.filter((c) => c.changeType === Added || (c.changeType === NotModified && options.printNotModified))
+				.filter(
+					(c) =>
+						c.changeType === Added || (c.changeType === NotModified && options.printNotModified),
+				)
 				.map((c) => {
 					return chalk.green(c.text)
 				})
 				.join(' ')
-			printAccents1(lineNumberOffset, tchanges.from, tchanges.to, chalk.red('-- ') + removed, Removed)
+			printAccents1(
+				lineNumberOffset,
+				tchanges.from,
+				tchanges.to,
+				chalk.red('-- ') + removed,
+				Removed,
+			)
 			printAccents1(lineNumberOffset, tchanges.from, tchanges.to, chalk.green('++ ') + added, Added)
 		})
 		console.log()

@@ -26,7 +26,9 @@ describe('unit test', async function () {
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout.trim())).to.eql(
-				normalize(`✓ ${root}/test/functional/resources/unit-ok-scenario/success.dhall run successfuly.`),
+				normalize(
+					`✓ ${root}/test/functional/resources/unit-ok-scenario/success.dhall run successfuly.`,
+				),
 			)
 			expect(stderr).to.eq('')
 		})

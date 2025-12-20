@@ -16,7 +16,9 @@ export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 	)
 }
 
-export function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarConfig; content: string }>): tm.Registry {
+export function createRegistryFromGrammars(
+	grammars: Array<{ grammar: IGrammarConfig; content: string }>,
+): tm.Registry {
 	const grammarIndex: { [key: string]: tm.IRawGrammar } = {}
 
 	const _injections: { [scopeName: string]: string[] } = {}

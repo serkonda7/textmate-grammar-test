@@ -65,7 +65,11 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
 		this.reportPath = reportPath
 	}
 
-	abstract reportTestResult(filename: string, parsedFile: GrammarTestCase, failures: TestFailure[]): void
+	abstract reportTestResult(
+		filename: string,
+		parsedFile: GrammarTestCase,
+		failures: TestFailure[],
+	): void
 
 	protected abstract caseClassname(filename: string): string | undefined
 
@@ -223,13 +227,15 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
 	}
 	protected suiteFailuresCount(s: XunitSuite): number {
 		return s.cases.reduce(
-			(accSuite, c) => accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'failure' ? 1 : 0), 0),
+			(accSuite, c) =>
+				accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'failure' ? 1 : 0), 0),
 			0,
 		)
 	}
 	protected suiteErrorsCount(s: XunitSuite): number {
 		return s.cases.reduce(
-			(accSuite, c) => accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'error' ? 1 : 0), 0),
+			(accSuite, c) =>
+				accSuite + c.failures.reduce((accCase, f) => accCase + (f.type === 'error' ? 1 : 0), 0),
 			0,
 		)
 	}
@@ -269,10 +275,16 @@ export class XunitGitlabReporter extends XunitReportPerTestReporter {
 		return filename
 	}
 	protected suiteFailuresCount(s: XunitSuite): number {
-		return s.cases.reduce((accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'failure') ? 1 : 0), 0)
+		return s.cases.reduce(
+			(accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'failure') ? 1 : 0),
+			0,
+		)
 	}
 	protected suiteErrorsCount(s: XunitSuite): number {
-		return s.cases.reduce((accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'error') ? 1 : 0), 0)
+		return s.cases.reduce(
+			(accSuite, c) => accSuite + (c.failures.some((f) => f.type === 'error') ? 1 : 0),
+			0,
+		)
 	}
 }
 
@@ -300,7 +312,9 @@ if (isatty) {
 }
 
 function handleGrammarTestError(filename: string, testCase: GrammarTestCase, reason: any): void {
-	console.log(chalk.red(symbols.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error')
+	console.log(
+		chalk.red(symbols.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error',
+	)
 	console.log(reason)
 }
 
@@ -421,10 +435,15 @@ function printReason(
 	colorizer: Colorizer,
 ) {
 	if (failure.missing && failure.missing.length > 0) {
-		sink(colorizer.red(padding + 'missing required scopes: ') + colorizer.gray(failure.missing.join(' ')))
+		sink(
+			colorizer.red(padding + 'missing required scopes: ') +
+				colorizer.gray(failure.missing.join(' ')),
+		)
 	}
 	if (failure.unexpected && failure.unexpected.length > 0) {
-		sink(colorizer.red(padding + 'prohibited scopes: ') + colorizer.gray(failure.unexpected.join(' ')))
+		sink(
+			colorizer.red(padding + 'prohibited scopes: ') + colorizer.gray(failure.unexpected.join(' ')),
+		)
 	}
 	if (failure.actual !== undefined) {
 		sink(colorizer.red(padding + 'actual: ') + colorizer.gray(failure.actual.join(' ')))
@@ -441,10 +460,16 @@ function createConsoleReporter(compact: boolean) {
 	return compact ? new ConsoleCompactReporter() : new ConsoleFullReporter()
 }
 
-export function createReporter(compact: boolean, xunitFormat: 'generic' | 'gitlab', xunitReport?: string) {
+export function createReporter(
+	compact: boolean,
+	xunitFormat: 'generic' | 'gitlab',
+	xunitReport?: string,
+) {
 	if (xunitReport) {
 		const xunitReporter =
-			xunitFormat === 'gitlab' ? new XunitGitlabReporter(xunitReport) : new XunitGenericReporter(xunitReport)
+			xunitFormat === 'gitlab'
+				? new XunitGitlabReporter(xunitReport)
+				: new XunitGenericReporter(xunitReport)
 		return new CompositeReporter(createConsoleReporter(compact), xunitReporter)
 	}
 

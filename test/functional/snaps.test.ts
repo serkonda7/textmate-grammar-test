@@ -28,7 +28,9 @@ describe('snap test', () => {
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout)).to.eq(
-				normalize(`✓ ${root}/test/functional/resources/snap-ok-scenario/simple.dhall run successfully.`),
+				normalize(
+					`✓ ${root}/test/functional/resources/snap-ok-scenario/simple.dhall run successfully.`,
+				),
 			)
 			expect(stderr).to.eq('')
 		})
@@ -89,7 +91,9 @@ describe('snap test', () => {
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout)).to.eq(
-				normalize(`✓ ${root}/test/functional/resources/snap-update-snapshot/simple.dhall run successfully.\n`),
+				normalize(
+					`✓ ${root}/test/functional/resources/snap-update-snapshot/simple.dhall run successfully.\n`,
+				),
 			)
 			expect(stderr).to.eq('')
 		})
