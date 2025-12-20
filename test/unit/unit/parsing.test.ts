@@ -210,8 +210,11 @@ const parserTestDhallExpectedResult = {
 		'',
 		'',
 		'let user = "bill"',
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
 		'in  { home       = "/home/${user}"',
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
 		'    , privateKey = "/home/${user}/id_ed25519"',
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
 		'    , publicKey  = "/home/${user}/id_ed25519.pub"',
 		'}',
 		'',

@@ -18,11 +18,9 @@
       "style": {
         "useTemplate": "off" // Concat is often used after complex calls
       },
-      // TODO: reduce disabled rules over time
       "suspicious": {
-        "noExplicitAny": "off",
-        "noTemplateCurlyInString": "off",
-        "useIterableCallbackReturn": "off"
+        "noExplicitAny": "off", // Used for flexible error reporting
+        "useIterableCallbackReturn": "off" // FIXME: I don't really understand this yet
       }
     }
   },
