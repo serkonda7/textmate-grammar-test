@@ -87,36 +87,34 @@ if (rawTestCases.length === 0) {
 
 const limit = pLimit(MAX_CONCURRENT_TESTS)
 
+// Run tests in parallel
 const testResults: Promise<number[]> = Promise.all(
-	rawTestCases.map((filename): Promise<number> => {
-		let tc: GrammarTestCase | undefined
+	rawTestCases.map(async (filename): Promise<number> => {
+		let testCase: GrammarTestCase
+
+		// Read and parse test case
 		try {
-			tc = parseGrammarTestCase(fs.readFileSync(filename).toString())
+			testCase = parseGrammarTestCase(fs.readFileSync(filename, 'utf8'))
 		} catch (error) {
 			reporter.reportParseError(filename, error)
-			return new Promise((resolve) => {
-				resolve(ExitCode.Failure)
-			})
+			return ExitCode.Failure
 		}
-		const testCase = tc as GrammarTestCase
-		return limit(() => runGrammarTestCase(registry, testCase))
-			.then((failures) => {
-				reporter.reportTestResult(filename, testCase, failures)
-				return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
-			})
-			.catch((error: any) => {
-				reporter.reportGrammarTestError(filename, testCase, error)
-				return ExitCode.Failure
-			})
+
+		// Execute test case
+		try {
+			const failures = await limit(() => runGrammarTestCase(registry, testCase))
+			reporter.reportTestResult(filename, testCase, failures)
+			return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
+		} catch (error: any) {
+			reporter.reportGrammarTestError(filename, testCase, error)
+			return ExitCode.Failure
+		}
 	}),
 )
 
+// Process results
 testResults.then((xs) => {
 	reporter.reportSuiteResult()
-	const result = xs.reduce((a, b) => a + b, 0)
-	if (result === ExitCode.Success) {
-		process.exit(ExitCode.Success)
-	} else {
-		process.exit(ExitCode.Failure)
-	}
+	const success = xs.every((x) => x === ExitCode.Success)
+	process.exit(success ? ExitCode.Success : ExitCode.Failure)
 })
