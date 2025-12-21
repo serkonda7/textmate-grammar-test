@@ -13,54 +13,41 @@ Please be aware that there might be breaking changes with the old behaviour.
 
 
 ## Installation
-
-As a project dependency:
-
-```bash
-npm i --save-dev textmate-grammar-test
-```
-
-Or as a standalone command line tool:
-
-```bash
-npm i -g textmate-grammar-test
-textmate-grammar-test --help
+```sh
+npm install --save-dev textmate-grammar-test
 ```
 
 
-## Unit tests
+## Unit Testing
+<!-- TODO example -->
 
-```scala
-// SYNTAX TEST "source.scala" "sample testcase"
+This section describes the syntax for writing unit tests.
 
-// line can start with a <comment token> and not have a valid assertion
+<!-- TODO small collapsible glossar -->
 
-class Stack[A] {
-// <-----  keyword.declaration.scala
-//   ^ - keyword.declaration.scala entity.name.class.declaration
-//    ^^^^^  entity.name.class.declaration
-//         ^  source.scala meta.bracket.scala
-//          ^  entity.name.class
-//           ^  meta.bracket.scala
-//             ^  punctuation.section.block.begin.scala
+
+### File Header
+All tests must start with a header line:
+```
+<comment token> SYNTAX TEST "<scopeName>" "Optional description"
 ```
 
-To write a unit test:
-
-* include a header line:
-
-```
-<comment token> SYNTAX TEST "<language scope>" "optional description"
+Example (TypeScript):
+```ts
+// SYNTAX TEST "source.ts" "Example header for a TypeScript grammar test"
 ```
 
-* Require tokens to have specific scope by using `^`&nbsp;&nbsp;:
+
+### Require token to have a specific scope
+<!-- TODO cleanup -->
+Require tokens to have specific scope by using `^`&nbsp;&nbsp;:
 
 ```scala
 private var elements: List[A] = Nil
 //          ^^^^^^^^ variable.other.declaration.scala
 ```
 
-* Get into those pesky first few characters by using `<-`:
+Get into those pesky first few characters by using `<-`:
 
 ```scala
 var x = 3
@@ -71,6 +58,9 @@ x=5
 //  you specify offset from start by using '~' character, just in case
 ```
 
+
+### Prevent scope on a token
+<!-- TODO cleanup -->
 * To ensure that tokens **don't** have undesired scopes put `-` symbol before them:
 ```scala
   / ensure comment start with two double slashes
@@ -93,6 +83,7 @@ textmate-grammar-test 'tests/unit/**/*.test.scala'
 
 
 ## Snapshot tests
+<!-- TODO rewrite and cleanup -->
 Snapshot tests are like `functional tests` but you don't have to write outputs explicitly.
 All you have to do is to provide a source files, scopes of which you want to test. Then on
 the first run `textmate-grammar-snap` will generate a set of `.snap` files which are an
@@ -115,7 +106,7 @@ textmate-grammar-snap 'tests/snap/**/*.scala'
 ```
 
 ## Language configuration via package.json
-
+<!-- TODO rewrite and cleanup, possibly remove -->
 The configuration follows the format of vscode:
 
 ```json
@@ -148,7 +139,6 @@ Right now only regular grammars and *Injection Grammars* via `injectTo` directiv
 
 
 ## Command Line Options
-
 Unit tests:
 ```
 Usage: textmate-grammar-test [options] <testcases...>
@@ -191,7 +181,6 @@ Options:
 ```
 
 ## Setup VSCode unit test task
-
 You can setup a vscode unit test task for convenience:
 
 ```json

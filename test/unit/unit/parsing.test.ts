@@ -5,7 +5,7 @@ import {
 	parseGrammarTestCase,
 	parseHeader,
 	parseScopeAssertion,
-} from '../../../src/unit/parsing.ts'
+} from '../../../src/unit/parser.ts'
 
 describe('parseHeader', () => {
 	it('should parse one character comment token', () => {
@@ -28,7 +28,7 @@ describe('parseHeader', () => {
 	it('should throw meaningful error msg', () => {
 		expect(parseHeader.bind({}, ['-- SYNTAX TEST sql"'])).to.throw(
 			`Expecting the first line in the syntax test file to be in the following format:${EOL}` +
-				'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?',
+				'<comment token> SYNTAX TEST "<scopeName>" "description"',
 		)
 	})
 })

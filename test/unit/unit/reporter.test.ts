@@ -240,7 +240,7 @@ describe('XUnit reporters', () => {
 				'file2',
 				new Error(
 					'Expecting the first line in the syntax test file to be in the following format:\n' +
-						'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?\n',
+						'<comment token> SYNTAX TEST "<scopeName>" "description"\n',
 				),
 			)
 			reporter.reportTestResult(
@@ -272,7 +272,7 @@ describe('XUnit reporters', () => {
 				m.startsWith(
 					[
 						'Error: Expecting the first line in the syntax test file to be in the following format:',
-						'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?',
+						'<comment token> SYNTAX TEST "<scopeName>" "description"',
 					].join('\n'),
 				),
 			)
@@ -358,7 +358,7 @@ describe('XUnit reporters', () => {
 				'file3',
 				new Error(
 					'Expecting the first line in the syntax test file to be in the following format:\n' +
-						'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?\n',
+						'<comment token> SYNTAX TEST "<scopeName>" "description"\n',
 				),
 			)
 			reporter.reportSuiteResult()

@@ -1,6 +1,6 @@
 import tm from 'vscode-textmate'
 import type { GrammarTestCase, TestFailure } from './model.ts'
-import { parseGrammarTestCase } from './parsing.ts'
+import { parseGrammarTestCase } from './parser.ts'
 
 export { parseGrammarTestCase, missingScopes_ }
 
