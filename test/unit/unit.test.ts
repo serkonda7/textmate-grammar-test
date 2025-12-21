@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { createRegistry } from '../../src/common/index.ts'
-import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/core.ts'
+import { parseTestFile, runGrammarTestCase } from '../../src/unit/core.ts'
 
 const registry = createRegistry([
 	{
@@ -22,7 +22,7 @@ describe('Grammar test case', () => {
 	it('should report no errors on correct grammar test', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/successful.test.dhall')),
+			parseTestFile(loadFile('./test/resources/successful.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([])
 		})
@@ -30,7 +30,7 @@ describe('Grammar test case', () => {
 	it('should report missing scopes', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/missing.scopes.test.dhall')),
+			parseTestFile(loadFile('./test/resources/missing.scopes.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -196,7 +196,7 @@ describe('Grammar test case', () => {
 	it('should report unexpected scopes', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/unexpected.scopes.test.dhall')),
+			parseTestFile(loadFile('./test/resources/unexpected.scopes.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -367,7 +367,7 @@ describe('Grammar test case', () => {
 	it('should report out of place scopes', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/misplaced.scopes.test.dhall')),
+			parseTestFile(loadFile('./test/resources/misplaced.scopes.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -507,7 +507,7 @@ describe('Grammar test case', () => {
 	it('should report error when line assertion referes to non existing token', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/out.of.bounds.test.dhall')),
+			parseTestFile(loadFile('./test/resources/out.of.bounds.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -525,7 +525,7 @@ describe('Grammar test case', () => {
 	it('should count line with comment token and no assertions as a source line', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/sourceLineA.tf')),
+			parseTestFile(loadFile('./test/resources/sourceLineA.tf')),
 		).then((result) => {
 			expect(result).toEqual([])
 		})

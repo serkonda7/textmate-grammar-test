@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
-import { parseGrammarTestCase, parseScopeAssertion } from '../../../src/unit/parser.ts'
+import { parseTestFile, parseScopeAssertion } from '../../../src/unit/parser.ts'
 
 describe('parseScopeAssertion', () => {
 	it('should parse single ^ accent', () => {
@@ -150,16 +150,16 @@ describe('parseScopeAssertion', () => {
 	})
 })
 
-describe('parseGrammarTestCase', () => {
+describe('parseTestFile', () => {
 	it('should parse a valid test case', () => {
 		const testFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
-		expect(parseGrammarTestCase(testFile)).toEqual(parserTestDhallExpectedResult)
+		expect(parseTestFile(testFile)).toEqual(parserTestDhallExpectedResult)
 	})
 
 	it('should parse a test case with a windows line endings', () => {
 		const originalFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
 		const crlfFile = originalFile.replace(/\r?\n/g, '\n')
-		expect(parseGrammarTestCase(crlfFile)).toEqual(parserTestDhallExpectedResult)
+		expect(parseTestFile(crlfFile)).toEqual(parserTestDhallExpectedResult)
 	})
 })
 

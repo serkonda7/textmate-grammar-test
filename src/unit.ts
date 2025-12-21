@@ -7,7 +7,7 @@ import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
-import { parseGrammarTestCase, runGrammarTestCase } from './unit/core.ts'
+import { parseTestFile, runGrammarTestCase } from './unit/core.ts'
 import type { GrammarTestCase } from './unit/model.ts'
 import { createReporter } from './unit/reporter.ts'
 
@@ -41,7 +41,7 @@ class TestCaseRunner {
 
 		// Read and parse test case
 		try {
-			testCase = parseGrammarTestCase(fs.readFileSync(filename, 'utf8'))
+			testCase = parseTestFile(fs.readFileSync(filename, 'utf8'))
 		} catch (error) {
 			this.reporter.reportParseError(filename, error)
 			return ExitCode.Failure

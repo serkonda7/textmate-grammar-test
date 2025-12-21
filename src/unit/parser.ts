@@ -29,7 +29,7 @@ export function parseHeader(line: string): TestCaseMetadata {
 	}
 }
 
-export function parseGrammarTestCase(str: string): GrammarTestCase {
+export function parseTestFile(str: string): GrammarTestCase {
 	const headerLength = 1
 	const lines = str.split(/\r\n|\n/)
 
