@@ -1,5 +1,5 @@
+import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
-import { expect } from 'chai'
 import { createRegistry } from '../../src/common/index.ts'
 import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/core.ts'
 
@@ -24,7 +24,7 @@ describe('Grammar test case', () => {
 			registry,
 			parseGrammarTestCase(loadFile('./test/resources/successful.test.dhall')),
 		).then((result) => {
-			expect(result).to.eql([])
+			expect(result).toEqual([])
 		})
 	})
 	it('should report missing scopes', () => {
@@ -32,7 +32,7 @@ describe('Grammar test case', () => {
 			registry,
 			parseGrammarTestCase(loadFile('./test/resources/missing.scopes.test.dhall')),
 		).then((result) => {
-			expect(result).to.eql([
+			expect(result).toEqual([
 				{
 					missing: ['m1', 'keyword.operator.record.begin.dhall', 'm2.foo'],
 					actual: [
@@ -198,7 +198,7 @@ describe('Grammar test case', () => {
 			registry,
 			parseGrammarTestCase(loadFile('./test/resources/unexpected.scopes.test.dhall')),
 		).then((result) => {
-			expect(result).to.eql([
+			expect(result).toEqual([
 				{
 					missing: [],
 					actual: [
@@ -369,7 +369,7 @@ describe('Grammar test case', () => {
 			registry,
 			parseGrammarTestCase(loadFile('./test/resources/misplaced.scopes.test.dhall')),
 		).then((result) => {
-			expect(result).to.eql([
+			expect(result).toEqual([
 				{
 					missing: ['source.dhall'],
 					actual: [
@@ -509,7 +509,7 @@ describe('Grammar test case', () => {
 			registry,
 			parseGrammarTestCase(loadFile('./test/resources/out.of.bounds.test.dhall')),
 		).then((result) => {
-			expect(result).to.eql([
+			expect(result).toEqual([
 				{
 					end: 32,
 					line: 5,
@@ -527,7 +527,7 @@ describe('Grammar test case', () => {
 			registry,
 			parseGrammarTestCase(loadFile('./test/resources/sourceLineA.tf')),
 		).then((result) => {
-			expect(result).to.eql([])
+			expect(result).toEqual([])
 		})
 	})
 })
