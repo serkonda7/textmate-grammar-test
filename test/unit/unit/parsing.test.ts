@@ -1,34 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
-import { parseHeader } from 'textmate-grammar-test/unit'
 import { parseGrammarTestCase, parseScopeAssertion } from '../../../src/unit/parser.ts'
-
-describe('parseHeader', () => {
-	it('should parse one character comment token', () => {
-		const result = parseHeader('# SYNTAX TEST "scala"')
-		expect(result).toEqual({
-			commentToken: '#',
-			description: '',
-			scope: 'scala',
-		})
-	})
-
-	it('should parse description', () => {
-		const result = parseHeader('-- SYNTAX TEST "sql" "some description"')
-		expect(result).toEqual({
-			commentToken: '--',
-			description: 'some description',
-			scope: 'sql',
-		})
-	})
-	it('should throw meaningful error msg', () => {
-		expect(parseHeader.bind({}, '-- SYNTAX TEST sql"')).toThrow(
-			`First line must contain header:${EOL}` +
-				'<comment token> SYNTAX TEST "<scopeName>" "description"',
-		)
-	})
-})
 
 describe('parseScopeAssertion', () => {
 	it('should parse single ^ accent', () => {

@@ -68,9 +68,8 @@ export function parseScopeAssertion(
 	return []
 }
 
-const HEADER_ERR_MSG =
-	`First line must contain header:${EOL}` +
-	`<comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
+const HEADER_ERR_MSG = 'Invalid header'
+const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
 
 const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
 const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
@@ -86,7 +85,7 @@ export function parseHeader(line: string): TestCaseMetadata {
 
 	// No header matched
 	if (!match?.groups) {
-		throw new Error(HEADER_ERR_MSG)
+		throw new SyntaxError(HEADER_ERR_MSG, { cause: HEADER_ERR_CAUSE })
 	}
 
 	return {

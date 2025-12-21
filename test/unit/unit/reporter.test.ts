@@ -22,6 +22,8 @@ const xmlParser = new XMLParser({
 		['testcase', 'failure', 'error'].includes(tagName),
 })
 
+// TODO refactor this whole file.
+//   goal: not construct every test case and expected value but rely more closely on the library functions
 describe('XUnit reporters', () => {
 	let reportsDir: string
 
@@ -206,7 +208,6 @@ describe('XUnit reporters', () => {
 			)
 
 			expect(xmlCase2.$.name).toEqual('file:4')
-			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			expect(xmlCase2.failure).toBeUndefined
 
 			expect(xmlCase3.$.name).toEqual('file:6')
@@ -264,7 +265,6 @@ describe('XUnit reporters', () => {
 
 			const xmlCase = xml.testsuite.testcase[0]
 			expect(xmlCase.$.name).toEqual('Parse test file')
-			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			expect(xmlCase.failure).toBeUndefined()
 			expect(xmlCase.error).toHaveLength(1)
 			expect(xmlCase.error[0].$.message).toEqual('Failed to parse test file')
