@@ -1,7 +1,7 @@
 import * as fs from 'node:fs'
 import { expect } from 'chai'
 import { createRegistry } from '../../src/common/index.ts'
-import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/index.ts'
+import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/core.ts'
 
 const registry = createRegistry([
 	{

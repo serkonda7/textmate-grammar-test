@@ -77,7 +77,6 @@ const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
-
 /**
  * Parse first line header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"

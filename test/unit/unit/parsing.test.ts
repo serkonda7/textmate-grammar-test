@@ -1,7 +1,8 @@
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
 import { expect } from 'chai'
-import { parseGrammarTestCase, parseHeader, parseScopeAssertion } from '../../../src/unit/parser.ts'
+import { parseHeader } from 'textmate-grammar-test/unit'
+import { parseGrammarTestCase, parseScopeAssertion } from '../../../src/unit/parser.ts'
 
 describe('parseHeader', () => {
 	it('should parse one character comment token', () => {
