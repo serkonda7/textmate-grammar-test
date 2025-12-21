@@ -1,15 +1,11 @@
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
 import { expect } from 'chai'
-import {
-	parseGrammarTestCase,
-	parseHeader,
-	parseScopeAssertion,
-} from '../../../src/unit/parser.ts'
+import { parseGrammarTestCase, parseHeader, parseScopeAssertion } from '../../../src/unit/parser.ts'
 
 describe('parseHeader', () => {
 	it('should parse one character comment token', () => {
-		const result = parseHeader(['# SYNTAX TEST "scala"', '#'])
+		const result = parseHeader('# SYNTAX TEST "scala"')
 		expect(result).to.eql({
 			commentToken: '#',
 			description: '',
@@ -18,7 +14,7 @@ describe('parseHeader', () => {
 	})
 
 	it('should parse description', () => {
-		const result = parseHeader(['-- SYNTAX TEST "sql" "some description"'])
+		const result = parseHeader('-- SYNTAX TEST "sql" "some description"')
 		expect(result).to.eql({
 			commentToken: '--',
 			description: 'some description',
@@ -26,8 +22,8 @@ describe('parseHeader', () => {
 		})
 	})
 	it('should throw meaningful error msg', () => {
-		expect(parseHeader.bind({}, ['-- SYNTAX TEST sql"'])).to.throw(
-			`Expecting the first line in the syntax test file to be in the following format:${EOL}` +
+		expect(parseHeader.bind({}, '-- SYNTAX TEST sql"')).to.throw(
+			`First line must contain header:${EOL}` +
 				'<comment token> SYNTAX TEST "<scopeName>" "description"',
 		)
 	})
