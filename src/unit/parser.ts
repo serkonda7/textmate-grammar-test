@@ -1,72 +1,6 @@
 import { EOL } from 'node:os'
 import type { GrammarTestCase, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
 
-const leftArrowAssertRegex =
-	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
-const upArrowAssertRegex =
-	/^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
-
-export function parseScopeAssertion(
-	testCaseLineNumber: number,
-	commentLength: number,
-	as: string,
-): ScopeAssertion[] {
-	const s = as.slice(commentLength)
-
-	if (s.trim().startsWith('^')) {
-		const upArrowMatch = upArrowAssertRegex.exec(s)
-		if (upArrowMatch !== null) {
-			const [, , scopes = '', exclusions = ''] = upArrowMatch
-
-			if (scopes === '' && exclusions === '') {
-				throw new Error(
-					`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
-				)
-			} else {
-				const result = []
-				let startIdx = s.indexOf('^')
-				while (startIdx !== -1) {
-					let endIndx = startIdx
-					while (s[endIndx + 1] === '^') {
-						endIndx++
-					}
-					result.push({
-						from: commentLength + startIdx,
-						to: commentLength + endIndx + 1,
-						scopes: scopes.split(/\s+/).filter((x) => x),
-						exclude: exclusions.split(/\s+/).filter((x) => x),
-					} as ScopeAssertion)
-					startIdx = s.indexOf('^', endIndx + 1)
-				}
-				return result
-			}
-		} else {
-			throw new Error(`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL}`)
-		}
-	}
-
-	const leftArrowMatch = leftArrowAssertRegex.exec(s)
-
-	if (leftArrowMatch !== null) {
-		const [, , tildas, dashes, scopes = '', exclusions = ''] = leftArrowMatch
-		if (scopes === '' && exclusions === '') {
-			throw new Error(
-				`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
-			)
-		} else {
-			return [
-				{
-					from: tildas.length,
-					to: tildas.length + dashes.length,
-					scopes: scopes.split(/\s+/).filter((x) => x),
-					exclude: exclusions.split(/\s+/).filter((x) => x),
-				},
-			]
-		}
-	}
-
-	return []
-}
 
 const HEADER_ERR_MSG = 'Invalid header'
 const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
@@ -148,4 +82,72 @@ export function parseGrammarTestCase(str: string): GrammarTestCase {
 		source: source,
 		assertions: lineAssertions,
 	} as GrammarTestCase
+}
+
+
+const leftArrowAssertRegex =
+	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
+const upArrowAssertRegex =
+	/^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
+
+export function parseScopeAssertion(
+	testCaseLineNumber: number,
+	commentLength: number,
+	as: string,
+): ScopeAssertion[] {
+	const s = as.slice(commentLength)
+
+	if (s.trim().startsWith('^')) {
+		const upArrowMatch = upArrowAssertRegex.exec(s)
+		if (upArrowMatch !== null) {
+			const [, , scopes = '', exclusions = ''] = upArrowMatch
+
+			if (scopes === '' && exclusions === '') {
+				throw new Error(
+					`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
+				)
+			} else {
+				const result = []
+				let startIdx = s.indexOf('^')
+				while (startIdx !== -1) {
+					let endIndx = startIdx
+					while (s[endIndx + 1] === '^') {
+						endIndx++
+					}
+					result.push({
+						from: commentLength + startIdx,
+						to: commentLength + endIndx + 1,
+						scopes: scopes.split(/\s+/).filter((x) => x),
+						exclude: exclusions.split(/\s+/).filter((x) => x),
+					} as ScopeAssertion)
+					startIdx = s.indexOf('^', endIndx + 1)
+				}
+				return result
+			}
+		} else {
+			throw new Error(`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL}`)
+		}
+	}
+
+	const leftArrowMatch = leftArrowAssertRegex.exec(s)
+
+	if (leftArrowMatch !== null) {
+		const [, , tildas, dashes, scopes = '', exclusions = ''] = leftArrowMatch
+		if (scopes === '' && exclusions === '') {
+			throw new Error(
+				`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
+			)
+		} else {
+			return [
+				{
+					from: tildas.length,
+					to: tildas.length + dashes.length,
+					scopes: scopes.split(/\s+/).filter((x) => x),
+					exclude: exclusions.split(/\s+/).filter((x) => x),
+				},
+			]
+		}
+	}
+
+	return []
 }
