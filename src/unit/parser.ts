@@ -30,7 +30,6 @@ export function parseHeader(line: string): TestCaseMetadata {
 }
 
 export function parseTestFile(str: string): GrammarTestCase {
-	const headerLength = 1
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
@@ -39,7 +38,6 @@ export function parseTestFile(str: string): GrammarTestCase {
 
 	const metadata = parseHeader(lines[0])
 	const { commentToken } = metadata
-	const rest = lines.slice(headerLength)
 	const commentTokenLength = commentToken.length
 
 	function isLineAssertion(s: string): boolean {
@@ -55,24 +53,26 @@ export function parseTestFile(str: string): GrammarTestCase {
 	}
 
 	let sourceLineNumber = 0
-	const lineAssertions = [] as LineAssertion[]
-	let currentLineAssertion = emptyLineAssertion(headerLength, 0)
-	const source = [] as string[]
-	rest.forEach((s: string, i: number) => {
-		const tcLineNumber = headerLength + i
+	const lineAssertions: LineAssertion[] = []
+	let currentLineAssertion = emptyLineAssertion(0, 0)
+	const source: string[] = []
 
-		if (s.startsWith(commentToken) && isLineAssertion(s)) {
-			const as = parseScopeAssertion(tcLineNumber, commentToken.length, s)
+	for (let i = 1; i < lines.length; i++) {
+		const line = lines[i]
+
+		if (line.startsWith(commentToken) && isLineAssertion(line)) {
+			const as = parseScopeAssertion(i, commentToken.length, line)
 			currentLineAssertion.scopeAssertions = [...currentLineAssertion.scopeAssertions, ...as]
 		} else {
 			if (currentLineAssertion.scopeAssertions.length !== 0) {
 				lineAssertions.push(currentLineAssertion)
 			}
-			currentLineAssertion = emptyLineAssertion(tcLineNumber, sourceLineNumber)
-			source.push(s)
+			currentLineAssertion = emptyLineAssertion(i, sourceLineNumber)
+			source.push(line)
 			sourceLineNumber++
 		}
-	})
+	}
+
 	if (currentLineAssertion.scopeAssertions.length !== 0) {
 		lineAssertions.push(currentLineAssertion)
 	}
