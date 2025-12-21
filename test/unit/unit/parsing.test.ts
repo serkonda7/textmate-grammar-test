@@ -1,13 +1,13 @@
+import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
-import { expect } from 'chai'
 import { parseHeader } from 'textmate-grammar-test/unit'
 import { parseGrammarTestCase, parseScopeAssertion } from '../../../src/unit/parser.ts'
 
 describe('parseHeader', () => {
 	it('should parse one character comment token', () => {
 		const result = parseHeader('# SYNTAX TEST "scala"')
-		expect(result).to.eql({
+		expect(result).toEqual({
 			commentToken: '#',
 			description: '',
 			scope: 'scala',
@@ -16,14 +16,14 @@ describe('parseHeader', () => {
 
 	it('should parse description', () => {
 		const result = parseHeader('-- SYNTAX TEST "sql" "some description"')
-		expect(result).to.eql({
+		expect(result).toEqual({
 			commentToken: '--',
 			description: 'some description',
 			scope: 'sql',
 		})
 	})
 	it('should throw meaningful error msg', () => {
-		expect(parseHeader.bind({}, '-- SYNTAX TEST sql"')).to.throw(
+		expect(parseHeader.bind({}, '-- SYNTAX TEST sql"')).toThrow(
 			`First line must contain header:${EOL}` +
 				'<comment token> SYNTAX TEST "<scopeName>" "description"',
 		)
@@ -32,7 +32,7 @@ describe('parseHeader', () => {
 
 describe('parseScopeAssertion', () => {
 	it('should parse single ^ accent', () => {
-		expect(parseScopeAssertion(0, 1, '#^ source.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#^ source.dhall')).toEqual([
 			{
 				from: 1,
 				scopes: ['source.dhall'],
@@ -42,7 +42,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse multiple ^^^^ accents', () => {
-		expect(parseScopeAssertion(0, 1, '#  ^^^^^^ source.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#  ^^^^^^ source.dhall')).toEqual([
 			{
 				from: 3,
 				scopes: ['source.dhall'],
@@ -53,7 +53,7 @@ describe('parseScopeAssertion', () => {
 	})
 
 	it('should parse multiple scopes', () => {
-		expect(parseScopeAssertion(0, 1, '# ^^ source.dhall variable.other.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '# ^^ source.dhall variable.other.dhall')).toEqual([
 			{
 				from: 2,
 				scopes: ['source.dhall', 'variable.other.dhall'],
@@ -64,7 +64,7 @@ describe('parseScopeAssertion', () => {
 	})
 
 	it('should parse multiple accent groups', () => {
-		expect(parseScopeAssertion(0, 1, '# ^^ ^^^ source.dhall')).to.deep.equal([
+		expect(parseScopeAssertion(0, 1, '# ^^ ^^^ source.dhall')).toStrictEqual([
 			{
 				exclude: [],
 				from: 2,
@@ -81,7 +81,7 @@ describe('parseScopeAssertion', () => {
 	})
 
 	it('should parse single <- left arrow', () => {
-		expect(parseScopeAssertion(0, 1, '# <- source.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '# <- source.dhall')).toEqual([
 			{
 				from: 0,
 				scopes: ['source.dhall'],
@@ -92,7 +92,7 @@ describe('parseScopeAssertion', () => {
 	})
 
 	it('should parse multi <~~--- left arrow with padding', () => {
-		expect(parseScopeAssertion(0, 1, '# <~~~--- source.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '# <~~~--- source.dhall')).toEqual([
 			{
 				from: 3,
 				scopes: ['source.dhall'],
@@ -102,7 +102,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse single ^ accent with exclusion', () => {
-		expect(parseScopeAssertion(0, 1, '#^ - source.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#^ - source.dhall')).toEqual([
 			{
 				from: 1,
 				scopes: [],
@@ -112,7 +112,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse  ^^^ accents with scopes and exclusion', () => {
-		expect(parseScopeAssertion(0, 1, '#^^^ foo.bar bar - source.dhall foo')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#^^^ foo.bar bar - source.dhall foo')).toEqual([
 			{
 				from: 1,
 				scopes: ['foo.bar', 'bar'],
@@ -122,7 +122,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse <- with exclusion', () => {
-		expect(parseScopeAssertion(0, 1, '#<- - source.dhall')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#<- - source.dhall')).toEqual([
 			{
 				from: 0,
 				scopes: [],
@@ -132,7 +132,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse  <- with scopes and exclusion', () => {
-		expect(parseScopeAssertion(0, 1, '#<-- foo.bar bar - source.dhall foo')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#<-- foo.bar bar - source.dhall foo')).toEqual([
 			{
 				from: 0,
 				scopes: ['foo.bar', 'bar'],
@@ -142,7 +142,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse correctly treat spaces at the end with ^^', () => {
-		expect(parseScopeAssertion(0, 1, '#^^ foo - bar   ')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#^^ foo - bar   ')).toEqual([
 			{
 				from: 1,
 				scopes: ['foo'],
@@ -152,7 +152,7 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should parse correctly treat spaces at the end with  <- ', () => {
-		expect(parseScopeAssertion(0, 1, '#<-- foo ')).to.eql([
+		expect(parseScopeAssertion(0, 1, '#<-- foo ')).toEqual([
 			{
 				from: 0,
 				scopes: ['foo'],
@@ -162,14 +162,14 @@ describe('parseScopeAssertion', () => {
 		])
 	})
 	it('should throw an error for an empty <- ', () => {
-		expect(() => parseScopeAssertion(0, 1, '#<-- - ')).to.throw(
+		expect(() => parseScopeAssertion(0, 1, '#<-- - ')).toThrow(
 			`Invalid assertion at line 0:${EOL}` +
 				`#<-- - ${EOL}` +
 				` Missing both required and prohibited scopes`,
 		)
 	})
 	it('should throw an error on empty ^ ', () => {
-		expect(() => parseScopeAssertion(0, 1, '# ^^^ ')).to.throw(
+		expect(() => parseScopeAssertion(0, 1, '# ^^^ ')).toThrow(
 			`Invalid assertion at line 0:${EOL}` +
 				`# ^^^ ${EOL}` +
 				` Missing both required and prohibited scopes`,
@@ -180,13 +180,13 @@ describe('parseScopeAssertion', () => {
 describe('parseGrammarTestCase', () => {
 	it('should parse a valid test case', () => {
 		const testFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
-		expect(parseGrammarTestCase(testFile)).to.eql(parserTestDhallExpectedResult)
+		expect(parseGrammarTestCase(testFile)).toEqual(parserTestDhallExpectedResult)
 	})
 
 	it('should parse a test case with a windows line endings', () => {
 		const originalFile = fs.readFileSync('./test/resources/parser.test.dhall').toString()
 		const crlfFile = originalFile.replace(/\r?\n/g, '\n')
-		expect(parseGrammarTestCase(crlfFile)).to.eql(parserTestDhallExpectedResult)
+		expect(parseGrammarTestCase(crlfFile)).toEqual(parserTestDhallExpectedResult)
 	})
 })
 

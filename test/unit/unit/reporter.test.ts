@@ -1,7 +1,7 @@
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as p from 'node:path'
-import { expect } from 'chai'
 import { XMLParser } from 'fast-xml-parser'
 import type { LineAssertion, TestCaseMetadata, TestFailure } from '../../../src/unit/model.ts'
 import type { Reporter } from '../../../src/unit/reporter.ts'
@@ -64,19 +64,19 @@ describe('XUnit reporters', () => {
 			assertReportFiles('TEST-file1.xml', 'TEST-file2.xml')
 
 			const xml1 = readReport('TEST-file1.xml')
-			expect(xml1.testsuite.$.name).eq('case 1 description')
-			expect(xml1.testsuite.$.tests).eq('2')
-			expect(xml1.testsuite.$.failures).eq('0')
-			expect(xml1.testsuite.testcase).length(2)
-			expect(xml1.testsuite.testcase[0].$.name).eq('file1:1')
-			expect(xml1.testsuite.testcase[1].$.name).eq('file1:2')
+			expect(xml1.testsuite.$.name).toEqual('case 1 description')
+			expect(xml1.testsuite.$.tests).toEqual('2')
+			expect(xml1.testsuite.$.failures).toEqual('0')
+			expect(xml1.testsuite.testcase).toHaveLength(2)
+			expect(xml1.testsuite.testcase[0].$.name).toEqual('file1:1')
+			expect(xml1.testsuite.testcase[1].$.name).toEqual('file1:2')
 
 			const xml2 = readReport('TEST-file2.xml')
-			expect(xml2.testsuite.$.name).eq('file2')
-			expect(xml2.testsuite.$.tests).eq('1')
-			expect(xml2.testsuite.$.failures).eq('0')
-			expect(xml2.testsuite.testcase).length(1)
-			expect(xml2.testsuite.testcase[0].$.name).eq('file2:3')
+			expect(xml2.testsuite.$.name).toEqual('file2')
+			expect(xml2.testsuite.$.tests).toEqual('1')
+			expect(xml2.testsuite.$.failures).toEqual('0')
+			expect(xml2.testsuite.testcase).toHaveLength(1)
+			expect(xml2.testsuite.testcase[0].$.name).toEqual('file2:3')
 		})
 
 		it('should place reports for test files in nested directories directly into reports directory with mangled names', async () => {
@@ -112,16 +112,16 @@ describe('XUnit reporters', () => {
 			assertReportFiles('TEST-file1.xml', 'TEST-dir1.file2.xml', 'TEST-dir1.dir2.file3.xml')
 
 			const xml1 = readReport('TEST-file1.xml')
-			expect(xml1.testsuite.$.name).eq('file1')
-			expect(xml1.testsuite.testcase[0].$.name).eq('file1:1')
+			expect(xml1.testsuite.$.name).toEqual('file1')
+			expect(xml1.testsuite.testcase[0].$.name).toEqual('file1:1')
 
 			const xml2 = readReport('TEST-dir1.file2.xml')
-			expect(xml2.testsuite.$.name).eq('case 2 description')
-			expect(xml2.testsuite.testcase[0].$.name).eq(`dir1${sep}file2:2`)
+			expect(xml2.testsuite.$.name).toEqual('case 2 description')
+			expect(xml2.testsuite.testcase[0].$.name).toEqual(`dir1${sep}file2:2`)
 
 			const xml3 = readReport('TEST-dir1.dir2.file3.xml')
-			expect(xml3.testsuite.$.name).eq(`dir1${sep}dir2${sep}file3`)
-			expect(xml3.testsuite.testcase[0].$.name).eq(`dir1${sep}dir2${sep}file3:3`)
+			expect(xml3.testsuite.$.name).toEqual(`dir1${sep}dir2${sep}file3`)
+			expect(xml3.testsuite.testcase[0].$.name).toEqual(`dir1${sep}dir2${sep}file3:3`)
 		})
 
 		it('should escape reserved characters in failure description', async () => {
@@ -140,7 +140,7 @@ describe('XUnit reporters', () => {
 			reporter.reportSuiteResult()
 
 			const xml = readReport('TEST-file.xml')
-			expect(xml.testsuite.testcase[0].failure[0]._).eq(
+			expect(xml.testsuite.testcase[0].failure[0]._).toEqual(
 				[
 					'1: xml hell " \' < > &', // the escapes were converted back to regular chars by the xml lib when parsing
 					'   ^',
@@ -185,17 +185,17 @@ describe('XUnit reporters', () => {
 			assertReportFiles('TEST-file.xml')
 
 			const xml = readReport('TEST-file.xml')
-			expect(xml.testsuite.$.tests).eq('4')
-			expect(xml.testsuite.$.failures).eq('3')
-			expect(xml.testsuite.testcase).length(4)
+			expect(xml.testsuite.$.tests).toEqual('4')
+			expect(xml.testsuite.$.failures).toEqual('3')
+			expect(xml.testsuite.testcase).toHaveLength(4)
 
 			const [xmlCase1, xmlCase2, xmlCase3, xmlCase4] = xml.testsuite.testcase
 
-			expect(xmlCase1.$.name).eq('file:1')
-			expect(xmlCase1.failure).length(1)
+			expect(xmlCase1.$.name).toEqual('file:1')
+			expect(xmlCase1.failure).toHaveLength(1)
 			const [xmlFailure11] = xmlCase1.failure
-			expect(xmlFailure11.$.message).eq('Assertion failed at 1:1:2')
-			expect(xmlFailure11._).eq(
+			expect(xmlFailure11.$.message).toEqual('Assertion failed at 1:1:2')
+			expect(xmlFailure11._).toEqual(
 				[
 					'1: 1  source1',
 					'   ^',
@@ -205,25 +205,25 @@ describe('XUnit reporters', () => {
 				].join('\n'),
 			)
 
-			expect(xmlCase2.$.name).eq('file:4')
+			expect(xmlCase2.$.name).toEqual('file:4')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			expect(xmlCase2.failure).to.be.undefined
+			expect(xmlCase2.failure).toBeUndefined
 
-			expect(xmlCase3.$.name).eq('file:6')
-			expect(xmlCase3.failure).length(2)
+			expect(xmlCase3.$.name).toEqual('file:6')
+			expect(xmlCase3.failure).toHaveLength(2)
 			const [xmlFailure31, xmlFailure32] = xmlCase3.failure
-			expect(xmlFailure31.$.message).eq('Assertion failed at 6:1:4')
-			expect(xmlFailure31._).eq(
+			expect(xmlFailure31.$.message).toEqual('Assertion failed at 6:1:4')
+			expect(xmlFailure31._).toEqual(
 				['6: 6  source3', '   ^^^', 'missing required scopes: m1', 'actual: a1 a2'].join('\n'),
 			)
-			expect(xmlFailure32.$.message).eq('Assertion failed at 6:4:6')
-			expect(xmlFailure32._).eq(
+			expect(xmlFailure32.$.message).toEqual('Assertion failed at 6:4:6')
+			expect(xmlFailure32._).toEqual(
 				['6: 6  source3', '      ^^', 'prohibited scopes: u1', 'actual: a1'].join('\n'),
 			)
 
-			expect(xmlCase4.$.name).eq('file:9')
+			expect(xmlCase4.$.name).toEqual('file:9')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			expect(xmlCase4.failure).to.be.undefined
+			expect(xmlCase4.failure).toBeUndefined
 		})
 
 		it('should create report for test file which fails to parse', async () => {
@@ -257,18 +257,18 @@ describe('XUnit reporters', () => {
 			assertReportFiles('TEST-file1.xml', 'TEST-file2.xml', 'TEST-file3.xml')
 
 			const xml = readReport('TEST-file2.xml')
-			expect(xml.testsuite.$.tests).eq('1')
-			expect(xml.testsuite.$.failures).eq('0')
-			expect(xml.testsuite.$.errors).eq('1')
-			expect(xml.testsuite.testcase).length(1)
+			expect(xml.testsuite.$.tests).toEqual('1')
+			expect(xml.testsuite.$.failures).toEqual('0')
+			expect(xml.testsuite.$.errors).toEqual('1')
+			expect(xml.testsuite.testcase).toHaveLength(1)
 
 			const xmlCase = xml.testsuite.testcase[0]
-			expect(xmlCase.$.name).eq('Parse test file')
+			expect(xmlCase.$.name).toEqual('Parse test file')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			expect(xmlCase.failure).to.be.undefined
-			expect(xmlCase.error).length(1)
-			expect(xmlCase.error[0].$.message).eq('Failed to parse test file')
-			expect(xmlCase.error[0]._).satisfy((m: string) =>
+			expect(xmlCase.failure).toBeUndefined()
+			expect(xmlCase.error).toHaveLength(1)
+			expect(xmlCase.error[0].$.message).toEqual('Failed to parse test file')
+			expect(xmlCase.error[0]._).toSatisfy((m: string) =>
 				m.startsWith(
 					[
 						'Error: First line must contain header:',
@@ -311,18 +311,18 @@ describe('XUnit reporters', () => {
 			assertReportFiles('TEST-file1.xml', 'TEST-file2.xml', 'TEST-file3.xml')
 
 			const xml = readReport('TEST-file2.xml')
-			expect(xml.testsuite.$.tests).eq('1')
-			expect(xml.testsuite.$.failures).eq('0')
-			expect(xml.testsuite.$.errors).eq('1')
-			expect(xml.testsuite.testcase).length(1)
+			expect(xml.testsuite.$.tests).toEqual('1')
+			expect(xml.testsuite.$.failures).toEqual('0')
+			expect(xml.testsuite.$.errors).toEqual('1')
+			expect(xml.testsuite.testcase).toHaveLength(1)
 
 			const xmlCase = xml.testsuite.testcase[0]
-			expect(xmlCase.$.name).eq('Run grammar tests')
+			expect(xmlCase.$.name).toEqual('Run grammar tests')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			expect(xmlCase.failure).to.be.undefined
-			expect(xmlCase.error).length(1)
-			expect(xmlCase.error[0].$.message).eq('Error when running grammar tests')
-			expect(xmlCase.error[0]._).satisfy((m: string) =>
+			expect(xmlCase.failure).toBeUndefined()
+			expect(xmlCase.error).toHaveLength(1)
+			expect(xmlCase.error[0].$.message).toEqual('Error when running grammar tests')
+			expect(xmlCase.error[0]._).toSatisfy((m: string) =>
 				m.startsWith(['Error: No grammar provided for <foobar>'].join('\n')),
 			)
 		})
@@ -364,13 +364,13 @@ describe('XUnit reporters', () => {
 			reporter.reportSuiteResult()
 
 			const xml1 = readReport('TEST-file1.xml')
-			expect(xml1.testsuite.testcase[0].$.classname).eq('file1')
+			expect(xml1.testsuite.testcase[0].$.classname).toEqual('file1')
 
 			const xml2 = readReport('TEST-file2.xml')
-			expect(xml2.testsuite.testcase[0].$.classname).eq('file2')
+			expect(xml2.testsuite.testcase[0].$.classname).toEqual('file2')
 
 			const xml3 = readReport('TEST-file3.xml')
-			expect(xml3.testsuite.testcase[0].$.classname).eq('file3')
+			expect(xml3.testsuite.testcase[0].$.classname).toEqual('file3')
 		})
 
 		it('should put all failed assertions for one source line into single failure', async () => {
@@ -408,17 +408,17 @@ describe('XUnit reporters', () => {
 			assertReportFiles('TEST-file.xml')
 
 			const xml = readReport('TEST-file.xml')
-			expect(xml.testsuite.$.tests).eq('4')
-			expect(xml.testsuite.$.failures).eq('2')
-			expect(xml.testsuite.testcase).length(4)
+			expect(xml.testsuite.$.tests).toEqual('4')
+			expect(xml.testsuite.$.failures).toEqual('2')
+			expect(xml.testsuite.testcase).toHaveLength(4)
 
 			const [xmlCase1, xmlCase2, xmlCase3, xmlCase4] = xml.testsuite.testcase
 
-			expect(xmlCase1.$.name).eq('file:1')
-			expect(xmlCase1.failure).length(1)
+			expect(xmlCase1.$.name).toEqual('file:1')
+			expect(xmlCase1.failure).toHaveLength(1)
 			const [xmlFailure1] = xmlCase1.failure
-			expect(xmlFailure1.$.message).eq('Failed at soure line 1')
-			expect(xmlFailure1._).eq(
+			expect(xmlFailure1.$.message).toEqual('Failed at soure line 1')
+			expect(xmlFailure1._).toEqual(
 				[
 					'at [file:1:1:2]:',
 					'1: 1  source1',
@@ -430,15 +430,15 @@ describe('XUnit reporters', () => {
 				].join('\n'),
 			)
 
-			expect(xmlCase2.$.name).eq('file:4')
+			expect(xmlCase2.$.name).toEqual('file:4')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			expect(xmlCase2.failure).to.be.undefined
+			expect(xmlCase2.failure).toBeUndefined()
 
-			expect(xmlCase3.$.name).eq('file:6')
-			expect(xmlCase3.failure).length(1)
+			expect(xmlCase3.$.name).toEqual('file:6')
+			expect(xmlCase3.failure).toHaveLength(1)
 			const [xmlFailure3] = xmlCase3.failure
-			expect(xmlFailure3.$.message).eq('Failed at soure line 6')
-			expect(xmlFailure3._).eq(
+			expect(xmlFailure3.$.message).toEqual('Failed at soure line 6')
+			expect(xmlFailure3._).toEqual(
 				[
 					'at [file:6:1:4]:',
 					'6: 6  source3',
@@ -455,15 +455,16 @@ describe('XUnit reporters', () => {
 				].join('\n'),
 			)
 
-			expect(xmlCase4.$.name).eq('file:9')
+			expect(xmlCase4.$.name).toEqual('file:9')
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			expect(xmlCase4.failure).to.be.undefined
+			expect(xmlCase4.failure).toBeUndefined()
 		})
 	})
 
 	const assertReportFiles: (...expected: string[]) => void = (...expected: string[]) => {
 		const reportFiles = fs.readdirSync(reportsDir)
-		expect(reportFiles).members(expected).length(expected.length)
+		expect(reportFiles).toEqual(expect.arrayContaining(expected))
+		expect(reportFiles).toHaveLength(expected.length)
 	}
 
 	const readReport = (filename: string) => {

@@ -1,9 +1,9 @@
+import { describe, expect, it } from 'bun:test'
 import child_process from 'node:child_process'
 import fs from 'node:fs'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import util from 'node:util'
-import { expect } from 'chai'
 import { normalize } from '../helpers.test.ts'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -15,8 +15,7 @@ const exec = util.promisify(child_process.exec)
 describe('snap test', () => {
 	const root = process.cwd()
 
-	it('should report OK for test without errors', async function () {
-		this.timeout(5000)
+	it('should report OK for test without errors', async () => {
 		return exec(
 			`node ${root}/dist/snapshot.js ` +
 				`--scope source.dhall ` +
@@ -27,17 +26,16 @@ describe('snap test', () => {
 				maxBuffer: 1024 * 512, // 512kb
 			},
 		).then(({ stdout, stderr }) => {
-			expect(normalize(stdout)).to.eq(
+			expect(normalize(stdout)).toEqual(
 				normalize(
 					`✓ ${root}/test/functional/resources/snap-ok-scenario/simple.dhall run successfully.`,
 				),
 			)
-			expect(stderr).to.eq('')
+			expect(stderr).toEqual('')
 		})
 	})
 
-	it('should report wrong or missing scopes', async function () {
-		this.timeout(5000)
+	it('should report wrong or missing scopes', async () => {
 		return exec(
 			`node ${root}/dist/snapshot.js ` +
 				`--scope source.dhall ` +
@@ -52,7 +50,7 @@ describe('snap test', () => {
 				throw new Error('should have failed')
 			})
 			.catch(({ stdout }) => {
-				expect(normalize(stdout)).to.eq(
+				expect(normalize(stdout)).toEqual(
 					normalize(
 						fs
 							.readFileSync(`${__dirname}/resources/snap-simple-failure/stdout.txt`)
@@ -63,8 +61,7 @@ describe('snap test', () => {
 			})
 	})
 
-	it('should report update snapshot', async function () {
-		this.timeout(5000)
+	it('should report update snapshot', async () => {
 		fs.copyFileSync(
 			`${__dirname}/resources/snap-update-snapshot/ref.dhall.snap`,
 			`${__dirname}/resources/snap-update-snapshot/simple.dhall.snap`,
@@ -90,12 +87,12 @@ describe('snap test', () => {
 				cwd: root,
 			},
 		).then(({ stdout, stderr }) => {
-			expect(normalize(stdout)).to.eq(
+			expect(normalize(stdout)).toEqual(
 				normalize(
 					`✓ ${root}/test/functional/resources/snap-update-snapshot/simple.dhall run successfully.\n`,
 				),
 			)
-			expect(stderr).to.eq('')
+			expect(stderr).toEqual('')
 		})
 		fs.unlinkSync(`${__dirname}/resources/snap-update-snapshot/simple.dhall.snap`)
 	})

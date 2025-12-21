@@ -1,9 +1,9 @@
+import { describe, expect, it } from 'bun:test'
 import child_process from 'node:child_process'
 import fs from 'node:fs'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import util from 'node:util'
-import { expect } from 'chai'
 import { normalize } from '../helpers.test.ts'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -12,8 +12,7 @@ const __dirname = dirname(__filename)
 const exec = util.promisify(child_process.exec)
 
 // FIXME: assertions and done()
-describe('unit test', async function () {
-	this.timeout(5000)
+describe('unit test', async () => {
 	const root = process.cwd()
 
 	it('should report OK for test without errors', () => {
@@ -25,12 +24,12 @@ describe('unit test', async function () {
 				cwd: root,
 			},
 		).then(({ stdout, stderr }) => {
-			expect(normalize(stdout.trim())).to.eql(
+			expect(normalize(stdout.trim())).toEqual(
 				normalize(
 					`✓ ${root}/test/functional/resources/unit-ok-scenario/success.dhall run successfuly.`,
 				),
 			)
-			expect(stderr).to.eq('')
+			expect(stderr).toEqual('')
 		})
 	})
 
@@ -47,7 +46,7 @@ describe('unit test', async function () {
 				throw new Error('should have failed')
 			})
 			.catch(({ stdout }) => {
-				expect(normalize(stdout)).to.deep.equal(
+				expect(normalize(stdout)).toStrictEqual(
 					normalize(
 						fs
 							.readFileSync(`${__dirname}/resources/unit-report-unexpected-scopes/stdout.txt`)
