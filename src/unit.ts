@@ -7,7 +7,7 @@ import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
-import { parseGrammarTestCase, runGrammarTestCase } from './unit/index.ts'
+import { parseGrammarTestCase, runGrammarTestCase } from './unit/core.ts'
 import type { GrammarTestCase } from './unit/model.ts'
 import { createReporter } from './unit/reporter.ts'
 
@@ -76,7 +76,8 @@ async function main(): Promise<ExitCode> {
 		)
 		.option(
 			'--config <configuration.json>',
-			'Path to the language configuration, package.json by default',
+			'Path to language configuration. Default: `package.json`',
+			'package.json',
 		)
 		.option(
 			'-c, --compact',

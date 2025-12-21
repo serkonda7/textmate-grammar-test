@@ -68,39 +68,43 @@ export function parseScopeAssertion(
 	return []
 }
 
-const headerErrorMessage =
-	`Expecting the first line in the syntax test file to be in the following format:${EOL}` +
-	`<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?${EOL}`
+const HEADER_ERR_MSG =
+	`First line must contain header:${EOL}` +
+	`<comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
 
-const headerRegex = /^([^\s]+)\s+SYNTAX\s+TEST\s+"([^"]+)"(?:\s+"([^"]+)")?\s*$/
+const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
+const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
+const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
+const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
 /**
- * parse the first line with the format:
- * <comment character(s)> SYNTAX TEST "<language identifier>" <"description">? ([+-]<flag>)*
+ * Parse first line header into metadata.
+ *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
  */
-export function parseHeader(as: string[]): TestCaseMetadata {
-	if (as.length < 1) {
-		throw new Error(headerErrorMessage)
+export function parseHeader(line: string): TestCaseMetadata {
+	const match = HEADER_REGEX.exec(line)
+
+	// No header matched
+	if (!match?.groups) {
+		throw new Error(HEADER_ERR_MSG)
 	}
 
-	const matchResult = headerRegex.exec(as[0])
-
-	if (matchResult === null) {
-		throw new Error(headerErrorMessage)
-	} else {
-		const [, commentToken, scope, description = ''] = matchResult
-		return {
-			commentToken: commentToken,
-			scope: scope,
-			description: description,
-		} as TestCaseMetadata
+	return {
+		commentToken: match.groups.comment,
+		scope: match.groups.scope,
+		description: match.groups.desc ?? '',
 	}
 }
 
 export function parseGrammarTestCase(str: string): GrammarTestCase {
 	const headerLength = 1
 	const lines = str.split(/\r\n|\n/)
-	const metadata = parseHeader(lines)
+
+	if (lines.length <= 1) {
+		throw new Error('Expected non-empty test')
+	}
+
+	const metadata = parseHeader(lines[0])
 	const { commentToken } = metadata
 	const rest = lines.slice(headerLength)
 	const commentTokenLength = commentToken.length

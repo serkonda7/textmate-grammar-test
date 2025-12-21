@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { missingScopes_ } from '../../../src/unit/index.ts'
+import { missingScopes_ } from '../../../src/unit/core.ts'
 
 // FIXME: move somewhere..
 describe('scopesEqual_', () => {

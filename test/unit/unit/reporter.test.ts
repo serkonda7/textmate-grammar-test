@@ -239,8 +239,8 @@ describe('XUnit reporters', () => {
 			reporter.reportParseError(
 				'file2',
 				new Error(
-					'Expecting the first line in the syntax test file to be in the following format:\n' +
-						'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?\n',
+					'First line must contain header:\n' +
+						'<comment token> SYNTAX TEST "<scopeName>" "description"\n',
 				),
 			)
 			reporter.reportTestResult(
@@ -271,8 +271,8 @@ describe('XUnit reporters', () => {
 			expect(xmlCase.error[0]._).satisfy((m: string) =>
 				m.startsWith(
 					[
-						'Error: Expecting the first line in the syntax test file to be in the following format:',
-						'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?',
+						'Error: First line must contain header:',
+						'<comment token> SYNTAX TEST "<scopeName>" "description"',
 					].join('\n'),
 				),
 			)
@@ -357,8 +357,8 @@ describe('XUnit reporters', () => {
 			reporter.reportParseError(
 				'file3',
 				new Error(
-					'Expecting the first line in the syntax test file to be in the following format:\n' +
-						'<comment character(s)> SYNTAX TEST "<language identifier>"  ("description")?\n',
+					'First line must contain header:\n' +
+						'<comment token> SYNTAX TEST "<scopeName>" "description"\n',
 				),
 			)
 			reporter.reportSuiteResult()
@@ -478,7 +478,6 @@ function metadata(description?: string): TestCaseMetadata {
 		scope: 'main.scope',
 		commentToken: '//',
 		description: description || '',
-		allowMiddleLineAssertions: true,
 	}
 }
 

@@ -27,13 +27,16 @@
     "textmate-grammar-test": "./dist/unit.js",
     "textmate-grammar-snap": "./dist/snapshot.js"
   },
+  "exports": {
+    "./unit": "./src/unit/index.ts"
+  },
   "files": [
     "dist/",
     "README.md",
     "LICENSE.txt"
   ],
   "scripts": {
-    "test": "mocha \"test/**/*.test.ts\"",
+    "test": "bun run check && mocha \"test/**/*.test.ts\"",
     "lint": "biome check",
     "lint:fix": "biome check --write",
     "lint:ci": "biome ci",

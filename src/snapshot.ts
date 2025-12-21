@@ -27,7 +27,8 @@ program
 	.option('-u, --updateSnapshot', 'overwrite all snap files with new changes')
 	.option(
 		'--config <configuration.json>',
-		'Path to the language configuration, package.json by default',
+		'Path to language configuration. Default: `package.json`',
+		'package.json',
 	)
 	.option('--printNotModified', 'include not modified scopes in the output', false)
 	.option('--expandDiff', 'produce each diff on two lines prefixed with "++" and "--"', false)

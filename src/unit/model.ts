@@ -2,7 +2,6 @@ export interface TestCaseMetadata {
 	commentToken: string
 	scope: string
 	description: string
-	allowMiddleLineAssertions: boolean
 }
 
 export interface ScopeAssertion {
