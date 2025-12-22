@@ -89,7 +89,7 @@ export function parseTestFile(str: string): GrammarTestFile {
 	}
 }
 
-class AssertionParser {
+export class AssertionParser {
 	comment_offset: number
 	line: string = ''
 	pos: number = 0
@@ -144,20 +144,27 @@ class AssertionParser {
 			this.skip_spaces()
 
 			// Parse scopes
-			const scope_re = /(?<scope>(?:!\s+)?\w+(?:\.[-\w]+)*)/g
+			const R_RAW_SCOPE = '\\w+(?:\\.[-\\w]+)*'
+			const R_SCOPES = `(?<scope>${R_RAW_SCOPE})*`
+			const R_EXCLUDES = `(?:\\s+!\\s+(?<exclude>${R_RAW_SCOPE}))*`
+			const SCOPES_RE = new RegExp(`${R_SCOPES}${R_EXCLUDES}`, 'g')
 
 			const scopes: string[] = []
 			const exclusions: string[] = []
 
-			for (const match of this.line.slice(this.pos).matchAll(scope_re)) {
-				if (match.groups) {
-					const scopeStr = match.groups.scope.trim()
-					if (scopeStr.startsWith('!')) {
-						// Add exclusion without `!` and spaces
-						exclusions.push(scopeStr.slice(1).trimStart())
-					} else {
-						scopes.push(scopeStr)
-					}
+			for (const match of this.line.slice(this.pos).matchAll(SCOPES_RE)) {
+				if (!match.groups) {
+					throw new Error('Failed to parse scopes/exclusions')
+				}
+
+				const { scope, exclude } = match.groups
+
+				if (scope) {
+					scopes.push(scope)
+				}
+
+				if (exclude) {
+					exclusions.push(exclude)
 				}
 			}
 

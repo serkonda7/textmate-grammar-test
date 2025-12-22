@@ -1,21 +1,21 @@
-# SYNTAX TEST "source.testlang" "File with simple but complete test syntax"
+# SYNTAX TEST "source.xy" "File with simple but complete test syntax"
 
 var x = "foo"
-# <--- keyword.control.testlang
-#       ^^^^^ source.testlang string.quoted.double.testlang ! constant.integer.testlang
+# <--- keyword.control.xy
+#       ^^^^^ source.xy string.xy ! constant.integer.xy
 
 # Comments can be tested too
-# ^ comment.line.testlang
+# ^ comment.line.xy
 
 if (true) {
   var y = 4
-# <~~--- keyword.control.testlang
-# ^^^ keyword.control.testlang
+# <~~--- keyword.control.xy
+# ^^^ keyword.control.xy
 }
 
 # Another normal comment
 
 var s = "hi @{name}"
-#       ^^^^^^^^^^^^ string.quoted.double.testlang
-#           ^^^^^^^ variable.interpolation.testlang
-#             ^^^^ meta.label.testlang
+#       ^^^^^^^^^^^^ string.quoted.double.xy
+#           ^^^^^^^ variable.interpolation.xy
+#             ^^^^ meta.label.xy

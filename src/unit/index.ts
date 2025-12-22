@@ -1,1 +1,1 @@
-export { parseHeader, parseTestFile } from './parser.ts'
+export { AssertionParser, parseHeader, parseTestFile } from './parser.ts'

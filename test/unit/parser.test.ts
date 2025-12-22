@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import fs from 'node:fs'
-import { parseHeader, parseTestFile } from '../../src/unit/index.ts'
+import { AssertionParser, parseHeader, parseTestFile } from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/types.ts'
 
 describe('parseHeader', () => {
-	it('one char comment token', () => {
+	test('one char comment token', () => {
 		const res = parseHeader('# SYNTAX TEST "scala"')
 		expect(res).toEqual({
 			comment_token: '#',
@@ -13,7 +13,7 @@ describe('parseHeader', () => {
 		})
 	})
 
-	it('description and longer comment token', () => {
+	test('description and longer comment token', () => {
 		const res = parseHeader('-- SYNTAX TEST "sql" "some description"')
 		expect(res).toEqual({
 			comment_token: '--',
@@ -22,7 +22,7 @@ describe('parseHeader', () => {
 		})
 	})
 
-	it('header errors', () => {
+	test('header errors', () => {
 		expect(() => {
 			parseHeader('# bla bla "scala"')
 		}).toThrowError(SyntaxError('Invalid header'))
@@ -32,12 +32,12 @@ describe('parseHeader', () => {
 describe('parseTestFile', () => {
 	const input = fs.readFileSync('./test/resources/parser.testlang', 'utf-8')
 
-	it('valid test file', () => {
+	test('valid test file', () => {
 		const res = parseTestFile(input)
 		check_result(res)
 	})
 
-	it('windows line endings', () => {
+	test('windows line endings', () => {
 		const ctrl_input = input.replace(/\r?\n/g, '\n')
 		const res = parseTestFile(ctrl_input)
 		check_result(res)
@@ -54,4 +54,103 @@ describe('parseTestFile', () => {
 		// Number of assertions on last source line
 		expect(res.test_lines.at(-1)?.scope_asserts).toHaveLength(3)
 	}
+})
+
+describe('AssertionParser assert kinds', () => {
+	const assert_parser = new AssertionParser(1)
+
+	test('single ^', () => {
+		expect(assert_parser.parse_line('#^ source.xy')).toStrictEqual([
+			{
+				from: 1,
+				to: 2,
+				scopes: ['source.xy'],
+				exclude: [],
+			},
+		])
+
+		const res2 = assert_parser.parse_line('# ^ source.xy')[0]
+		expect(res2.from).toBe(2)
+		expect(res2.to).toBe(3)
+	})
+
+	test('multiple ^^^', () => {
+		const res = assert_parser.parse_line('# ^^^ string.xy')[0]
+		expect(res.from).toBe(2)
+		expect(res.to).toBe(5)
+	})
+
+	/* TODO
+	it('should parse multiple accent groups', () => {
+		expect(parseScopeAssertion(0, 1, '# ^^ ^^^ source.dhall')).toStrictEqual([
+			{
+				exclude: [],
+				from: 2,
+				scopes: ['source.dhall'],
+				to: 4,
+			},
+			{
+				exclude: [],
+				from: 5,
+				scopes: ['source.dhall'],
+				to: 8,
+			},
+		])
+	})
+	*/
+
+	test('simple arrow <---', () => {
+		const res = assert_parser.parse_line('# <--- source.xy')[0]
+		expect(res.from).toBe(0)
+		expect(res.to).toBe(3)
+	})
+
+	test('padded arrow <~~~--', () => {
+		const res = assert_parser.parse_line('# <~~~-- source.xy')[0]
+		expect(res.from).toBe(3)
+		expect(res.to).toBe(5)
+	})
+
+	test('leading spaces', () => {
+		const res = assert_parser.parse_line('    # ^^^ source.xy')[0]
+		expect(res.from).toBe(7)
+		expect(res.to).toBe(10)
+	})
+})
+
+describe('AssertionParser scopes', () => {
+	const assert_parser = new AssertionParser(1)
+
+	test('multiple scopes', () => {
+		const res = assert_parser.parse_line('# ^ constant.int.xy')[0]
+		expect(res.scopes).toHaveLength(1)
+		expect(res.exclude).toHaveLength(0)
+	})
+
+	test('exclusions', () => {
+		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.xy')[0]
+		expect(res.scopes).toHaveLength(0)
+		expect(res.exclude).toHaveLength(2)
+	})
+
+	test('complex', () => {
+		const res = assert_parser.parse_line('# <~~-- source.xy comment.line.xy ! foo.bar bar')[0]
+		expect(res.scopes).toEqual(['source.xy', 'comment.line.xy'])
+		expect(res.exclude).toEqual(['foo.bar', 'bar'])
+	})
+
+	test('trailing spaces', () => {
+		const res = assert_parser.parse_line('# ^ source.xy   ')[0]
+		expect(res.scopes).toEqual(['source.xy'])
+	})
+
+	test('missing scopes', () => {
+		expect(() => {
+			assert_parser.parse_line('# ^ ')
+		}).toThrowError()
+
+		expect(() => {
+			assert_parser.parse_line('# <-- ')
+		}).toThrowError()
+	})
 })
