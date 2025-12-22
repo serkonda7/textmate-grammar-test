@@ -510,7 +510,7 @@ describe('Grammar test case', () => {
 			expect(result).toEqual([
 				{
 					end: 32,
-					line: 5,
+					line: 6,
 					actual: [],
 					missing: ['missing.scope'],
 					srcLineText: '',

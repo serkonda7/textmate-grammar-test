@@ -44,7 +44,7 @@ describe('parseTestFile', () => {
 	})
 
 	function check_result(res: GrammarTestFile) {
-		expect(res.metadata.scope).toBe('source.testlang')
+		expect(res.metadata.scope).toBe('source.xy')
 		expect(res.metadata.comment_token).toBe('#')
 		expect(res.metadata.description.length).toBeGreaterThan(5)
 
@@ -111,10 +111,16 @@ describe('AssertionParser assert kinds', () => {
 		expect(res.to).toBe(5)
 	})
 
-	test('leading spaces', () => {
+	test('spaces before assert', () => {
+		const res = assert_parser.parse_line('#    ^ source.xy')[0]
+		expect(res.from).toBe(5)
+	})
+
+	test('leading spaces before comment', () => {
 		const res = assert_parser.parse_line('    # ^^^ source.xy')[0]
-		expect(res.from).toBe(7)
-		expect(res.to).toBe(10)
+		expect(res.scopes).toEqual(['source.xy'])
+		expect(res.from).toBe(6)
+		expect(res.to).toBe(9)
 	})
 })
 
@@ -129,8 +135,8 @@ describe('AssertionParser scopes', () => {
 
 	test('exclusions', () => {
 		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.xy')[0]
-		expect(res.scopes).toHaveLength(0)
 		expect(res.exclude).toHaveLength(2)
+		expect(res.scopes).toHaveLength(0)
 	})
 
 	test('complex', () => {

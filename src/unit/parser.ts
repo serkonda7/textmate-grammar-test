@@ -60,7 +60,7 @@ export function parseTestFile(str: string): GrammarTestFile {
 
 		// Scope assertion line
 		if (is_assertion(line)) {
-			scope_assertions = assert_parser.parse_line(line)
+			scope_assertions = scope_assertions.concat(assert_parser.parse_line(line))
 			continue
 		}
 
@@ -100,31 +100,31 @@ export class AssertionParser {
 
 	parse_line(_line: string): ScopeAssertion[] {
 		this.line = _line
-		this.pos = this.comment_offset
+		this.pos = 0
 
 		const result: ScopeAssertion[] = []
 
 		while (this.pos < this.line.length) {
+			// Indentation, comment, spaces
+			//   e.g. `    #    ^ source.xy`
 			this.skip_spaces()
-
-			const c = this.line[this.pos]
-			this.pos++
+			this.pos += this.comment_offset
+			this.skip_spaces()
 
 			let start = this.pos
 			let end = -1
 
+			const c = this.line[this.pos]
+			this.pos++
+
 			// Parse assertion type
 			if (c === '^') {
-				this.pos++
-
 				while (this.line[this.pos] === '^') {
 					this.pos++
 				}
 
 				end = this.pos
 			} else if (c === '<') {
-				this.pos++
-
 				let nr_tildas = 0
 				while (this.line[this.pos] === '~') {
 					this.pos++
@@ -139,33 +139,35 @@ export class AssertionParser {
 
 				start = nr_tildas
 				end = start + nr_dashes
+			} else {
+				// TODO proper message and details
+				throw new Error('')
 			}
 
-			this.skip_spaces()
-
 			// Parse scopes
-			const R_RAW_SCOPE = '\\w+(?:\\.[-\\w]+)*'
-			const R_SCOPES = `(?<scope>${R_RAW_SCOPE})*`
-			const R_EXCLUDES = `(?:\\s+!\\s+(?<exclude>${R_RAW_SCOPE}))*`
-			const SCOPES_RE = new RegExp(`${R_SCOPES}${R_EXCLUDES}`, 'g')
+			const SCOPE_RE = /\w+(?:\.[-\w]+)*/g
+
+			const remaining_line = this.line.slice(this.pos)
+			const [scopes_part, excludes_part] = remaining_line.split(/\s+!\s+/, 2)
 
 			const scopes: string[] = []
 			const exclusions: string[] = []
 
-			for (const match of this.line.slice(this.pos).matchAll(SCOPES_RE)) {
-				if (!match.groups) {
-					throw new Error('Failed to parse scopes/exclusions')
+			if (scopes_part) {
+				for (const match of scopes_part.matchAll(SCOPE_RE)) {
+					scopes.push(match[0])
 				}
+			}
 
-				const { scope, exclude } = match.groups
-
-				if (scope) {
-					scopes.push(scope)
+			if (excludes_part) {
+				for (const match of excludes_part.matchAll(SCOPE_RE)) {
+					exclusions.push(match[0])
 				}
+			}
 
-				if (exclude) {
-					exclusions.push(exclude)
-				}
+			if (scopes.length === 0 && exclusions.length === 0) {
+				// TODO proper message and details
+				throw new Error('')
 			}
 
 			result.push({
