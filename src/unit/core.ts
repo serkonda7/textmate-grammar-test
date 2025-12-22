@@ -1,5 +1,5 @@
 import tm from 'vscode-textmate'
-import type { GrammarTestFile, TestFailure } from './model.ts'
+import type { GrammarTestFile, TestFailure } from './types.ts'
 
 export { missingScopes_ }
 
@@ -16,8 +16,8 @@ export async function runGrammarTestCase(
 
 		const failures: TestFailure[] = []
 
-		for (const assertion of testCase.assertions) {
-			const { line_number: testCaseLineNumber, source_line: line, scopeAssertions } = assertion
+		for (const assertion of testCase.test_lines) {
+			const { line_nr: testCaseLineNumber, src: line, scope_asserts: scopeAssertions } = assertion
 			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 			ruleStack = ruleStack1
 

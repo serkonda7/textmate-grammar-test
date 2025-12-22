@@ -1,11 +1,11 @@
 import { EOL } from 'node:os'
 import {
 	type GrammarTestFile,
-	type LineAssertion,
+	type TestedLine,
 	new_line_assertion,
 	type ScopeAssertion,
-	type TestCaseMetadata,
-} from './model.ts'
+	type FileMetadata,
+} from './types.ts'
 
 const HEADER_ERR_MSG = 'Invalid header'
 const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
@@ -19,7 +19,7 @@ const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${
  * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
  */
-export function parseHeader(line: string): TestCaseMetadata {
+export function parseHeader(line: string): FileMetadata {
 	const match = HEADER_REGEX.exec(line)
 
 	// No header matched
@@ -28,7 +28,7 @@ export function parseHeader(line: string): TestCaseMetadata {
 	}
 
 	return {
-		commentToken: match.groups.comment,
+		comment_token: match.groups.comment,
 		scope: match.groups.scope,
 		description: match.groups.desc ?? '',
 	}
@@ -42,14 +42,14 @@ export function parseTestFile(str: string): GrammarTestFile {
 	}
 
 	const metadata = parseHeader(lines[0])
-	const { commentToken } = metadata
+	const { comment_token: commentToken } = metadata
 	const commentTokenLength = commentToken.length
 
 	function isLineAssertion(s: string): boolean {
 		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
 	}
 
-	const lineAssertions: LineAssertion[] = []
+	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
 	let src_line_nr = 0
 
@@ -65,7 +65,7 @@ export function parseTestFile(str: string): GrammarTestFile {
 		// Store previous line assertion
 		if (scope_assertions.length > 0) {
 			lineAssertions.push(
-				new_line_assertion(lines[src_line_nr], src_line_nr, scope_assertions.slice()),
+				new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 			)
 		}
 
@@ -77,13 +77,13 @@ export function parseTestFile(str: string): GrammarTestFile {
 	// Handle remaining assertions at EOF
 	if (scope_assertions.length > 0) {
 		lineAssertions.push(
-			new_line_assertion(lines[src_line_nr], src_line_nr, scope_assertions.slice()),
+			new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 		)
 	}
 
 	return {
 		metadata: metadata,
-		assertions: lineAssertions,
+		test_lines: lineAssertions,
 	}
 }
 

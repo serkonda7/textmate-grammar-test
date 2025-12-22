@@ -3,7 +3,7 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as p from 'node:path'
 import { XMLParser } from 'fast-xml-parser'
-import type { LineAssertion, TestCaseMetadata, TestFailure } from '../../../src/unit/model.ts'
+import type { TestedLine, FileMetadata, TestFailure } from '../../../src/unit/types.ts'
 import type { Reporter } from '../../../src/unit/reporter.ts'
 import { XunitGenericReporter, XunitGitlabReporter } from '../../../src/unit/reporter.ts'
 
@@ -47,7 +47,7 @@ describe('XUnit reporters', () => {
 				'file1',
 				{
 					metadata: metadata('case 1 description'),
-					assertions: [lineAssertion('source1', 1), lineAssertion('source1', 2)],
+					test_lines: [lineAssertion('source1', 1), lineAssertion('source1', 2)],
 				},
 				[],
 			)
@@ -55,7 +55,7 @@ describe('XUnit reporters', () => {
 				'file2',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source2', 3)],
+					test_lines: [lineAssertion('source2', 3)],
 				},
 				[],
 			)
@@ -84,7 +84,7 @@ describe('XUnit reporters', () => {
 				'file1',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source1', 1)],
+					test_lines: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
@@ -92,7 +92,7 @@ describe('XUnit reporters', () => {
 				`dir1${sep}file2`,
 				{
 					metadata: metadata('case 2 description'),
-					assertions: [lineAssertion('source2', 2)],
+					test_lines: [lineAssertion('source2', 2)],
 				},
 				[],
 			)
@@ -100,7 +100,7 @@ describe('XUnit reporters', () => {
 				`dir1${sep}dir2${sep}file3`,
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source3', 3)],
+					test_lines: [lineAssertion('source3', 3)],
 				},
 				[],
 			)
@@ -126,7 +126,7 @@ describe('XUnit reporters', () => {
 				'file',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('xml hell " \' < > &', 1)],
+					test_lines: [lineAssertion('xml hell " \' < > &', 1)],
 				},
 				[assertionFailure('xml hell " \' < > &', 1, 0, 1, [], ['m1'], [])],
 			)
@@ -148,7 +148,7 @@ describe('XUnit reporters', () => {
 				'file',
 				{
 					metadata: metadata(),
-					assertions: [
+					test_lines: [
 						lineAssertion('1  source1', 1),
 						lineAssertion('4  source2', 4),
 						lineAssertion('6  source3', 6),
@@ -211,7 +211,7 @@ describe('XUnit reporters', () => {
 				'file1',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source1', 1)],
+					test_lines: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
@@ -226,7 +226,7 @@ describe('XUnit reporters', () => {
 				'file3',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source3', 3)],
+					test_lines: [lineAssertion('source3', 3)],
 				},
 				[],
 			)
@@ -260,7 +260,7 @@ describe('XUnit reporters', () => {
 				'file1',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source1', 1)],
+					test_lines: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
@@ -268,7 +268,7 @@ describe('XUnit reporters', () => {
 				'file2',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source1', 2)],
+					test_lines: [lineAssertion('source1', 2)],
 				},
 				new Error('No grammar provided for <foobar>'),
 			)
@@ -276,7 +276,7 @@ describe('XUnit reporters', () => {
 				'file3',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source3', 3)],
+					test_lines: [lineAssertion('source3', 3)],
 				},
 				[],
 			)
@@ -314,7 +314,7 @@ describe('XUnit reporters', () => {
 				'file1',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source1', 1)],
+					test_lines: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
@@ -322,7 +322,7 @@ describe('XUnit reporters', () => {
 				'file2',
 				{
 					metadata: metadata(),
-					assertions: [lineAssertion('source1', 2)],
+					test_lines: [lineAssertion('source1', 2)],
 				},
 				new Error('No grammar provided for <foobar>'),
 			)
@@ -350,7 +350,7 @@ describe('XUnit reporters', () => {
 				'file',
 				{
 					metadata: metadata(),
-					assertions: [
+					test_lines: [
 						lineAssertion('1  source1', 1),
 						lineAssertion('4  source2', 4),
 						lineAssertion('6  source3', 6),
@@ -434,19 +434,19 @@ describe('XUnit reporters', () => {
 	}
 })
 
-function metadata(description?: string): TestCaseMetadata {
+function metadata(description?: string): FileMetadata {
 	return {
 		scope: 'main.scope',
-		commentToken: '//',
+		comment_token: '//',
 		description: description || '',
 	}
 }
 
-function lineAssertion(source_line: string, testCaseLineNumber: number): LineAssertion {
+function lineAssertion(source_line: string, testCaseLineNumber: number): TestedLine {
 	return {
-		source_line: source_line,
-		line_number: testCaseLineNumber - 1,
-		scopeAssertions: [
+		src: source_line,
+		line_nr: testCaseLineNumber,
+		scope_asserts: [
 			{
 				from: -1,
 				to: -2,

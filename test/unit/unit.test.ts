@@ -3,7 +3,7 @@ import * as fs from 'node:fs'
 import { createRegistry } from '../../src/common/index.ts'
 import { runGrammarTestCase } from '../../src/unit/core.ts'
 import { parseTestFile } from '../../src/unit/index.ts'
-import type { TestFailure } from '../../src/unit/model.ts'
+import type { TestFailure } from '../../src/unit/types.ts'
 
 const registry = createRegistry([
 	{

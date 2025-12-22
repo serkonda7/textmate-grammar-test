@@ -9,7 +9,7 @@ import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { runGrammarTestCase } from './unit/core.ts'
 import { parseTestFile } from './unit/index.ts'
-import type { GrammarTestFile } from './unit/model.ts'
+import type { GrammarTestFile } from './unit/types.ts'
 import { createReporter } from './unit/reporter.ts'
 
 const MAX_CONCURRENT_TESTS = 8

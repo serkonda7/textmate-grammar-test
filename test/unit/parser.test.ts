@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import fs from 'node:fs'
 import { parseHeader, parseTestFile } from '../../src/unit/index.ts'
-import type { GrammarTestFile } from '../../src/unit/model'
+import type { GrammarTestFile } from '../../src/unit/types.ts'
 
 describe('parseHeader', () => {
 	it('one char comment token', () => {
 		const res = parseHeader('# SYNTAX TEST "scala"')
 		expect(res).toEqual({
-			commentToken: '#',
+			comment_token: '#',
 			scope: 'scala',
 			description: '',
 		})
@@ -16,7 +16,7 @@ describe('parseHeader', () => {
 	it('description and longer comment token', () => {
 		const res = parseHeader('-- SYNTAX TEST "sql" "some description"')
 		expect(res).toEqual({
-			commentToken: '--',
+			comment_token: '--',
 			description: 'some description',
 			scope: 'sql',
 		})
@@ -45,13 +45,13 @@ describe('parseTestFile', () => {
 
 	function check_result(res: GrammarTestFile) {
 		expect(res.metadata.scope).toBe('source.testlang')
-		expect(res.metadata.commentToken).toBe('#')
+		expect(res.metadata.comment_token).toBe('#')
 		expect(res.metadata.description.length).toBeGreaterThan(5)
 
 		// Source lines with assertions
-		expect(res.assertions).toHaveLength(4)
+		expect(res.test_lines).toHaveLength(4)
 
 		// Number of assertions on last source line
-		expect(res.assertions.at(-1)?.scopeAssertions).toHaveLength(3)
+		expect(res.test_lines.at(-1)?.scope_asserts).toHaveLength(3)
 	}
 })
