@@ -43,7 +43,7 @@ export function parseTestFile(str: string): GrammarTestFile {
 
 	const metadata = parseHeader(lines[0])
 	const { comment_token } = metadata
-	const line_assert_re = new RegExp(`^${RegExp.escape(comment_token)}\\s*(\\^|<[~]*[-]+)`)
+	const line_assert_re = new RegExp(`\\s*${RegExp.escape(comment_token)}\\s*(\\^|<[~]*[-]+)`)
 
 	function is_assertion(s: string): boolean {
 		return line_assert_re.test(s)
@@ -104,6 +104,7 @@ export class AssertionParser {
 
 		const result: ScopeAssertion[] = []
 
+		// TODO split this up into it's parts, basically the break at the end should not be needed as the loop stops after assertion type
 		while (this.pos < this.line.length) {
 			// Indentation, comment, spaces
 			//   e.g. `    #    ^ source.xy`
