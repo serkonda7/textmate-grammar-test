@@ -1,0 +1,17 @@
+# SYNTAX TEST "source.testlang" "File with simple but complete test syntax"
+
+var x = "foo"
+# <--- keyword.control.testlang
+
+# A normal comment in between
+
+if (true) {
+  var y = 4
+# <~~--- keyword.control.testlang
+# ^^^ keyword.control.testlang
+}
+
+var s = "hi @{name}"
+#       ^^^^^^^^^^^^ string.quoted.double.testlang
+#           ^^^^^^^ variable.interpolation.testlang
+#             ^^^^ meta.label.testlang
