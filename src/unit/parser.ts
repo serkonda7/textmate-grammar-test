@@ -49,6 +49,8 @@ export function parseTestFile(str: string): GrammarTestFile {
 		return line_assert_re.test(s)
 	}
 
+	const assert_parser = new AssertionParser(comment_token.length)
+
 	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
 	let src_line_nr = 0
@@ -58,7 +60,7 @@ export function parseTestFile(str: string): GrammarTestFile {
 
 		// Scope assertion line
 		if (is_assertion(line)) {
-			scope_assertions = scope_assertions.concat(parseScopeAssertion(i, comment_token.length, line))
+			scope_assertions = assert_parser.parse_line(line)
 			continue
 		}
 
@@ -87,69 +89,94 @@ export function parseTestFile(str: string): GrammarTestFile {
 	}
 }
 
-const leftArrowAssertRegex =
-	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
-const upArrowAssertRegex =
-	/^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
+class AssertionParser {
+	comment_offset: number
+	line: string = ''
+	pos: number = 0
 
-export function parseScopeAssertion(
-	testCaseLineNumber: number,
-	commentLength: number,
-	as: string,
-): ScopeAssertion[] {
-	const s = as.slice(commentLength)
+	constructor(comment_length: number) {
+		this.comment_offset = comment_length
+	}
 
-	if (s.trim().startsWith('^')) {
-		const upArrowMatch = upArrowAssertRegex.exec(s)
-		if (upArrowMatch !== null) {
-			const [, , scopes = '', exclusions = ''] = upArrowMatch
+	parse_line(_line: string): ScopeAssertion[] {
+		this.line = _line
+		this.pos = this.comment_offset
 
-			if (scopes === '' && exclusions === '') {
-				throw new Error(
-					`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
-				)
-			} else {
-				const result = []
-				let startIdx = s.indexOf('^')
-				while (startIdx !== -1) {
-					let endIndx = startIdx
-					while (s[endIndx + 1] === '^') {
-						endIndx++
-					}
-					result.push({
-						from: commentLength + startIdx,
-						to: commentLength + endIndx + 1,
-						scopes: scopes.split(/\s+/).filter((x) => x),
-						exclude: exclusions.split(/\s+/).filter((x) => x),
-					} as ScopeAssertion)
-					startIdx = s.indexOf('^', endIndx + 1)
+		const result: ScopeAssertion[] = []
+
+		while (this.pos < this.line.length) {
+			this.skip_spaces()
+
+			const c = this.line[this.pos]
+			this.pos++
+
+			let start = this.pos
+			let end = -1
+
+			// Parse assertion type
+			if (c === '^') {
+				this.pos++
+
+				while (this.line[this.pos] === '^') {
+					this.pos++
 				}
-				return result
+
+				end = this.pos
+			} else if (c === '<') {
+				this.pos++
+
+				let nr_tildas = 0
+				while (this.line[this.pos] === '~') {
+					this.pos++
+					nr_tildas++
+				}
+
+				let nr_dashes = 0
+				while (this.line[this.pos] === '-') {
+					this.pos++
+					nr_dashes++
+				}
+
+				start = nr_tildas
+				end = start + nr_dashes
 			}
-		} else {
-			throw new Error(`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL}`)
+
+			this.skip_spaces()
+
+			// Parse scopes
+			const scope_re = /(?<scope>(?:!\s+)?\w+(?:\.[-\w]+)*)/g
+
+			const scopes: string[] = []
+			const exclusions: string[] = []
+
+			for (const match of this.line.slice(this.pos).matchAll(scope_re)) {
+				if (match.groups) {
+					const scopeStr = match.groups.scope.trim()
+					if (scopeStr.startsWith('!')) {
+						// Add exclusion without `!` and spaces
+						exclusions.push(scopeStr.slice(1).trimStart())
+					} else {
+						scopes.push(scopeStr)
+					}
+				}
+			}
+
+			result.push({
+				from: start,
+				to: end,
+				scopes: scopes,
+				exclude: exclusions,
+			} as ScopeAssertion)
+
+			break
 		}
+
+		return result
 	}
 
-	const leftArrowMatch = leftArrowAssertRegex.exec(s)
-
-	if (leftArrowMatch !== null) {
-		const [, , tildas, dashes, scopes = '', exclusions = ''] = leftArrowMatch
-		if (scopes === '' && exclusions === '') {
-			throw new Error(
-				`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
-			)
-		} else {
-			return [
-				{
-					from: tildas.length,
-					to: tildas.length + dashes.length,
-					scopes: scopes.split(/\s+/).filter((x) => x),
-					exclude: exclusions.split(/\s+/).filter((x) => x),
-				},
-			]
+	skip_spaces(): void {
+		while (this.line[this.pos] === ' ') {
+			this.pos++
 		}
 	}
-
-	return []
 }

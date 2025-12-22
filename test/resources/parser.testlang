@@ -2,6 +2,7 @@
 
 var x = "foo"
 # <--- keyword.control.testlang
+#       ^^^^^ source.testlang string.quoted.double.testlang ! constant.integer.testlang
 
 # Comments can be tested too
 # ^ comment.line.testlang
