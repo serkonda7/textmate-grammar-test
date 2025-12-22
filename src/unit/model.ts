@@ -19,6 +19,18 @@ export interface LineAssertion {
 	scopeAssertions: ScopeAssertion[]
 }
 
+export function new_line_assertion(
+	src_line: string,
+	line_nr: number,
+	scope_assertions: ScopeAssertion[],
+): LineAssertion {
+	return {
+		source_line: src_line,
+		line_number: line_nr,
+		scopeAssertions: scope_assertions,
+	}
+}
+
 export interface GrammarTestFile {
 	metadata: TestCaseMetadata
 	assertions: LineAssertion[]
