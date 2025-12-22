@@ -1,4 +1,5 @@
 # Testing
+> This is currently outdated and will be updated soon!
 
 Any contributions are really appreciated! :) Just make sure that all existing tests work, or if they have changed the
 change is meaningful.
@@ -12,7 +13,6 @@ change is meaningful.
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/multiple.groups.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/misplaced.scopes.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/out.of.bounds.test.dhall
-node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/s.parser.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/simple.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/successful.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/unexpected.scopes.test.dhall

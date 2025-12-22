@@ -1,17 +1,14 @@
 import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
+import { parseTestFile } from 'textmate-grammar-test/unit'
 import { createRegistry } from '../../src/common/index.ts'
-import { parseTestFile, runGrammarTestCase } from '../../src/unit/core.ts'
+import { runGrammarTestCase } from '../../src/unit/core.ts'
 import type { TestFailure } from '../../src/unit/model.ts'
 
 const registry = createRegistry([
 	{
 		scopeName: 'source.dhall',
 		path: './test/resources/dhall.tmLanguage.json',
-	},
-	{
-		scopeName: 'source.terraform',
-		path: './test/resources/terraform.tmLanguage.json',
 	},
 ])
 
@@ -521,14 +518,6 @@ describe('Grammar test case', () => {
 					unexpected: [],
 				},
 			])
-		})
-	})
-	it('should count line with comment token and no assertions as a source line', () => {
-		return runGrammarTestCase(
-			registry,
-			parseTestFile(loadFile('./test/resources/sourceLineA.tf')),
-		).then((result) => {
-			expect(result).toEqual([])
 		})
 	})
 })

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://www.schemastore.org/tmlanguage.json",
+  "name": "Testlang",
+  "scopeName": "source.testlang",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#keywords" },
+    { "include": "#strings" },
+    { "include": "#numbers" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.testlang",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.testlang",
+          "match": "\\bvar\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.testlang",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "variable.interpolation.testlang",
+              "match": "@\\{([^}]+)\\}",
+              "captures": {
+                "1": {
+                  "name": "meta.label.testlang"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.integer.testlang",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    }
+  }
+}

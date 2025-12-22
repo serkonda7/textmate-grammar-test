@@ -1,5 +1,11 @@
 import { EOL } from 'node:os'
-import type { GrammarTestFile, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
+import {
+	type GrammarTestFile,
+	type LineAssertion,
+	new_line_assertion,
+	type ScopeAssertion,
+	type TestCaseMetadata,
+} from './model.ts'
 
 const HEADER_ERR_MSG = 'Invalid header'
 const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
@@ -10,7 +16,7 @@ const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
 /**
- * Parse first line header into metadata.
+ * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
  */
 export function parseHeader(line: string): TestCaseMetadata {
@@ -43,43 +49,42 @@ export function parseTestFile(str: string): GrammarTestFile {
 		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
 	}
 
-	function emptyLineAssertion(tcLineNumber: number): LineAssertion {
-		return {
-			source_line: '',
-			line_number: tcLineNumber,
-			scopeAssertions: [],
-		} as LineAssertion
-	}
-
 	const lineAssertions: LineAssertion[] = []
-	let currentLineAssertion = emptyLineAssertion(0)
-	let src_line = ''
+	let scope_assertions: ScopeAssertion[] = []
+	let src_line_nr = 0
 
 	for (let i = 1; i < lines.length; i++) {
 		const line = lines[i]
 
-		if (line.startsWith(commentToken) && isLineAssertion(line)) {
-			const as = parseScopeAssertion(i, commentToken.length, line)
-			currentLineAssertion.scopeAssertions = [...currentLineAssertion.scopeAssertions, ...as]
-		} else {
-			if (currentLineAssertion.scopeAssertions.length !== 0) {
-				currentLineAssertion.source_line = src_line
-				lineAssertions.push(currentLineAssertion)
-			}
-
-			src_line = line
-			currentLineAssertion = emptyLineAssertion(i)
+		// Scope assertion line
+		if (isLineAssertion(line)) {
+			scope_assertions = scope_assertions.concat(parseScopeAssertion(i, commentToken.length, line))
+			continue
 		}
+
+		// Store previous line assertion
+		if (scope_assertions.length > 0) {
+			lineAssertions.push(
+				new_line_assertion(lines[src_line_nr], src_line_nr, scope_assertions.slice()),
+			)
+		}
+
+		// Reset for next source line
+		src_line_nr = i
+		scope_assertions = []
 	}
 
-	if (currentLineAssertion.scopeAssertions.length !== 0) {
-		lineAssertions.push(currentLineAssertion)
+	// Handle remaining assertions at EOF
+	if (scope_assertions.length > 0) {
+		lineAssertions.push(
+			new_line_assertion(lines[src_line_nr], src_line_nr, scope_assertions.slice()),
+		)
 	}
 
 	return {
 		metadata: metadata,
 		assertions: lineAssertions,
-	} as GrammarTestFile
+	}
 }
 
 const leftArrowAssertRegex =
