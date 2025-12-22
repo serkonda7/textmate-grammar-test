@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { createRegistry } from '../../src/common/index.ts'
-import { parseGrammarTestCase, runGrammarTestCase } from '../../src/unit/core.ts'
+import { parseTestFile, runGrammarTestCase } from '../../src/unit/core.ts'
+import type { TestFailure } from '../../src/unit/model.ts'
 
 const registry = createRegistry([
 	{
@@ -22,7 +23,7 @@ describe('Grammar test case', () => {
 	it('should report no errors on correct grammar test', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/successful.test.dhall')),
+			parseTestFile(loadFile('./test/resources/successful.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([])
 		})
@@ -30,7 +31,7 @@ describe('Grammar test case', () => {
 	it('should report missing scopes', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/missing.scopes.test.dhall')),
+			parseTestFile(loadFile('./test/resources/missing.scopes.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -42,7 +43,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 11,
-					srcLine: 10,
+					srcLineText: 'in  { home       = "/home/${user}"',
 					start: 4,
 					end: 5,
 				},
@@ -55,7 +56,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 6,
 					end: 16,
 				},
@@ -69,7 +70,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 17,
 					end: 18,
 				},
@@ -83,7 +84,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 19,
 					end: 20,
 				},
@@ -97,7 +98,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 20,
 					end: 26,
 				},
@@ -113,7 +114,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 26,
 					end: 28,
 				},
@@ -129,7 +130,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 28,
 					end: 32,
 				},
@@ -145,7 +146,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 32,
 					end: 33,
 				},
@@ -159,7 +160,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 33,
 					end: 44,
 				},
@@ -173,7 +174,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 44,
 					end: 45,
 				},
@@ -186,17 +187,17 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 20,
-					srcLine: 13,
+					srcLineText: '}',
 					start: 0,
 					end: 1,
 				},
-			])
+			] as TestFailure[])
 		})
 	})
 	it('should report unexpected scopes', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/unexpected.scopes.test.dhall')),
+			parseTestFile(loadFile('./test/resources/unexpected.scopes.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -208,7 +209,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 11,
-					srcLine: 10,
+					srcLineText: 'in  { home       = "/home/${user}"',
 					start: 4,
 					end: 5,
 				},
@@ -221,7 +222,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['variable.object.property.dhall', 'source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 6,
 					end: 16,
 				},
@@ -235,7 +236,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 19,
 					end: 20,
 				},
@@ -249,7 +250,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 20,
 					end: 26,
 				},
@@ -265,7 +266,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 26,
 					end: 28,
 				},
@@ -281,7 +282,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 28,
 					end: 32,
 				},
@@ -297,7 +298,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 32,
 					end: 33,
 				},
@@ -311,7 +312,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 33,
 					end: 44,
 				},
@@ -325,7 +326,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['source.dhall'],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 44,
 					end: 45,
 				},
@@ -341,7 +342,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: ['meta.label.dhall'],
 					line: 17,
-					srcLine: 12,
+					srcLineText: '    , publicKey  = "/home/${user}/id_ed25519.pub"',
 					start: 28,
 					end: 32,
 				},
@@ -357,17 +358,17 @@ describe('Grammar test case', () => {
 						'keyword.operator.record.end.dhall',
 					],
 					line: 20,
-					srcLine: 13,
+					srcLineText: '}',
 					start: 0,
 					end: 1,
 				},
-			])
+			] as TestFailure[])
 		})
 	})
 	it('should report out of place scopes', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/misplaced.scopes.test.dhall')),
+			parseTestFile(loadFile('./test/resources/misplaced.scopes.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -380,7 +381,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 17,
 					end: 18,
 				},
@@ -394,7 +395,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 19,
 					end: 20,
 				},
@@ -408,7 +409,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 20,
 					end: 26,
 				},
@@ -424,7 +425,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 26,
 					end: 28,
 				},
@@ -440,7 +441,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 28,
 					end: 32,
 				},
@@ -456,7 +457,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 32,
 					end: 33,
 				},
@@ -470,7 +471,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 33,
 					end: 44,
 				},
@@ -484,7 +485,7 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 13,
-					srcLine: 11,
+					srcLineText: '    , privateKey = "/home/${user}/id_ed25519"',
 					start: 44,
 					end: 45,
 				},
@@ -497,17 +498,17 @@ describe('Grammar test case', () => {
 					],
 					unexpected: [],
 					line: 20,
-					srcLine: 13,
+					srcLineText: '}',
 					start: 0,
 					end: 1,
 				},
-			])
+			] as TestFailure[])
 		})
 	})
 	it('should report error when line assertion referes to non existing token', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/out.of.bounds.test.dhall')),
+			parseTestFile(loadFile('./test/resources/out.of.bounds.test.dhall')),
 		).then((result) => {
 			expect(result).toEqual([
 				{
@@ -515,7 +516,7 @@ describe('Grammar test case', () => {
 					line: 5,
 					actual: [],
 					missing: ['missing.scope'],
-					srcLine: 4,
+					srcLineText: '',
 					start: 30,
 					unexpected: [],
 				},
@@ -525,7 +526,7 @@ describe('Grammar test case', () => {
 	it('should count line with comment token and no assertions as a source line', () => {
 		return runGrammarTestCase(
 			registry,
-			parseGrammarTestCase(loadFile('./test/resources/sourceLineA.tf')),
+			parseTestFile(loadFile('./test/resources/sourceLineA.tf')),
 		).then((result) => {
 			expect(result).toEqual([])
 		})

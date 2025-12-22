@@ -1,5 +1,86 @@
 import { EOL } from 'node:os'
-import type { GrammarTestCase, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
+import type { GrammarTestFile, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
+
+const HEADER_ERR_MSG = 'Invalid header'
+const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
+
+const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
+const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
+const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
+const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
+
+/**
+ * Parse first line header into metadata.
+ *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
+ */
+export function parseHeader(line: string): TestCaseMetadata {
+	const match = HEADER_REGEX.exec(line)
+
+	// No header matched
+	if (!match?.groups) {
+		throw new SyntaxError(HEADER_ERR_MSG, { cause: HEADER_ERR_CAUSE })
+	}
+
+	return {
+		commentToken: match.groups.comment,
+		scope: match.groups.scope,
+		description: match.groups.desc ?? '',
+	}
+}
+
+export function parseTestFile(str: string): GrammarTestFile {
+	const lines = str.split(/\r\n|\n/)
+
+	if (lines.length <= 1) {
+		throw new Error('Expected non-empty test')
+	}
+
+	const metadata = parseHeader(lines[0])
+	const { commentToken } = metadata
+	const commentTokenLength = commentToken.length
+
+	function isLineAssertion(s: string): boolean {
+		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
+	}
+
+	function emptyLineAssertion(tcLineNumber: number): LineAssertion {
+		return {
+			source_line: '',
+			line_number: tcLineNumber,
+			scopeAssertions: [],
+		} as LineAssertion
+	}
+
+	const lineAssertions: LineAssertion[] = []
+	let currentLineAssertion = emptyLineAssertion(0)
+	let src_line = ''
+
+	for (let i = 1; i < lines.length; i++) {
+		const line = lines[i]
+
+		if (line.startsWith(commentToken) && isLineAssertion(line)) {
+			const as = parseScopeAssertion(i, commentToken.length, line)
+			currentLineAssertion.scopeAssertions = [...currentLineAssertion.scopeAssertions, ...as]
+		} else {
+			if (currentLineAssertion.scopeAssertions.length !== 0) {
+				currentLineAssertion.source_line = src_line
+				lineAssertions.push(currentLineAssertion)
+			}
+
+			src_line = line
+			currentLineAssertion = emptyLineAssertion(i)
+		}
+	}
+
+	if (currentLineAssertion.scopeAssertions.length !== 0) {
+		lineAssertions.push(currentLineAssertion)
+	}
+
+	return {
+		metadata: metadata,
+		assertions: lineAssertions,
+	} as GrammarTestFile
+}
 
 const leftArrowAssertRegex =
 	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
@@ -66,86 +147,4 @@ export function parseScopeAssertion(
 	}
 
 	return []
-}
-
-const HEADER_ERR_MSG = 'Invalid header'
-const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
-
-const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
-const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
-const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
-const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
-
-/**
- * Parse first line header into metadata.
- *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
- */
-export function parseHeader(line: string): TestCaseMetadata {
-	const match = HEADER_REGEX.exec(line)
-
-	// No header matched
-	if (!match?.groups) {
-		throw new SyntaxError(HEADER_ERR_MSG, { cause: HEADER_ERR_CAUSE })
-	}
-
-	return {
-		commentToken: match.groups.comment,
-		scope: match.groups.scope,
-		description: match.groups.desc ?? '',
-	}
-}
-
-export function parseGrammarTestCase(str: string): GrammarTestCase {
-	const headerLength = 1
-	const lines = str.split(/\r\n|\n/)
-
-	if (lines.length <= 1) {
-		throw new Error('Expected non-empty test')
-	}
-
-	const metadata = parseHeader(lines[0])
-	const { commentToken } = metadata
-	const rest = lines.slice(headerLength)
-	const commentTokenLength = commentToken.length
-
-	function isLineAssertion(s: string): boolean {
-		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
-	}
-
-	function emptyLineAssertion(tcLineNumber: number, srcLineNumber: number): LineAssertion {
-		return {
-			testCaseLineNumber: tcLineNumber,
-			sourceLineNumber: srcLineNumber,
-			scopeAssertions: [],
-		} as LineAssertion
-	}
-
-	let sourceLineNumber = 0
-	const lineAssertions = [] as LineAssertion[]
-	let currentLineAssertion = emptyLineAssertion(headerLength, 0)
-	const source = [] as string[]
-	rest.forEach((s: string, i: number) => {
-		const tcLineNumber = headerLength + i
-
-		if (s.startsWith(commentToken) && isLineAssertion(s)) {
-			const as = parseScopeAssertion(tcLineNumber, commentToken.length, s)
-			currentLineAssertion.scopeAssertions = [...currentLineAssertion.scopeAssertions, ...as]
-		} else {
-			if (currentLineAssertion.scopeAssertions.length !== 0) {
-				lineAssertions.push(currentLineAssertion)
-			}
-			currentLineAssertion = emptyLineAssertion(tcLineNumber, sourceLineNumber)
-			source.push(s)
-			sourceLineNumber++
-		}
-	})
-	if (currentLineAssertion.scopeAssertions.length !== 0) {
-		lineAssertions.push(currentLineAssertion)
-	}
-
-	return {
-		metadata: metadata,
-		source: source,
-		assertions: lineAssertions,
-	} as GrammarTestCase
 }

@@ -1,66 +1,62 @@
 import tm from 'vscode-textmate'
-import type { GrammarTestCase, TestFailure } from './model.ts'
-import { parseGrammarTestCase } from './parser.ts'
+import type { GrammarTestFile, TestFailure } from './model.ts'
+import { parseTestFile } from './parser.ts'
 
-export { parseGrammarTestCase, missingScopes_ }
+export { parseTestFile, missingScopes_ }
 
 export async function runGrammarTestCase(
 	registry: tm.Registry,
-	testCase: GrammarTestCase,
+	testCase: GrammarTestFile,
 ): Promise<TestFailure[]> {
 	return registry.loadGrammar(testCase.metadata.scope).then((grammar: tm.IGrammar | null) => {
 		if (!grammar) {
 			throw new Error(`Could not load scope ${testCase.metadata.scope}`)
 		}
 
-		const assertions = toMap((x) => x.sourceLineNumber, testCase.assertions)
-
 		let ruleStack = tm.INITIAL
 
 		const failures: TestFailure[] = []
 
-		testCase.source.forEach((line: string, n: number) => {
+		for (const assertion of testCase.assertions) {
+			const { line_number: testCaseLineNumber, source_line: line, scopeAssertions } = assertion
 			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 			ruleStack = ruleStack1
 
-			if (assertions[n] !== undefined) {
-				const { testCaseLineNumber, scopeAssertions } = assertions[n]
-
-				scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
-					const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
-					if (xs.length === 0 && requiredScopes.length > 0) {
-						failures.push({
-							missing: requiredScopes,
-							unexpected: [],
-							actual: [],
-							line: testCaseLineNumber,
-							srcLine: n,
-							start: from,
-							end: to,
-						} as TestFailure)
-					} else {
-						xs.forEach((token) => {
-							const unexpected = excludedScopes.filter((s) => {
-								return token.scopes.includes(s)
-							})
-							const missing = missingScopes_(requiredScopes, token.scopes)
-
-							if (missing.length || unexpected.length) {
-								failures.push({
-									missing: missing,
-									actual: token.scopes,
-									unexpected: unexpected,
-									line: testCaseLineNumber,
-									srcLine: n,
-									start: token.startIndex,
-									end: token.endIndex,
-								} as TestFailure)
-							}
+			scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
+				const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
+				if (xs.length === 0 && requiredScopes.length > 0) {
+					failures.push({
+						missing: requiredScopes,
+						unexpected: [],
+						actual: [],
+						line: testCaseLineNumber,
+						srcLineText: line,
+						start: from,
+						end: to,
+					} as TestFailure)
+				} else {
+					xs.forEach((token) => {
+						const unexpected = excludedScopes.filter((s) => {
+							return token.scopes.includes(s)
 						})
-					}
-				})
-			}
-		})
+						const missing = missingScopes_(requiredScopes, token.scopes)
+
+						if (missing.length || unexpected.length) {
+							failures.push({
+								missing: missing,
+								actual: token.scopes,
+								unexpected: unexpected,
+								line: testCaseLineNumber,
+								srcLineText: line,
+								start: token.startIndex,
+								end: token.endIndex,
+							} as TestFailure)
+						}
+					})
+				}
+			})
+		}
+
 		return failures
 	})
 }
@@ -78,11 +74,4 @@ function missingScopes_(rs: string[], as: string[]): string[] {
 	}
 
 	return j === rs.length ? [] : rs.slice(j)
-}
-
-function toMap<T>(f: (x: T) => number, xs: T[]): { [key: number]: T } {
-	return xs.reduce((m: { [key: number]: T }, x: T) => {
-		m[f(x)] = x
-		return m
-	}, {})
 }

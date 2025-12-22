@@ -20,7 +20,8 @@
       },
       "suspicious": {
         "noExplicitAny": "off", // Used for flexible error reporting
-        "useIterableCallbackReturn": "off" // FIXME: I don't really understand this yet
+        "useIterableCallbackReturn": "off", // FIXME: I don't really understand this yet
+        "noTemplateCurlyInString": "off" // That's used in too many test files. FIXME: get rid of the exception (and probably refactor all tests)
       }
     }
   },
