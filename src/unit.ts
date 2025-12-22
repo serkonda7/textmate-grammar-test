@@ -8,7 +8,7 @@ import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { parseTestFile, runGrammarTestCase } from './unit/core.ts'
-import type { GrammarTestCase } from './unit/model.ts'
+import type { GrammarTestFile } from './unit/model.ts'
 import { createReporter } from './unit/reporter.ts'
 
 const MAX_CONCURRENT_TESTS = 8
@@ -37,7 +37,7 @@ class TestCaseRunner {
 	) {}
 
 	async runSingleTest(filename: string): Promise<ExitCode> {
-		let testCase: GrammarTestCase
+		let testCase: GrammarTestFile
 
 		// Read and parse test case
 		try {

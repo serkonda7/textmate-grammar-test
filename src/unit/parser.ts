@@ -1,5 +1,5 @@
 import { EOL } from 'node:os'
-import type { GrammarTestCase, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
+import type { GrammarTestFile, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
 
 
 const HEADER_ERR_MSG = 'Invalid header'
@@ -29,7 +29,7 @@ export function parseHeader(line: string): TestCaseMetadata {
 	}
 }
 
-export function parseTestFile(str: string): GrammarTestCase {
+export function parseTestFile(str: string): GrammarTestFile {
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
@@ -44,18 +44,17 @@ export function parseTestFile(str: string): GrammarTestCase {
 		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
 	}
 
-	function emptyLineAssertion(tcLineNumber: number, srcLineNumber: number): LineAssertion {
+	function emptyLineAssertion(tcLineNumber: number): LineAssertion {
 		return {
-			testCaseLineNumber: tcLineNumber,
-			sourceLineNumber: srcLineNumber,
+			source_line: '',
+			line_number: tcLineNumber,
 			scopeAssertions: [],
 		} as LineAssertion
 	}
 
-	let sourceLineNumber = 0
 	const lineAssertions: LineAssertion[] = []
-	let currentLineAssertion = emptyLineAssertion(0, 0)
-	const source: string[] = []
+	let currentLineAssertion = emptyLineAssertion(0)
+	let src_line = ''
 
 	for (let i = 1; i < lines.length; i++) {
 		const line = lines[i]
@@ -65,11 +64,12 @@ export function parseTestFile(str: string): GrammarTestCase {
 			currentLineAssertion.scopeAssertions = [...currentLineAssertion.scopeAssertions, ...as]
 		} else {
 			if (currentLineAssertion.scopeAssertions.length !== 0) {
+				currentLineAssertion.source_line = src_line
 				lineAssertions.push(currentLineAssertion)
 			}
-			currentLineAssertion = emptyLineAssertion(i, sourceLineNumber)
-			source.push(line)
-			sourceLineNumber++
+
+			src_line = line
+			currentLineAssertion = emptyLineAssertion(i)
 		}
 	}
 
@@ -79,9 +79,8 @@ export function parseTestFile(str: string): GrammarTestCase {
 
 	return {
 		metadata: metadata,
-		source: source,
 		assertions: lineAssertions,
-	} as GrammarTestCase
+	} as GrammarTestFile
 }
 
 

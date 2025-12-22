@@ -1,3 +1,4 @@
+// Metadata taken from file header
 export interface TestCaseMetadata {
 	commentToken: string
 	scope: string
@@ -12,14 +13,14 @@ export interface ScopeAssertion {
 }
 
 export interface LineAssertion {
-	testCaseLineNumber: number
-	sourceLineNumber: number
+	source_line: string // Content of the line being asserted
+	// TODO change to true line number (1 indexing)
+	line_number: number // Source line number in the file (0 indexed)
 	scopeAssertions: ScopeAssertion[]
 }
 
-export interface GrammarTestCase {
+export interface GrammarTestFile {
 	metadata: TestCaseMetadata
-	source: string[]
 	assertions: LineAssertion[]
 }
 
@@ -28,7 +29,7 @@ export interface TestFailure {
 	actual: string[]
 	unexpected: string[]
 	line: number
-	srcLine: number
+	srcLineText: string
 	start: number
 	end: number
 }

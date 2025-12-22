@@ -46,18 +46,16 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file1',
 				{
-					source: ['source1'],
 					metadata: metadata('case 1 description'),
-					assertions: [lineAssertion(0, 1), lineAssertion(0, 2)],
+					assertions: [lineAssertion('source1', 1), lineAssertion('source1', 2)],
 				},
 				[],
 			)
 			reporter.reportTestResult(
 				'file2',
 				{
-					source: ['source2'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 3)],
+					assertions: [lineAssertion('source2', 3)],
 				},
 				[],
 			)
@@ -85,27 +83,24 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file1',
 				{
-					source: ['source1'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1)],
+					assertions: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
 			reporter.reportTestResult(
 				`dir1${sep}file2`,
 				{
-					source: ['source2'],
 					metadata: metadata('case 2 description'),
-					assertions: [lineAssertion(0, 2)],
+					assertions: [lineAssertion('source2', 2)],
 				},
 				[],
 			)
 			reporter.reportTestResult(
 				`dir1${sep}dir2${sep}file3`,
 				{
-					source: ['source3'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 3)],
+					assertions: [lineAssertion('source3', 3)],
 				},
 				[],
 			)
@@ -130,14 +125,10 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file',
 				{
-					source: [
-						'xml hell " \' < > &',
-						// 'assertion',
-					],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1)],
+					assertions: [lineAssertion('xml hell " \' < > &', 1)],
 				},
-				[assertionFailure(0, 1, 0, 1, [], ['m1'], [])],
+				[assertionFailure('xml hell " \' < > &', 1, 0, 1, [], ['m1'], [])],
 			)
 			reporter.reportSuiteResult()
 
@@ -156,30 +147,18 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file',
 				{
-					source: [
-						/*0*/ '1  source1',
-						//   '2  assertion1',
-						//   '3  assertion2',
-						/*1*/ '4  source2',
-						//   '5  assertion3',
-						/*2*/ '6  source3',
-						//   '7  assertion4',
-						//   '8  assertion5',
-						/*3*/ '9  source4',
-						//   '10 assertion6',
-					],
 					metadata: metadata(),
 					assertions: [
-						lineAssertion(0, 1),
-						lineAssertion(1, 4),
-						lineAssertion(2, 6),
-						lineAssertion(3, 9),
+						lineAssertion('1  source1', 1),
+						lineAssertion('4  source2', 4),
+						lineAssertion('6  source3', 6),
+						lineAssertion('9  source4', 9),
 					],
 				},
 				[
-					assertionFailure(0, 1, 0, 1, ['a1', 'a2', 'a3'], ['m1', 'm2'], ['u1']),
-					assertionFailure(2, 6, 0, 3, ['a1', 'a2'], ['m1'], []),
-					assertionFailure(2, 6, 3, 5, ['a1'], [], ['u1']),
+					assertionFailure('1  source1', 1, 0, 1, ['a1', 'a2', 'a3'], ['m1', 'm2'], ['u1']),
+					assertionFailure('6  source3', 6, 0, 3, ['a1', 'a2'], ['m1'], []),
+					assertionFailure('6  source3', 6, 3, 5, ['a1'], [], ['u1']),
 				],
 			)
 			reporter.reportSuiteResult()
@@ -231,9 +210,8 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file1',
 				{
-					source: ['source1'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1)],
+					assertions: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
@@ -247,9 +225,8 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file3',
 				{
-					source: ['source3'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 3)],
+					assertions: [lineAssertion('source3', 3)],
 				},
 				[],
 			)
@@ -282,27 +259,24 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file1',
 				{
-					source: ['source1'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1)],
+					assertions: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
 			reporter.reportGrammarTestError(
 				'file2',
 				{
-					source: ['source1'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 2)],
+					assertions: [lineAssertion('source1', 2)],
 				},
 				new Error('No grammar provided for <foobar>'),
 			)
 			reporter.reportTestResult(
 				'file3',
 				{
-					source: ['source3'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 3)],
+					assertions: [lineAssertion('source3', 3)],
 				},
 				[],
 			)
@@ -339,18 +313,16 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file1',
 				{
-					source: ['source1'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 1)],
+					assertions: [lineAssertion('source1', 1)],
 				},
 				[],
 			)
 			reporter.reportGrammarTestError(
 				'file2',
 				{
-					source: ['source1'],
 					metadata: metadata(),
-					assertions: [lineAssertion(0, 2)],
+					assertions: [lineAssertion('source1', 2)],
 				},
 				new Error('No grammar provided for <foobar>'),
 			)
@@ -377,30 +349,18 @@ describe('XUnit reporters', () => {
 			reporter.reportTestResult(
 				'file',
 				{
-					source: [
-						/*0*/ '1  source1',
-						//   '2  assertion1',
-						//   '3  assertion2',
-						/*1*/ '4  source2',
-						//   '5  assertion3',
-						/*2*/ '6  source3',
-						//   '7  assertion4',
-						//   '8  assertion5',
-						/*3*/ '9  source4',
-						// '10 assertion6',
-					],
 					metadata: metadata(),
 					assertions: [
-						lineAssertion(0, 1),
-						lineAssertion(1, 4),
-						lineAssertion(2, 6),
-						lineAssertion(3, 9),
+						lineAssertion('1  source1', 1),
+						lineAssertion('4  source2', 4),
+						lineAssertion('6  source3', 6),
+						lineAssertion('9  source4', 9),
 					],
 				},
 				[
-					assertionFailure(0, 1, 0, 1, ['a1', 'a2', 'a3'], ['m1', 'm2'], ['u1']),
-					assertionFailure(2, 6, 0, 3, ['a1', 'a2'], ['m1'], []),
-					assertionFailure(2, 6, 3, 5, ['a1'], [], ['u1']),
+					assertionFailure('1  source1', 1, 0, 1, ['a1', 'a2', 'a3'], ['m1', 'm2'], ['u1']),
+					assertionFailure('6  source3', 6, 0, 3, ['a1', 'a2'], ['m1'], []),
+					assertionFailure('6  source3', 6, 3, 5, ['a1'], [], ['u1']),
 				],
 			)
 			reporter.reportSuiteResult()
@@ -482,10 +442,10 @@ function metadata(description?: string): TestCaseMetadata {
 	}
 }
 
-function lineAssertion(sourceLineNumber: number, testCaseLineNumber: number): LineAssertion {
+function lineAssertion(source_line: string, testCaseLineNumber: number): LineAssertion {
 	return {
-		sourceLineNumber,
-		testCaseLineNumber: testCaseLineNumber - 1,
+		source_line: source_line,
+		line_number: testCaseLineNumber - 1,
 		scopeAssertions: [
 			{
 				from: -1,
@@ -498,7 +458,7 @@ function lineAssertion(sourceLineNumber: number, testCaseLineNumber: number): Li
 }
 
 function assertionFailure(
-	sourceLineNumber: number,
+	sourceLineText: string,
 	testCaseLineNumber: number,
 	start: number,
 	end: number,
@@ -510,7 +470,7 @@ function assertionFailure(
 		actual,
 		missing,
 		unexpected,
-		srcLine: sourceLineNumber,
+		srcLineText: sourceLineText,
 		line: testCaseLineNumber - 1,
 		start,
 		end,

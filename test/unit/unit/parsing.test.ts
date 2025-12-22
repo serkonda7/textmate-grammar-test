@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
 import { parseTestFile, parseScopeAssertion } from '../../../src/unit/parser.ts'
+import { GrammarTestFile } from '../../../src/unit/model.ts'
 
 describe('parseScopeAssertion', () => {
 	it('should parse single ^ accent', () => {
@@ -163,40 +164,16 @@ describe('parseTestFile', () => {
 	})
 })
 
-const parserTestDhallExpectedResult = {
+const parserTestDhallExpectedResult: GrammarTestFile = {
 	metadata: {
 		commentToken: '--',
 		description: '',
 		scope: 'source.dhall',
 	},
-	source: [
-		'-- simple test',
-		'',
-		'',
-		"{- Don't repeat yourself!",
-		'',
-		'   Repetition is error-prone',
-		'-}',
-		'',
-		'',
-		'let user = "bill"',
-		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
-		'in  { home       = "/home/${user}"',
-		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
-		'    , privateKey = "/home/${user}/id_ed25519"',
-		// biome-ignore lint/suspicious/noTemplateCurlyInString: false positive
-		'    , publicKey  = "/home/${user}/id_ed25519.pub"',
-		'}',
-		'',
-		'',
-		'',
-		'',
-		'',
-	],
 	assertions: [
 		{
-			testCaseLineNumber: 11,
-			sourceLineNumber: 10,
+			line_number: 11,
+			source_line: 'in  { home       = "/home/${user}"',
 			scopeAssertions: [
 				{
 					from: 4,
@@ -207,8 +184,8 @@ const parserTestDhallExpectedResult = {
 			],
 		},
 		{
-			testCaseLineNumber: 13,
-			sourceLineNumber: 11,
+			line_number: 13,
+			source_line: '    , privateKey = "/home/${user}/id_ed25519"',
 			scopeAssertions: [
 				{
 					from: 6,
@@ -240,8 +217,8 @@ const parserTestDhallExpectedResult = {
 			],
 		},
 		{
-			testCaseLineNumber: 17,
-			sourceLineNumber: 12,
+			line_number: 17,
+			source_line: '    , publicKey  = "/home/${user}/id_ed25519.pub"',
 			scopeAssertions: [
 				{
 					from: 26,
@@ -258,8 +235,8 @@ const parserTestDhallExpectedResult = {
 			],
 		},
 		{
-			testCaseLineNumber: 20,
-			sourceLineNumber: 13,
+			line_number: 20,
+			source_line: '}',
 			scopeAssertions: [
 				{
 					from: 0,
