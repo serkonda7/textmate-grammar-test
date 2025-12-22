@@ -48,10 +48,10 @@ describe('parseTestFile', () => {
 		expect(res.metadata.commentToken).toBe('#')
 		expect(res.metadata.description.length).toBeGreaterThan(5)
 
-		// 3 tested lines
-		expect(res.assertions).toHaveLength(3)
+		// Source lines with assertions
+		expect(res.assertions).toHaveLength(4)
 
-		// Last line has 3 scope assertions
+		// Number of assertions on last source line
 		expect(res.assertions.at(-1)?.scopeAssertions).toHaveLength(3)
 	}
 })

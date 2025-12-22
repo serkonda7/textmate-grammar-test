@@ -3,13 +3,16 @@
 var x = "foo"
 # <--- keyword.control.testlang
 
-# A normal comment in between
+# Comments can be tested too
+# ^ comment.line.testlang
 
 if (true) {
   var y = 4
 # <~~--- keyword.control.testlang
 # ^^^ keyword.control.testlang
 }
+
+# Another normal comment
 
 var s = "hi @{name}"
 #       ^^^^^^^^^^^^ string.quoted.double.testlang

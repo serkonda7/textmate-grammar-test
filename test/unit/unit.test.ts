@@ -10,10 +10,6 @@ const registry = createRegistry([
 		scopeName: 'source.dhall',
 		path: './test/resources/dhall.tmLanguage.json',
 	},
-	{
-		scopeName: 'source.terraform',
-		path: './test/resources/terraform.tmLanguage.json',
-	},
 ])
 
 function loadFile(filename: string): string {
@@ -522,14 +518,6 @@ describe('Grammar test case', () => {
 					unexpected: [],
 				},
 			])
-		})
-	})
-	it('should count line with comment token and no assertions as a source line', () => {
-		return runGrammarTestCase(
-			registry,
-			parseTestFile(loadFile('./test/resources/sourceLineA.tf')),
-		).then((result) => {
-			expect(result).toEqual([])
 		})
 	})
 })
