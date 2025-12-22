@@ -1,8 +1,7 @@
 import tm from 'vscode-textmate'
 import type { GrammarTestFile, TestFailure } from './model.ts'
-import { parseTestFile } from './parser.ts'
 
-export { parseTestFile, missingScopes_ }
+export { missingScopes_ }
 
 export async function runGrammarTestCase(
 	registry: tm.Registry,
