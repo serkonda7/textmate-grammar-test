@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { createRegistry } from '../../src/common/index.ts'
 import { parseTestFile, runGrammarTestCase } from '../../src/unit/core.ts'
-import { TestFailure } from '../../src/unit/model.ts'
+import type { TestFailure } from '../../src/unit/model.ts'
 
 const registry = createRegistry([
 	{

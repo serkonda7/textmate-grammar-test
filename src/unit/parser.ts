@@ -1,7 +1,6 @@
 import { EOL } from 'node:os'
 import type { GrammarTestFile, LineAssertion, ScopeAssertion, TestCaseMetadata } from './model.ts'
 
-
 const HEADER_ERR_MSG = 'Invalid header'
 const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
 
@@ -82,7 +81,6 @@ export function parseTestFile(str: string): GrammarTestFile {
 		assertions: lineAssertions,
 	} as GrammarTestFile
 }
-
 
 const leftArrowAssertRegex =
 	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/

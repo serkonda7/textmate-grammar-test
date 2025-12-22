@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
-import { parseTestFile, parseScopeAssertion } from '../../../src/unit/parser.ts'
-import { GrammarTestFile } from '../../../src/unit/model.ts'
+import type { GrammarTestFile } from '../../../src/unit/model.ts'
+import { parseScopeAssertion, parseTestFile } from '../../../src/unit/parser.ts'
 
 describe('parseScopeAssertion', () => {
 	it('should parse single ^ accent', () => {
