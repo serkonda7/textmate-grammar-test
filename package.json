@@ -27,9 +27,6 @@
     "textmate-grammar-test": "./dist/unit.js",
     "textmate-grammar-snap": "./dist/snapshot.js"
   },
-  "exports": {
-    "./unit": "./src/unit/index.ts"
-  },
   "files": [
     "dist/",
     "README.md",

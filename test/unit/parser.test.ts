@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import fs from 'node:fs'
-import { parseHeader, parseTestFile } from 'textmate-grammar-test/unit'
+import { parseHeader, parseTestFile } from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/model'
 
 describe('parseHeader', () => {
