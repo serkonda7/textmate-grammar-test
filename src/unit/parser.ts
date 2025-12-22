@@ -1,10 +1,10 @@
 import { EOL } from 'node:os'
 import {
+	type FileMetadata,
 	type GrammarTestFile,
-	type TestedLine,
 	new_line_assertion,
 	type ScopeAssertion,
-	type FileMetadata,
+	type TestedLine,
 } from './types.ts'
 
 const HEADER_ERR_MSG = 'Invalid header'
@@ -42,11 +42,11 @@ export function parseTestFile(str: string): GrammarTestFile {
 	}
 
 	const metadata = parseHeader(lines[0])
-	const { comment_token: commentToken } = metadata
-	const commentTokenLength = commentToken.length
+	const { comment_token } = metadata
+	const line_assert_re = new RegExp(`^${RegExp.escape(comment_token)}\\s*(\\^|<[~]*[-]+)`)
 
-	function isLineAssertion(s: string): boolean {
-		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
+	function is_assertion(s: string): boolean {
+		return line_assert_re.test(s)
 	}
 
 	const lineAssertions: TestedLine[] = []
@@ -57,8 +57,8 @@ export function parseTestFile(str: string): GrammarTestFile {
 		const line = lines[i]
 
 		// Scope assertion line
-		if (isLineAssertion(line)) {
-			scope_assertions = scope_assertions.concat(parseScopeAssertion(i, commentToken.length, line))
+		if (is_assertion(line)) {
+			scope_assertions = scope_assertions.concat(parseScopeAssertion(i, comment_token.length, line))
 			continue
 		}
 
