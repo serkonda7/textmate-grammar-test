@@ -33,7 +33,7 @@
     "LICENSE.txt"
   ],
   "scripts": {
-    "test": "bun run check && bun test",
+    "test": "bun run check && bun run build:dev && bun test",
     "lint": "biome check",
     "lint:fix": "biome check --write",
     "lint:ci": "biome ci",
