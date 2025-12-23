@@ -16,6 +16,4 @@ if (true) {
 # Another normal comment
 
 var s = "hi @{name}"
-#       ^^^^^^^^^^^^ string.quoted.double.xy
-#           ^^^^^^^ variable.interpolation.xy
-#             ^^^^ meta.label.xy
+#             ^^^^ string.xy variable.interpolation.xy meta.label.xy

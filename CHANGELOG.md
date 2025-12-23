@@ -3,7 +3,13 @@
 _unreleased_
 
 **Breaking Changed**
+- Character for negative scope tests is now `!` (before: `-`)
 - Failure exit code is now `1` (before: `-1`)
+
+**Other Changes**
+- readme: Improve syntax explanation
+- unit/parser: Complete code overhaul and refactor
+- Replace mocha/chai with bun:test
 
 
 ## 0.2.8 - 0.2.9
