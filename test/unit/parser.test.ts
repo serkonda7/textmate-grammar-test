@@ -80,25 +80,6 @@ describe('AssertionParser assert kinds', () => {
 		expect(res.to).toBe(5)
 	})
 
-	/* TODO
-	it('should parse multiple accent groups', () => {
-		expect(parseScopeAssertion(0, 1, '# ^^ ^^^ source.dhall')).toStrictEqual([
-			{
-				exclude: [],
-				from: 2,
-				scopes: ['source.dhall'],
-				to: 4,
-			},
-			{
-				exclude: [],
-				from: 5,
-				scopes: ['source.dhall'],
-				to: 8,
-			},
-		])
-	})
-	*/
-
 	test('simple arrow <---', () => {
 		const res = assert_parser.parse_line('# <--- source.xy')[0]
 		expect(res.from).toBe(0)
