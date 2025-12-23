@@ -1,0 +1,7 @@
+# SYNTAX TEST "source.xy" "Tab Indentation"
+
+if (true) {
+	var a = 1
+	#       ^ constant.int.xy
+#   ^^^ keyword.control.xy
+}
