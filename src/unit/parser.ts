@@ -16,6 +16,7 @@ const SCOPE_RE = /[-\w]+(?:\.[-\w]+)*/g
 // Laxer scope regex allowing: `+`
 const LEGACY_SCOPE_RW = /[+-\w]+(?:\.[+-\w]+)*/g
 
+// TODO add docs in readme explaining the modes
 export enum ScopeRegexMode {
 	standard,
 	legacy,
