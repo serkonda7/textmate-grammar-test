@@ -6,7 +6,7 @@ export interface FileMetadata {
 }
 
 export interface ScopeAssertion {
-	from: number // note the 0 index
+	from: number
 	to: number // exclusive
 	scopes: string[]
 	excludes: string[]

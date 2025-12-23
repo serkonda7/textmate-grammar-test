@@ -42,6 +42,7 @@ class TestCaseRunner {
 
 		// Read and parse test case
 		try {
+			// TODO actually allow the user to choose the mode via cli flag
 			testCase = parseTestFile(fs.readFileSync(filename, 'utf8'))
 		} catch (error) {
 			this.reporter.reportParseError(filename, error)

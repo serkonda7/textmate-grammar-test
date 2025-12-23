@@ -145,11 +145,18 @@ describe('AssertionParser scopes', () => {
 	})
 })
 
-describe('AssertionParser legacy scopes', () => {
+describe('AssertionParser in different modes', () => {
 	const legacy_parser = new AssertionParser(1, ScopeRegexMode.legacy)
 
-	test('Edgecase scope names', () => {
+	test('c++ scope', () => {
 		const res = legacy_parser.parse_line('# ^ source.c++')
 		expect(res.scopes).toEqual(['source.c++'])
+	})
+
+	const permissive_parser = new AssertionParser(1, ScopeRegexMode.permissive)
+
+	test('Scope name with symbols', () => {
+		const res = permissive_parser.parse_line('# ^ foo.$0.--.spam#25')
+		expect(res.scopes).toEqual(['foo.$0.--.spam#25'])
 	})
 })

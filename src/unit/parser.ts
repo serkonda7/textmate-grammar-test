@@ -11,15 +11,22 @@ const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
-// Scope names are lowercase alphanumeric, `-` and are separated by dots
-const SCOPE_RE = /[-\w]+(?:\.[-\w]+)*/g
-// Laxer scope regex allowing: `+`
-const LEGACY_SCOPE_RW = /[+-\w]+(?:\.[+-\w]+)*/g
-
 // TODO add docs in readme explaining the modes
 export enum ScopeRegexMode {
 	standard,
 	legacy,
+	permissive,
+}
+
+const REGEX_BY_MODE: Record<ScopeRegexMode, RegExp> = {
+	// Names are lowercase alphanumeric, `-` and separated by dots
+	[ScopeRegexMode.standard]: /[-\w]+(?:\.[-\w]+)*/g,
+
+	// For legacy grammars allowing: `+`
+	[ScopeRegexMode.legacy]: /[+-\w]+(?:\.[+-\w]+)*/g,
+
+	// Any non-whitespace except dot
+	[ScopeRegexMode.permissive]: /[^.\s]+(?:\.[^.\s]+)*/g,
 }
 
 // RegExp.escape polyfill for Node.js <= 24
@@ -48,7 +55,10 @@ export function parseHeader(line: string): FileMetadata {
 	}
 }
 
-export function parseTestFile(str: string): GrammarTestFile {
+export function parseTestFile(
+	str: string,
+	mode: ScopeRegexMode = ScopeRegexMode.standard,
+): GrammarTestFile {
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
@@ -63,8 +73,7 @@ export function parseTestFile(str: string): GrammarTestFile {
 		return line_assert_re.test(s)
 	}
 
-	// TODO actually allow the user to choose the mode
-	const assert_parser = new AssertionParser(comment_token.length, ScopeRegexMode.standard)
+	const assert_parser = new AssertionParser(comment_token.length, mode)
 
 	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
@@ -112,7 +121,7 @@ export class AssertionParser {
 
 	constructor(comment_length: number, mode: ScopeRegexMode) {
 		this.comment_offset = comment_length
-		this.scope_re = mode === ScopeRegexMode.standard ? SCOPE_RE : LEGACY_SCOPE_RW
+		this.scope_re = REGEX_BY_MODE[mode]
 	}
 
 	parse_line(_line: string): ScopeAssertion {
