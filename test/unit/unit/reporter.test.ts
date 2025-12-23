@@ -451,7 +451,7 @@ function lineAssertion(source_line: string, testCaseLineNumber: number): TestedL
 				from: -1,
 				to: -2,
 				scopes: ['scope1'],
-				exclude: [],
+				excludes: [],
 			},
 		],
 	}

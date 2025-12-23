@@ -9,7 +9,7 @@ export interface ScopeAssertion {
 	from: number // note the 0 index
 	to: number // exclusive
 	scopes: string[]
-	exclude: string[]
+	excludes: string[]
 }
 
 export interface TestedLine {

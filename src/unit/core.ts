@@ -21,7 +21,7 @@ export async function runGrammarTestCase(
 			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 			ruleStack = ruleStack1
 
-			scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
+			scopeAssertions.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
 				const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
 				if (xs.length === 0 && requiredScopes.length > 0) {
 					failures.push({

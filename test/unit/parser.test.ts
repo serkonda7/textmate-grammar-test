@@ -60,45 +60,43 @@ describe('AssertionParser assert kinds', () => {
 	const assert_parser = new AssertionParser(1)
 
 	test('single ^', () => {
-		expect(assert_parser.parse_line('#^ source.xy')).toStrictEqual([
-			{
-				from: 1,
-				to: 2,
-				scopes: ['source.xy'],
-				exclude: [],
-			},
-		])
+		expect(assert_parser.parse_line('#^ source.xy')).toStrictEqual({
+			from: 1,
+			to: 2,
+			scopes: ['source.xy'],
+			excludes: [],
+		})
 
-		const res2 = assert_parser.parse_line('# ^ source.xy')[0]
+		const res2 = assert_parser.parse_line('# ^ source.xy')
 		expect(res2.from).toBe(2)
 		expect(res2.to).toBe(3)
 	})
 
 	test('multiple ^^^', () => {
-		const res = assert_parser.parse_line('# ^^^ string.xy')[0]
+		const res = assert_parser.parse_line('# ^^^ string.xy')
 		expect(res.from).toBe(2)
 		expect(res.to).toBe(5)
 	})
 
 	test('simple arrow <---', () => {
-		const res = assert_parser.parse_line('# <--- source.xy')[0]
+		const res = assert_parser.parse_line('# <--- source.xy')
 		expect(res.from).toBe(0)
 		expect(res.to).toBe(3)
 	})
 
 	test('padded arrow <~~~--', () => {
-		const res = assert_parser.parse_line('# <~~~-- source.xy')[0]
+		const res = assert_parser.parse_line('# <~~~-- source.xy')
 		expect(res.from).toBe(3)
 		expect(res.to).toBe(5)
 	})
 
 	test('spaces before assert', () => {
-		const res = assert_parser.parse_line('#    ^ source.xy')[0]
+		const res = assert_parser.parse_line('#    ^ source.xy')
 		expect(res.from).toBe(5)
 	})
 
 	test('leading spaces before comment', () => {
-		const res = assert_parser.parse_line('    # ^^^ source.xy')[0]
+		const res = assert_parser.parse_line('    # ^^^ source.xy')
 		expect(res.scopes).toEqual(['source.xy'])
 		expect(res.from).toBe(6)
 		expect(res.to).toBe(9)
@@ -109,25 +107,25 @@ describe('AssertionParser scopes', () => {
 	const assert_parser = new AssertionParser(1)
 
 	test('multiple scopes', () => {
-		const res = assert_parser.parse_line('# ^ constant.int.xy')[0]
+		const res = assert_parser.parse_line('# ^ constant.int.xy')
 		expect(res.scopes).toHaveLength(1)
-		expect(res.exclude).toHaveLength(0)
+		expect(res.excludes).toHaveLength(0)
 	})
 
 	test('exclusions', () => {
-		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.xy')[0]
-		expect(res.exclude).toHaveLength(2)
+		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.xy')
+		expect(res.excludes).toHaveLength(2)
 		expect(res.scopes).toHaveLength(0)
 	})
 
 	test('complex', () => {
-		const res = assert_parser.parse_line('# <~~-- source.xy comment.line.xy ! foo.bar bar')[0]
+		const res = assert_parser.parse_line('# <~~-- source.xy comment.line.xy ! foo.bar bar')
 		expect(res.scopes).toEqual(['source.xy', 'comment.line.xy'])
-		expect(res.exclude).toEqual(['foo.bar', 'bar'])
+		expect(res.excludes).toEqual(['foo.bar', 'bar'])
 	})
 
 	test('trailing spaces', () => {
-		const res = assert_parser.parse_line('# ^ source.xy   ')[0]
+		const res = assert_parser.parse_line('# ^ source.xy   ')
 		expect(res.scopes).toEqual(['source.xy'])
 	})
 
