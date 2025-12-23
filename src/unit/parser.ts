@@ -1,4 +1,3 @@
-import { EOL } from 'node:os'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
@@ -7,13 +6,20 @@ import {
 	type TestedLine,
 } from './types.ts'
 
-const HEADER_ERR_MSG = 'Invalid header'
-const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
-
 const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
 const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
+
+// Scope names are lowercase alphanumeric, `-` and are separated by dots
+const SCOPE_RE = /[-\w]+(?:\.[-\w]+)*/g
+// Laxer scope regex allowing: `+`
+const LEGACY_SCOPE_RW = /[+-\w]+(?:\.[+-\w]+)*/g
+
+export enum ScopeRegexMode {
+	standard,
+	legacy,
+}
 
 // RegExp.escape polyfill for Node.js <= 24
 if (!RegExp.escape) {
@@ -29,7 +35,9 @@ export function parseHeader(line: string): FileMetadata {
 
 	// No header matched
 	if (!match?.groups) {
-		throw new SyntaxError(HEADER_ERR_MSG, { cause: HEADER_ERR_CAUSE })
+		throw new SyntaxError('Invalid header', {
+			cause: `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"`,
+		})
 	}
 
 	return {
@@ -54,7 +62,8 @@ export function parseTestFile(str: string): GrammarTestFile {
 		return line_assert_re.test(s)
 	}
 
-	const assert_parser = new AssertionParser(comment_token.length)
+	// TODO actually allow the user to choose the mode
+	const assert_parser = new AssertionParser(comment_token.length, ScopeRegexMode.standard)
 
 	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
@@ -95,12 +104,14 @@ export function parseTestFile(str: string): GrammarTestFile {
 }
 
 export class AssertionParser {
-	comment_offset: number
-	line: string = ''
-	pos: number = 0
+	private comment_offset: number
+	private scope_re: RegExp
+	private line: string = ''
+	private pos: number = 0
 
-	constructor(comment_length: number) {
+	constructor(comment_length: number, mode: ScopeRegexMode) {
 		this.comment_offset = comment_length
+		this.scope_re = mode === ScopeRegexMode.standard ? SCOPE_RE : LEGACY_SCOPE_RW
 	}
 
 	parse_line(_line: string): ScopeAssertion {
@@ -122,13 +133,13 @@ export class AssertionParser {
 		return { from, to, scopes, excludes }
 	}
 
-	skip_spaces(): void {
+	private skip_spaces(): void {
 		while (this.line[this.pos] === ' ') {
 			this.pos++
 		}
 	}
 
-	parse_assertion_range(): { from: number; to: number } {
+	private parse_assertion_range(): { from: number; to: number } {
 		const start = this.pos
 
 		const c = this.line[this.pos]
@@ -164,9 +175,7 @@ export class AssertionParser {
 		throw new SyntaxError('Cannot parse assertion')
 	}
 
-	parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {
-		const SCOPE_RE = /\w+(?:\.[-\w]+)*/g
-
+	private parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {
 		const remaining_line = this.line.slice(this.pos)
 		const [scopes_part, excludes_part] = remaining_line.split(/\s+!\s+/, 2)
 
@@ -174,11 +183,11 @@ export class AssertionParser {
 		let excludes: string[] = []
 
 		if (scopes_part) {
-			scopes = [...scopes_part.matchAll(SCOPE_RE)].map((m) => m[0])
+			scopes = [...scopes_part.matchAll(this.scope_re)].map((m) => m[0])
 		}
 
 		if (excludes_part) {
-			excludes = [...excludes_part.matchAll(SCOPE_RE)].map((m) => m[0])
+			excludes = [...excludes_part.matchAll(this.scope_re)].map((m) => m[0])
 		}
 
 		return { scopes, excludes }
