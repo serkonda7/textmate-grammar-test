@@ -38,47 +38,46 @@ Example (TypeScript):
 ```
 
 
-### Require token to have a specific scope
-<!-- TODO cleanup -->
-Require tokens to have specific scope by using `^`&nbsp;&nbsp;:
-
-```scala
-private var elements: List[A] = Nil
-//          ^^^^^^^^ variable.other.declaration.scala
+### Require specific scopes
+Require tokens to have a specific scope by using `^`:
+```ts
+let count: number = 1
+//  ^^^^^ variable.other.readwrite.ts
+//         ^^^^^^ support.type.primitive.ts
 ```
 
-Get into those pesky first few characters by using `<-`:
-
-```scala
-var x = 3
-// <--- keyword.declaration.volatile.scala
-//  the length of '-' determine how many characters are matched from the start of the line
-x=5
-//  <~- keyword.operator.comparison.scala
-//  you specify offset from start by using '~' character, just in case
+You can test for multiple scopes too. The order must be from general scope to more specifc:
+```ts
+let count: number = 1
+//         ^^^^^^ meta.type.annotation.ts meta.var-single-variable.expr.ts meta.var.expr.ts
 ```
 
 
-### Prevent scope on a token
-<!-- TODO cleanup -->
-* To ensure that tokens **don't** have undesired scopes put `-` symbol before them:
-```scala
-  / ensure comment start with two double slashes
-  ^ - comment.line.double slash.scala
-
-  / or you can combine both positive and negative scopes
-  ^ source.scala - comment.line.double slash.scala
+### Prevent specific scopes
+To ensure tokens don't have a unexpected scope, add a `!` surrounded by spaces:
+```ts
+    / not a comment
+//  ^ ! comment.line.double-slash.ts
 ```
 
-Lines which start with a `<comment token>` and assertion symbol are ignored by the textmate grammar.
+You can combine positive and negative scopes too. The `!` is only needed to separate the groups:
+```ts
+    / not a comment
+//  ^ source.ts ! comment.line.double-slash.ts storage.type.ts
+```
 
 
-Note, that scope comparison takes into account relative scope's position.
-So, if required scopes are `'scope1 scope2'`, the test will report an error if a grammar returns them as `'scope2 scope1'`.
+### Test the first token of a line
+To test a token at the beginning of the line, use `<-`.
+The number of `-` determines the token length.
+In case you need an offset, use `~`:
+```ts
+let x = "a"
+// <--- storage.type.ts
 
-To run a unit test:
-```bash
-textmate-grammar-test 'tests/unit/**/*.test.scala'
+// With offset:
+x = "b"
+// <~~- keyword.operator.assignment.ts
 ```
 
 

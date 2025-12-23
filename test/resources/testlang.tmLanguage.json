@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/tmlanguage.json",
   "name": "Testlang",
-  "scopeName": "source.testlang",
+  "scopeName": "source.xy",
   "patterns": [
     { "include": "#comments" },
     { "include": "#keywords" },
@@ -12,7 +12,7 @@
     "comments": {
       "patterns": [
         {
-          "name": "comment.line.testlang",
+          "name": "comment.line.xy",
           "match": "#.*$"
         }
       ]
@@ -20,7 +20,7 @@
     "keywords": {
       "patterns": [
         {
-          "name": "keyword.control.testlang",
+          "name": "keyword.control.xy",
           "match": "\\bvar\\b"
         }
       ]
@@ -28,16 +28,16 @@
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double.testlang",
+          "name": "string.xy",
           "begin": "\"",
           "end": "\"",
           "patterns": [
             {
-              "name": "variable.interpolation.testlang",
+              "name": "variable.interpolation.xy",
               "match": "@\\{([^}]+)\\}",
               "captures": {
                 "1": {
-                  "name": "meta.label.testlang"
+                  "name": "meta.label.xy"
                 }
               }
             }
@@ -48,7 +48,7 @@
     "numbers": {
       "patterns": [
         {
-          "name": "constant.integer.testlang",
+          "name": "constant.int.xy",
           "match": "\\b\\d+\\b"
         }
       ]

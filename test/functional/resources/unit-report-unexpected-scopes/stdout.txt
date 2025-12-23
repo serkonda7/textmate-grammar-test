@@ -67,6 +67,3 @@
       ^
   prohibited scopes: meta.declaration.data.record.block.dhall keyword.operator.record.end.dhall
   actual: source.dhall meta.declaration.data.record.block.dhall keyword.operator.record.end.dhall
-
-
-

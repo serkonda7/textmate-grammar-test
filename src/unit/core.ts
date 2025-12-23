@@ -1,5 +1,5 @@
 import tm from 'vscode-textmate'
-import type { GrammarTestFile, TestFailure } from './model.ts'
+import type { GrammarTestFile, TestFailure } from './types.ts'
 
 export { missingScopes_ }
 
@@ -16,19 +16,19 @@ export async function runGrammarTestCase(
 
 		const failures: TestFailure[] = []
 
-		for (const assertion of testCase.assertions) {
-			const { line_number: testCaseLineNumber, source_line: line, scopeAssertions } = assertion
+		for (const assertion of testCase.test_lines) {
+			const { line_nr: testCaseLineNumber, src: line, scope_asserts: scopeAssertions } = assertion
 			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 			ruleStack = ruleStack1
 
-			scopeAssertions.forEach(({ from, to, scopes: requiredScopes, exclude: excludedScopes }) => {
+			scopeAssertions.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
 				const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
 				if (xs.length === 0 && requiredScopes.length > 0) {
 					failures.push({
 						missing: requiredScopes,
 						unexpected: [],
 						actual: [],
-						line: testCaseLineNumber,
+						line: testCaseLineNumber - 1,
 						srcLineText: line,
 						start: from,
 						end: to,
@@ -45,7 +45,7 @@ export async function runGrammarTestCase(
 								missing: missing,
 								actual: token.scopes,
 								unexpected: unexpected,
-								line: testCaseLineNumber,
+								line: testCaseLineNumber - 1,
 								srcLineText: line,
 								start: token.startIndex,
 								end: token.endIndex,

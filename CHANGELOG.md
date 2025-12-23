@@ -2,8 +2,16 @@
 ## 0.3.0
 _unreleased_
 
-**Breaking Changed**
+**Breaking Changes**
+- Character for negative scope tests is now `!` (before: `-`)
 - Failure exit code is now `1` (before: `-1`)
+- Remove support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
+  - Workaround: split into multiple lines
+
+**Other Changes**
+- readme: Improve syntax explanation
+- unit/parser: Complete code overhaul and refactor
+- Replace mocha/chai with bun:test
 
 
 ## 0.2.8 - 0.2.9

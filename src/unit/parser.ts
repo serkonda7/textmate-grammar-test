@@ -1,11 +1,11 @@
 import { EOL } from 'node:os'
 import {
+	type FileMetadata,
 	type GrammarTestFile,
-	type LineAssertion,
 	new_line_assertion,
 	type ScopeAssertion,
-	type TestCaseMetadata,
-} from './model.ts'
+	type TestedLine,
+} from './types.ts'
 
 const HEADER_ERR_MSG = 'Invalid header'
 const HEADER_ERR_CAUSE = `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"${EOL}`
@@ -15,11 +15,16 @@ const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
+// RegExp.escape polyfill for Node.js <= 24
+if (!RegExp.escape) {
+	RegExp.escape = (string) => String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /**
  * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
  */
-export function parseHeader(line: string): TestCaseMetadata {
+export function parseHeader(line: string): FileMetadata {
 	const match = HEADER_REGEX.exec(line)
 
 	// No header matched
@@ -28,7 +33,7 @@ export function parseHeader(line: string): TestCaseMetadata {
 	}
 
 	return {
-		commentToken: match.groups.comment,
+		comment_token: match.groups.comment,
 		scope: match.groups.scope,
 		description: match.groups.desc ?? '',
 	}
@@ -42,14 +47,16 @@ export function parseTestFile(str: string): GrammarTestFile {
 	}
 
 	const metadata = parseHeader(lines[0])
-	const { commentToken } = metadata
-	const commentTokenLength = commentToken.length
+	const { comment_token } = metadata
+	const line_assert_re = new RegExp(`\\s*${RegExp.escape(comment_token)}\\s*(\\^|<[~]*[-]+)`)
 
-	function isLineAssertion(s: string): boolean {
-		return s.startsWith(commentToken) && /^\s*(\^|<[~]*[-]+)/.test(s.substring(commentTokenLength))
+	function is_assertion(s: string): boolean {
+		return line_assert_re.test(s)
 	}
 
-	const lineAssertions: LineAssertion[] = []
+	const assert_parser = new AssertionParser(comment_token.length)
+
+	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
 	let src_line_nr = 0
 
@@ -57,15 +64,15 @@ export function parseTestFile(str: string): GrammarTestFile {
 		const line = lines[i]
 
 		// Scope assertion line
-		if (isLineAssertion(line)) {
-			scope_assertions = scope_assertions.concat(parseScopeAssertion(i, commentToken.length, line))
+		if (is_assertion(line)) {
+			scope_assertions.push(assert_parser.parse_line(line))
 			continue
 		}
 
 		// Store previous line assertion
 		if (scope_assertions.length > 0) {
 			lineAssertions.push(
-				new_line_assertion(lines[src_line_nr], src_line_nr, scope_assertions.slice()),
+				new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 			)
 		}
 
@@ -77,79 +84,103 @@ export function parseTestFile(str: string): GrammarTestFile {
 	// Handle remaining assertions at EOF
 	if (scope_assertions.length > 0) {
 		lineAssertions.push(
-			new_line_assertion(lines[src_line_nr], src_line_nr, scope_assertions.slice()),
+			new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 		)
 	}
 
 	return {
 		metadata: metadata,
-		assertions: lineAssertions,
+		test_lines: lineAssertions,
 	}
 }
 
-const leftArrowAssertRegex =
-	/^(\s*)<([~]*)([-]+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
-const upArrowAssertRegex =
-	/^\s*((?:(?:\^+)\s*)+)((?:\s*\w[-\w.]*)*)(?:\s*-)?((?:\s*\w[-\w.]*)*)\s*$/
+export class AssertionParser {
+	comment_offset: number
+	line: string = ''
+	pos: number = 0
 
-export function parseScopeAssertion(
-	testCaseLineNumber: number,
-	commentLength: number,
-	as: string,
-): ScopeAssertion[] {
-	const s = as.slice(commentLength)
+	constructor(comment_length: number) {
+		this.comment_offset = comment_length
+	}
 
-	if (s.trim().startsWith('^')) {
-		const upArrowMatch = upArrowAssertRegex.exec(s)
-		if (upArrowMatch !== null) {
-			const [, , scopes = '', exclusions = ''] = upArrowMatch
+	parse_line(_line: string): ScopeAssertion {
+		this.line = _line
+		this.pos = 0
 
-			if (scopes === '' && exclusions === '') {
-				throw new Error(
-					`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
-				)
-			} else {
-				const result = []
-				let startIdx = s.indexOf('^')
-				while (startIdx !== -1) {
-					let endIndx = startIdx
-					while (s[endIndx + 1] === '^') {
-						endIndx++
-					}
-					result.push({
-						from: commentLength + startIdx,
-						to: commentLength + endIndx + 1,
-						scopes: scopes.split(/\s+/).filter((x) => x),
-						exclude: exclusions.split(/\s+/).filter((x) => x),
-					} as ScopeAssertion)
-					startIdx = s.indexOf('^', endIndx + 1)
-				}
-				return result
+		// Skip comment token and spaces around it
+		this.skip_spaces()
+		this.pos += this.comment_offset
+		this.skip_spaces()
+
+		const { from, to } = this.parse_assertion_range()
+		const { scopes, excludes } = this.parse_scopes_and_exclusions()
+
+		if (scopes.length === 0 && excludes.length === 0) {
+			throw new SyntaxError('Assertion misses scopes')
+		}
+
+		return { from, to, scopes, excludes }
+	}
+
+	skip_spaces(): void {
+		while (this.line[this.pos] === ' ') {
+			this.pos++
+		}
+	}
+
+	parse_assertion_range(): { from: number; to: number } {
+		const start = this.pos
+
+		const c = this.line[this.pos]
+		this.pos++
+
+		if (c === '^') {
+			while (this.line[this.pos] === '^') {
+				this.pos++
 			}
-		} else {
-			throw new Error(`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL}`)
+
+			return { from: start, to: this.pos }
 		}
+
+		if (c === '<') {
+			let nr_tildas = 0
+			while (this.line[this.pos] === '~') {
+				this.pos++
+				nr_tildas++
+			}
+
+			let nr_dashes = 0
+			while (this.line[this.pos] === '-') {
+				this.pos++
+				nr_dashes++
+			}
+
+			return {
+				from: nr_tildas,
+				to: nr_tildas + nr_dashes,
+			}
+		}
+
+		throw new SyntaxError('Cannot parse assertion')
 	}
 
-	const leftArrowMatch = leftArrowAssertRegex.exec(s)
+	parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {
+		const SCOPE_RE = /\w+(?:\.[-\w]+)*/g
 
-	if (leftArrowMatch !== null) {
-		const [, , tildas, dashes, scopes = '', exclusions = ''] = leftArrowMatch
-		if (scopes === '' && exclusions === '') {
-			throw new Error(
-				`Invalid assertion at line ${testCaseLineNumber}:${EOL}${as}${EOL} Missing both required and prohibited scopes`,
-			)
-		} else {
-			return [
-				{
-					from: tildas.length,
-					to: tildas.length + dashes.length,
-					scopes: scopes.split(/\s+/).filter((x) => x),
-					exclude: exclusions.split(/\s+/).filter((x) => x),
-				},
-			]
+		const remaining_line = this.line.slice(this.pos)
+		const [scopes_part, excludes_part] = remaining_line.split(/\s+!\s+/, 2)
+
+		let scopes: string[] = []
+		let excludes: string[] = []
+
+		if (scopes_part) {
+			scopes = [...scopes_part.matchAll(SCOPE_RE)].map((m) => m[0])
 		}
-	}
 
-	return []
+		if (excludes_part) {
+			excludes = [...excludes_part.matchAll(SCOPE_RE)].map((m) => m[0])
+		}
+
+		return { scopes, excludes }
+	}
 }
