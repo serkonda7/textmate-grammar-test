@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import fs from 'node:fs'
-import { AssertionParser, parseHeader, parseTestFile } from '../../src/unit/index.ts'
+import {
+	AssertionParser,
+	parseHeader,
+	parseTestFile,
+	ScopeRegexMode,
+} from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/types.ts'
 
 describe('parseHeader', () => {
@@ -57,7 +62,7 @@ describe('parseTestFile', () => {
 })
 
 describe('AssertionParser assert kinds', () => {
-	const assert_parser = new AssertionParser(1)
+	const assert_parser = new AssertionParser(1, ScopeRegexMode.standard)
 
 	test('single ^', () => {
 		expect(assert_parser.parse_line('#^ source.xy')).toStrictEqual({
@@ -104,7 +109,7 @@ describe('AssertionParser assert kinds', () => {
 })
 
 describe('AssertionParser scopes', () => {
-	const assert_parser = new AssertionParser(1)
+	const assert_parser = new AssertionParser(1, ScopeRegexMode.standard)
 
 	test('multiple scopes', () => {
 		const res = assert_parser.parse_line('# ^ constant.int.xy')
@@ -113,7 +118,7 @@ describe('AssertionParser scopes', () => {
 	})
 
 	test('exclusions', () => {
-		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.xy')
+		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.number-sign.xy')
 		expect(res.excludes).toHaveLength(2)
 		expect(res.scopes).toHaveLength(0)
 	})
@@ -129,7 +134,7 @@ describe('AssertionParser scopes', () => {
 		expect(res.scopes).toEqual(['source.xy'])
 	})
 
-	test('missing scopes', () => {
+	test('Error on missing scopes', () => {
 		expect(() => {
 			assert_parser.parse_line('# ^ ')
 		}).toThrowError()
@@ -137,5 +142,21 @@ describe('AssertionParser scopes', () => {
 		expect(() => {
 			assert_parser.parse_line('# <-- ')
 		}).toThrowError()
+	})
+})
+
+describe('AssertionParser in different modes', () => {
+	const legacy_parser = new AssertionParser(1, ScopeRegexMode.legacy)
+
+	test('c++ scope', () => {
+		const res = legacy_parser.parse_line('# ^ source.c++')
+		expect(res.scopes).toEqual(['source.c++'])
+	})
+
+	const permissive_parser = new AssertionParser(1, ScopeRegexMode.permissive)
+
+	test('Scope name with symbols', () => {
+		const res = permissive_parser.parse_line('# ^ foo.$0.--.spam#25')
+		expect(res.scopes).toEqual(['foo.$0.--.spam#25'])
 	})
 })
