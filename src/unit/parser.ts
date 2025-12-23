@@ -15,6 +15,11 @@ const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
+// RegExp.escape polyfill for Node.js <= 24
+if (!RegExp.escape) {
+	RegExp.escape = (string) => String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /**
  * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
