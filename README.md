@@ -3,13 +3,24 @@
 [![npm version][npm-badge]][npm-link]
 [![npm updated][npm-date-badge]][npm-link]
 
-Write unit or snapshot tests for TextMate grammars validated against the VS Code TextMate engine.
+Write unit and snapshot tests for TextMate grammars validated against the VS Code TextMate engine.
 
 
 ## Why this fork exists
-The original [vscode-tmgrammar-test](https://github.com/PanAeon/vscode-tmgrammar-test) seems no longer maintained.
-This fork addresses key points like dependency updates, technical debt and reported bugs.
-Please be aware that there might be breaking changes with the old behaviour.
+The original [vscode-tmgrammar-test](https://github.com/PanAeon/vscode-tmgrammar-test) is no longer maintained.
+
+This fork has updated dependencies, a refactored code base and of course additional bug fixes and features.
+
+
+### Migrating
+Migration from the old package is easy:
+- `npm install --save-dev textmate-grammar-test@~0.2.9`
+- Change all `vscode-tmgrammar-test` to `textmate-grammar-test`
+- Change all `vscode-tmgrammar-snap` to `textmate-grammar-snap`
+- Done
+
+> [!IMPORTANT]
+> Version `0.3.0` will introduce some breaking changes (for details, see the [changelog](CHANGELOG.md)).
 
 
 ## Installation

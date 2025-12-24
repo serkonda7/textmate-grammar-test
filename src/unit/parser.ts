@@ -1,3 +1,4 @@
+import { err, ok, type Result } from '../lib/result.ts'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
@@ -5,6 +6,21 @@ import {
 	type ScopeAssertion,
 	type TestedLine,
 } from './types.ts'
+
+//
+// String definitions
+//
+
+const ERR_INVALID_HEADER = 'Invalid header'
+const ERR_INVALID_HEADER_MSG =
+	'Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"'
+const ERR_EMPTY_TEST = 'Expected non-empty test'
+const ERR_ASSERT_NO_SCOPES = 'Assertion requires a scope'
+const ERR_ASSERT_PARSE = 'Cannot parse assertion'
+
+//
+// Regex definitions
+//
 
 const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
 const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
@@ -34,39 +50,47 @@ if (!RegExp.escape) {
 	RegExp.escape = (string) => String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+//
+// Parser logic
+//
+
+type AssertPos = { from: number; to: number }
+
 /**
  * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
  */
-export function parseHeader(line: string): FileMetadata {
+export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	const match = HEADER_REGEX.exec(line)
 
 	// No header matched
 	if (!match?.groups) {
-		throw new SyntaxError('Invalid header', {
-			cause: `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"`,
-		})
+		return err(new SyntaxError(ERR_INVALID_HEADER, { cause: ERR_INVALID_HEADER_MSG }))
 	}
 
-	return {
+	return ok({
 		comment_token: match.groups.comment,
 		scope: match.groups.scope,
 		description: match.groups.desc ?? '',
-	}
+	})
 }
 
 export function parseTestFile(
 	str: string,
 	mode: ScopeRegexMode = ScopeRegexMode.standard,
-): GrammarTestFile {
+): Result<GrammarTestFile, Error> {
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
-		throw new Error('Expected non-empty test')
+		return err(new Error(ERR_EMPTY_TEST))
 	}
 
 	const metadata = parseHeader(lines[0])
-	const { comment_token } = metadata
+	if (metadata.error) {
+		return err(metadata.error)
+	}
+
+	const { comment_token } = metadata.value
 	const line_assert_re = new RegExp(`\\s*${RegExp.escape(comment_token)}\\s*(\\^|<[~]*[-]+)`)
 
 	function is_assertion(s: string): boolean {
@@ -84,7 +108,12 @@ export function parseTestFile(
 
 		// Scope assertion line
 		if (is_assertion(line)) {
-			scope_assertions.push(assert_parser.parse_line(line))
+			const assertion = assert_parser.parse_line(line)
+			if (assertion.error) {
+				return err(assertion.error)
+			}
+
+			scope_assertions.push(assertion.value)
 			continue
 		}
 
@@ -107,10 +136,10 @@ export function parseTestFile(
 		)
 	}
 
-	return {
-		metadata: metadata,
+	return ok({
+		metadata: metadata.value,
 		test_lines: lineAssertions,
-	}
+	})
 }
 
 export class AssertionParser {
@@ -124,7 +153,7 @@ export class AssertionParser {
 		this.scope_re = REGEX_BY_MODE[mode]
 	}
 
-	parse_line(_line: string): ScopeAssertion {
+	parse_line(_line: string): Result<ScopeAssertion, SyntaxError> {
 		this.line = _line
 		this.pos = 0
 
@@ -133,14 +162,19 @@ export class AssertionParser {
 		this.pos += this.comment_offset
 		this.skip_spaces()
 
-		const { from, to } = this.parse_assertion_range()
+		const assert_range = this.parse_assertion_range()
+		if (assert_range.error) {
+			return err(assert_range.error)
+		}
+
+		const { from, to } = assert_range.value
 		const { scopes, excludes } = this.parse_scopes_and_exclusions()
 
 		if (scopes.length === 0 && excludes.length === 0) {
-			throw new SyntaxError('Assertion misses scopes')
+			return err(new SyntaxError(ERR_ASSERT_NO_SCOPES))
 		}
 
-		return { from, to, scopes, excludes }
+		return ok({ from, to, scopes, excludes })
 	}
 
 	private skip_spaces(): void {
@@ -149,7 +183,7 @@ export class AssertionParser {
 		}
 	}
 
-	private parse_assertion_range(): { from: number; to: number } {
+	private parse_assertion_range(): Result<AssertPos, SyntaxError> {
 		const start = this.pos
 
 		const c = this.line[this.pos]
@@ -160,7 +194,7 @@ export class AssertionParser {
 				this.pos++
 			}
 
-			return { from: start, to: this.pos }
+			return ok({ from: start, to: this.pos })
 		}
 
 		if (c === '<') {
@@ -176,13 +210,13 @@ export class AssertionParser {
 				nr_dashes++
 			}
 
-			return {
+			return ok({
 				from: nr_tildas,
 				to: nr_tildas + nr_dashes,
-			}
+			})
 		}
 
-		throw new SyntaxError('Cannot parse assertion')
+		return err(new SyntaxError(ERR_ASSERT_PARSE))
 	}
 
 	private parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {
