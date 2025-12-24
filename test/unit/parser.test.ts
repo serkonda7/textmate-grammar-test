@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import fs from 'node:fs'
+import { unwrap } from '../../src/lib/result.ts'
 import {
 	AssertionParser,
 	parseHeader,
@@ -37,13 +38,13 @@ describe('parseTestFile', () => {
 	const input = fs.readFileSync('./test/resources/parser.testlang', 'utf-8')
 
 	test('valid test file', () => {
-		const res = parseTestFile(input)
+		const res = unwrap(parseTestFile(input))
 		check_result(res)
 	})
 
 	test('windows line endings', () => {
 		const ctrl_input = input.replace(/\r?\n/g, '\n')
-		const res = parseTestFile(ctrl_input)
+		const res = unwrap(parseTestFile(ctrl_input))
 		check_result(res)
 	})
 
@@ -64,43 +65,43 @@ describe('AssertionParser assert kinds', () => {
 	const assert_parser = new AssertionParser(1, ScopeRegexMode.standard)
 
 	test('single ^', () => {
-		expect(assert_parser.parse_line('#^ source.xy')).toStrictEqual({
+		expect(unwrap(assert_parser.parse_line('#^ source.xy'))).toStrictEqual({
 			from: 1,
 			to: 2,
 			scopes: ['source.xy'],
 			excludes: [],
 		})
 
-		const res2 = assert_parser.parse_line('# ^ source.xy')
+		const res2 = unwrap(assert_parser.parse_line('# ^ source.xy'))
 		expect(res2.from).toBe(2)
 		expect(res2.to).toBe(3)
 	})
 
 	test('multiple ^^^', () => {
-		const res = assert_parser.parse_line('# ^^^ string.xy')
+		const res = unwrap(assert_parser.parse_line('# ^^^ string.xy'))
 		expect(res.from).toBe(2)
 		expect(res.to).toBe(5)
 	})
 
 	test('simple arrow <---', () => {
-		const res = assert_parser.parse_line('# <--- source.xy')
+		const res = unwrap(assert_parser.parse_line('# <--- source.xy'))
 		expect(res.from).toBe(0)
 		expect(res.to).toBe(3)
 	})
 
 	test('padded arrow <~~~--', () => {
-		const res = assert_parser.parse_line('# <~~~-- source.xy')
+		const res = unwrap(assert_parser.parse_line('# <~~~-- source.xy'))
 		expect(res.from).toBe(3)
 		expect(res.to).toBe(5)
 	})
 
 	test('spaces before assert', () => {
-		const res = assert_parser.parse_line('#    ^ source.xy')
+		const res = unwrap(assert_parser.parse_line('#    ^ source.xy'))
 		expect(res.from).toBe(5)
 	})
 
 	test('leading spaces before comment', () => {
-		const res = assert_parser.parse_line('    # ^^^ source.xy')
+		const res = unwrap(assert_parser.parse_line('    # ^^^ source.xy'))
 		expect(res.scopes).toEqual(['source.xy'])
 		expect(res.from).toBe(6)
 		expect(res.to).toBe(9)
@@ -111,36 +112,34 @@ describe('AssertionParser scopes', () => {
 	const assert_parser = new AssertionParser(1, ScopeRegexMode.standard)
 
 	test('multiple scopes', () => {
-		const res = assert_parser.parse_line('# ^ constant.int.xy')
+		const res = unwrap(assert_parser.parse_line('# ^ constant.int.xy'))
 		expect(res.scopes).toHaveLength(1)
 		expect(res.excludes).toHaveLength(0)
 	})
 
 	test('exclusions', () => {
-		const res = assert_parser.parse_line('# <-- ! constant.int.xy comment.line.number-sign.xy')
+		const res = unwrap(
+			assert_parser.parse_line('# <-- ! constant.int.xy comment.line.number-sign.xy'),
+		)
 		expect(res.excludes).toHaveLength(2)
 		expect(res.scopes).toHaveLength(0)
 	})
 
 	test('complex', () => {
-		const res = assert_parser.parse_line('# <~~-- source.xy comment.line.xy ! foo.bar bar')
+		const res = unwrap(assert_parser.parse_line('# <~~-- source.xy comment.line.xy ! foo.bar bar'))
 		expect(res.scopes).toEqual(['source.xy', 'comment.line.xy'])
 		expect(res.excludes).toEqual(['foo.bar', 'bar'])
 	})
 
 	test('trailing spaces', () => {
-		const res = assert_parser.parse_line('# ^ source.xy   ')
+		const res = unwrap(assert_parser.parse_line('# ^ source.xy   '))
 		expect(res.scopes).toEqual(['source.xy'])
 	})
 
 	test('Error on missing scopes', () => {
-		expect(() => {
-			assert_parser.parse_line('# ^ ')
-		}).toThrowError()
+		expect(assert_parser.parse_line('# ^ ').error).toBeInstanceOf(SyntaxError)
 
-		expect(() => {
-			assert_parser.parse_line('# <-- ')
-		}).toThrowError()
+		expect(assert_parser.parse_line('# <-- ').error).toBeInstanceOf(SyntaxError)
 	})
 })
 
@@ -148,14 +147,14 @@ describe('AssertionParser in different modes', () => {
 	const legacy_parser = new AssertionParser(1, ScopeRegexMode.legacy)
 
 	test('c++ scope', () => {
-		const res = legacy_parser.parse_line('# ^ source.c++')
+		const res = unwrap(legacy_parser.parse_line('# ^ source.c++'))
 		expect(res.scopes).toEqual(['source.c++'])
 	})
 
 	const permissive_parser = new AssertionParser(1, ScopeRegexMode.permissive)
 
 	test('Scope name with symbols', () => {
-		const res = permissive_parser.parse_line('# ^ foo.$0.--.spam#25')
+		const res = unwrap(permissive_parser.parse_line('# ^ foo.$0.--.spam#25'))
 		expect(res.scopes).toEqual(['foo.$0.--.spam#25'])
 	})
 })

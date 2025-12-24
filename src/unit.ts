@@ -7,6 +7,7 @@ import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
+import { unwrap } from './lib/result.ts'
 import { runGrammarTestCase } from './unit/core.ts'
 import { parseTestFile } from './unit/index.ts'
 import { createReporter } from './unit/reporter.ts'
@@ -43,7 +44,7 @@ class TestCaseRunner {
 		// Read and parse test case
 		try {
 			// TODO actually allow the user to choose the mode via cli flag
-			testCase = parseTestFile(fs.readFileSync(filename, 'utf8'))
+			testCase = unwrap(parseTestFile(fs.readFileSync(filename, 'utf8')))
 		} catch (error) {
 			this.reporter.reportParseError(filename, error)
 			return ExitCode.Failure
