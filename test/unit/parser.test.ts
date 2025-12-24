@@ -11,7 +11,7 @@ import type { GrammarTestFile } from '../../src/unit/types.ts'
 describe('parseHeader', () => {
 	test('one char comment token', () => {
 		const res = parseHeader('# SYNTAX TEST "scala"')
-		expect(res).toEqual({
+		expect(res.value).toEqual({
 			comment_token: '#',
 			scope: 'scala',
 			description: '',
@@ -20,7 +20,7 @@ describe('parseHeader', () => {
 
 	test('description and longer comment token', () => {
 		const res = parseHeader('-- SYNTAX TEST "sql" "some description"')
-		expect(res).toEqual({
+		expect(res.value).toEqual({
 			comment_token: '--',
 			description: 'some description',
 			scope: 'sql',
@@ -28,9 +28,8 @@ describe('parseHeader', () => {
 	})
 
 	test('header errors', () => {
-		expect(() => {
-			parseHeader('# bla bla "scala"')
-		}).toThrowError(SyntaxError('Invalid header'))
+		const res = parseHeader('SYNTAX TEST "scala"')
+		expect(res.error).toBeInstanceOf(SyntaxError)
 	})
 })
 

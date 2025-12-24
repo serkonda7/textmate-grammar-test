@@ -1,3 +1,4 @@
+import { err, ok, type Result } from '../lib/result.ts'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
@@ -5,6 +6,19 @@ import {
 	type ScopeAssertion,
 	type TestedLine,
 } from './types.ts'
+
+//
+// String definitions
+//
+
+const ERR_INVALID_HEADER = 'Invalid header'
+const ERR_INVALID_HEADER_MSG =
+	'Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"'
+const ERR_EMPTY_TEST = 'Expected non-empty test'
+
+//
+// Regex definitions
+//
 
 const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
 const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
@@ -34,25 +48,27 @@ if (!RegExp.escape) {
 	RegExp.escape = (string) => String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+//
+// Parser logic
+//
+
 /**
  * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
  */
-export function parseHeader(line: string): FileMetadata {
+export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	const match = HEADER_REGEX.exec(line)
 
 	// No header matched
 	if (!match?.groups) {
-		throw new SyntaxError('Invalid header', {
-			cause: `Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"`,
-		})
+		return err(new SyntaxError(ERR_INVALID_HEADER, { cause: ERR_INVALID_HEADER_MSG }))
 	}
 
-	return {
+	return ok({
 		comment_token: match.groups.comment,
 		scope: match.groups.scope,
 		description: match.groups.desc ?? '',
-	}
+	})
 }
 
 export function parseTestFile(
@@ -62,11 +78,15 @@ export function parseTestFile(
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
-		throw new Error('Expected non-empty test')
+		throw new Error(ERR_EMPTY_TEST)
 	}
 
 	const metadata = parseHeader(lines[0])
-	const { comment_token } = metadata
+	if (metadata.error) {
+		throw metadata.error
+	}
+
+	const { comment_token } = metadata.value
 	const line_assert_re = new RegExp(`\\s*${RegExp.escape(comment_token)}\\s*(\\^|<[~]*[-]+)`)
 
 	function is_assertion(s: string): boolean {
@@ -108,7 +128,7 @@ export function parseTestFile(
 	}
 
 	return {
-		metadata: metadata,
+		metadata: metadata.value,
 		test_lines: lineAssertions,
 	}
 }
