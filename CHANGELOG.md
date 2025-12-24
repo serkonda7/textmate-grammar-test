@@ -10,6 +10,7 @@ _unreleased_
 
 **Other Changes**
 - readme: Clarify testing syntax
+- Change internal error handling to Result type instead of throwing
 - unit/parser: Complete code overhaul and refactor
 - Replace mocha/chai with bun:test
 
