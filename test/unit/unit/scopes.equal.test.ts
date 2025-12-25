@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 
-import { missingScopes_ } from '../../../src/unit/core.ts'
+import { missingScopes_ } from '../../../src/unit/test_runner.ts'
 
 // FIXME: move somewhere..
 describe('scopesEqual_', () => {

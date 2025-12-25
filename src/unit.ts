@@ -8,9 +8,9 @@ import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { unwrap } from './lib/result.ts'
-import { runGrammarTestCase } from './unit/core.ts'
 import { parseTestFile } from './unit/index.ts'
 import { createReporter } from './unit/reporter.ts'
+import { runGrammarTestCase } from './unit/test_runner.ts'
 import type { GrammarTestFile } from './unit/types.ts'
 
 const MAX_CONCURRENT_TESTS = 8

@@ -1,6 +1,6 @@
 import tm from 'vscode-textmate'
 import { err, ok, type Result } from '../lib/result.ts'
-import { parseTestFile, type ScopeRegexMode } from './index.ts'
+import { parse_file, type ScopeRegexMode } from './index.ts'
 import type { TestFailure } from './types.ts'
 
 export { missingScopes_ }
@@ -10,7 +10,7 @@ export async function test_file(
 	file_content: string,
 	parse_mode: ScopeRegexMode,
 ): Promise<Result<TestFailure[]>> {
-	const test_case_r = parseTestFile(file_content, parse_mode)
+	const test_case_r = parse_file(file_content, parse_mode)
 	if (test_case_r.error) {
 		return err(test_case_r.error)
 	}

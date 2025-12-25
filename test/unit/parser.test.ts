@@ -1,12 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import fs from 'node:fs'
 import { unwrap } from '../../src/lib/result.ts'
-import {
-	AssertionParser,
-	parseHeader,
-	parseTestFile,
-	ScopeRegexMode,
-} from '../../src/unit/index.ts'
+import { AssertionParser, parse_file, parseHeader, ScopeRegexMode } from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/types.ts'
 
 describe('parseHeader', () => {
@@ -38,13 +33,13 @@ describe('parseTestFile', () => {
 	const input = fs.readFileSync('./test/resources/parser.testlang', 'utf-8')
 
 	test('valid test file', () => {
-		const res = unwrap(parseTestFile(input))
+		const res = unwrap(parse_file(input))
 		check_result(res)
 	})
 
 	test('windows line endings', () => {
 		const ctrl_input = input.replace(/\r?\n/g, '\n')
-		const res = unwrap(parseTestFile(ctrl_input))
+		const res = unwrap(parse_file(ctrl_input))
 		check_result(res)
 	})
 

@@ -75,7 +75,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	})
 }
 
-export function parseTestFile(
+export function parse_file(
 	str: string,
 	mode: ScopeRegexMode = ScopeRegexMode.standard,
 ): Result<GrammarTestFile, Error> {

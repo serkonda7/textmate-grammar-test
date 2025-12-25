@@ -6,7 +6,6 @@ import * as tty from 'node:tty'
 import chalk from 'chalk'
 import type { GrammarTestFile, TestedLine, TestFailure } from './types.ts'
 
-// export needed for test
 export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void
 	reportParseError(filename: string, error: any): void
