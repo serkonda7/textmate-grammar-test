@@ -7,11 +7,8 @@ import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
-import { unwrap } from './lib/result.ts'
-import { parseTestFile } from './unit/index.ts'
+import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 import { createReporter } from './unit/reporter.ts'
-import { runGrammarTestCase } from './unit/test_runner.ts'
-import type { GrammarTestFile } from './unit/types.ts'
 
 const MAX_CONCURRENT_TESTS = 8
 
@@ -39,26 +36,17 @@ class TestCaseRunner {
 	) {}
 
 	async runSingleTest(filename: string): Promise<ExitCode> {
-		let testCase: GrammarTestFile
-
-		// Read and parse test case
-		try {
-			// TODO actually allow the user to choose the mode via cli flag
-			testCase = unwrap(parseTestFile(fs.readFileSync(filename, 'utf8')))
-		} catch (error) {
-			this.reporter.reportParseError(filename, error)
+		const runner = new TestRunner(this.registry)
+		const text = fs.readFileSync(filename, 'utf8')
+		const res = await runner.test_file(text, ScopeRegexMode.standard)
+		if (res.error) {
+			this.reporter.reportParseError(filename, res.error)
 			return ExitCode.Failure
 		}
 
-		// Execute test case
-		try {
-			const failures = await runGrammarTestCase(this.registry, testCase)
-			this.reporter.reportTestResult(filename, testCase, failures)
-			return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
-		} catch (error: any) {
-			this.reporter.reportGrammarTestError(filename, testCase, error)
-			return ExitCode.Failure
-		}
+		const failures = res.value
+		this.reporter.reportTestResult(filename, runner.test_case, failures)
+		return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
 	}
 
 	async runTests(testFiles: string[]): Promise<ExitCode[]> {

@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs'
 import { createRegistry } from '../../src/common/index.ts'
 import { unwrap } from '../../src/lib/result.ts'
-import { ScopeRegexMode, test_file } from '../../src/unit/index.ts'
+import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
 import type { TestFailure } from '../../src/unit/types.ts'
 
 const registry = createRegistry([
@@ -12,6 +12,8 @@ const registry = createRegistry([
 	},
 ])
 
+const runner = new TestRunner(registry)
+
 function read_file(filename: string): string {
 	return fs.readFileSync(filename, 'utf-8')
 }
@@ -19,8 +21,7 @@ function read_file(filename: string): string {
 describe('Grammar test case', () => {
 	test('should report no errors on correct grammar test', async () => {
 		const res = unwrap(
-			await test_file(
-				registry,
+			await runner.test_file(
 				read_file('./test/resources/successful.test.dhall'),
 				ScopeRegexMode.standard,
 			),
@@ -30,8 +31,7 @@ describe('Grammar test case', () => {
 
 	test('should report missing scopes', async () => {
 		const res = unwrap(
-			await test_file(
-				registry,
+			await runner.test_file(
 				read_file('./test/resources/missing.scopes.test.dhall'),
 				ScopeRegexMode.standard,
 			),
@@ -199,8 +199,7 @@ describe('Grammar test case', () => {
 
 	test('should report unexpected scopes', async () => {
 		const res = unwrap(
-			await test_file(
-				registry,
+			await runner.test_file(
 				read_file('./test/resources/unexpected.scopes.test.dhall'),
 				ScopeRegexMode.standard,
 			),
@@ -373,8 +372,7 @@ describe('Grammar test case', () => {
 
 	test('should report out of place scopes', async () => {
 		const res = unwrap(
-			await test_file(
-				registry,
+			await runner.test_file(
 				read_file('./test/resources/misplaced.scopes.test.dhall'),
 				ScopeRegexMode.standard,
 			),
@@ -516,8 +514,7 @@ describe('Grammar test case', () => {
 
 	test('should report error when line assertion referes to non existing token', async () => {
 		const res = unwrap(
-			await test_file(
-				registry,
+			await runner.test_file(
 				read_file('./test/resources/out.of.bounds.test.dhall'),
 				ScopeRegexMode.standard,
 			),
