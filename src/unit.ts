@@ -29,33 +29,6 @@ function collectGrammarOpts(value: string, previous: string[]): string[] {
 	return previous.concat([value])
 }
 
-class TestCaseRunner {
-	constructor(
-		private readonly registry: ReturnType<typeof createRegistry>,
-		private readonly reporter: ReturnType<typeof createReporter>,
-	) {}
-
-	async runSingleTest(filename: string): Promise<ExitCode> {
-		const runner = new TestRunner(this.registry)
-		const text = fs.readFileSync(filename, 'utf8')
-		const res = await runner.test_file(text, ScopeRegexMode.standard)
-		if (res.error) {
-			this.reporter.reportParseError(filename, res.error)
-			return ExitCode.Failure
-		}
-
-		const failures = res.value
-		this.reporter.reportTestResult(filename, runner.test_case, failures)
-		return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
-	}
-
-	async runTests(testFiles: string[]): Promise<ExitCode[]> {
-		const limit = pLimit(MAX_CONCURRENT_TESTS)
-		const tasks = testFiles.map((filename) => limit(() => this.runSingleTest(filename)))
-
-		return Promise.all(tasks)
-	}
-}
 async function main(): Promise<ExitCode> {
 	program
 		.description('Run Textmate grammar test cases using vscode-textmate')
@@ -104,8 +77,25 @@ async function main(): Promise<ExitCode> {
 	const registry = createRegistry(grammars)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
-	const runner = new TestCaseRunner(registry, reporter)
-	const results = await runner.runTests(rawTestCases)
+	const runner = new TestRunner(registry)
+
+	async function runSingleTest(filename: string): Promise<ExitCode> {
+		const text = fs.readFileSync(filename, 'utf8')
+		const res = await runner.test_file(text, ScopeRegexMode.standard)
+		if (res.error) {
+			reporter.reportParseError(filename, res.error)
+			return ExitCode.Failure
+		}
+
+		const failures = res.value
+		reporter.reportTestResult(filename, runner.test_case, failures)
+		return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
+	}
+
+	const limit = pLimit(MAX_CONCURRENT_TESTS)
+	const tasks = rawTestCases.map((filename) => limit(() => runSingleTest(filename)))
+
+	const results = await Promise.all(tasks)
 
 	reporter.reportSuiteResult()
 	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure

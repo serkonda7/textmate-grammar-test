@@ -25,7 +25,7 @@ export class TestRunner {
 
 		const grammar = await this.registry.loadGrammar(this.test_case.metadata.scope)
 		if (!grammar) {
-			throw new Error(`Could not load scope ${this.test_case.metadata.scope}`)
+			return err(new Error(`Could not load scope ${this.test_case.metadata.scope}`))
 		}
 
 		let ruleStack = tm.INITIAL
