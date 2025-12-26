@@ -3,7 +3,7 @@ import { err, ok, type Result } from '../lib/result.ts'
 import { parse_file, type ScopeRegexMode } from './index.ts'
 import type { GrammarTestFile, TestFailure } from './types.ts'
 
-export { missingScopes_ }
+export { get_missing_scopes as missingScopes_ }
 
 function find_overlapping_tokens(tokens: tm.IToken[], from: number, to: number): tm.IToken[] {
 	return tokens.filter((t) => {
@@ -56,17 +56,16 @@ export class TestRunner {
 						srcLineText: src_line,
 						start: from,
 						end: to,
-					} as TestFailure)
+					})
 					return
 				}
 
 				// Check each asserted token
 				asserted_tokens.forEach((token) => {
-					const unexpected = excludedScopes.filter((s) => {
-						return token.scopes.includes(s)
-					})
-					const missing = missingScopes_(requiredScopes, token.scopes)
+					const unexpected = get_unexpected_scopes(excludedScopes, token.scopes)
+					const missing = get_missing_scopes(requiredScopes, token.scopes)
 
+					// Add failure if any scopes are missing or unexpected
 					if (missing.length || unexpected.length) {
 						failures.push({
 							missing: missing,
@@ -76,7 +75,7 @@ export class TestRunner {
 							srcLineText: src_line,
 							start: token.startIndex,
 							end: token.endIndex,
-						} as TestFailure)
+						})
 					}
 				})
 			})
@@ -86,17 +85,23 @@ export class TestRunner {
 	}
 }
 
-function missingScopes_(rs: string[], as: string[]): string[] {
-	let i = 0,
-		j = 0
-	while (i < as.length && j < rs.length) {
-		if (as[i] === rs[j]) {
-			i++
-			j++
-		} else {
-			i++
+function get_unexpected_scopes(excluded: string[], actual: string[]): string[] {
+	return excluded.filter((scope) => actual.includes(scope))
+}
+
+// TODO won't this report false positives if required scopes are not contiguous in actual?
+function get_missing_scopes(required: string[], actual: string[]): string[] {
+	let required_idx = 0
+
+	for (const scope of actual) {
+		if (scope === required[required_idx]) {
+			required_idx++
+
+			if (required_idx === required.length) {
+				return []
+			}
 		}
 	}
 
-	return j === rs.length ? [] : rs.slice(j)
+	return required.slice(required_idx)
 }
