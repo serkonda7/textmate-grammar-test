@@ -1,16 +1,8 @@
 import tm from 'vscode-textmate'
 import { err, ok, type Result } from '../lib/result.ts'
 import { parse_file, type ScopeRegexMode } from './index.ts'
+import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
 import type { GrammarTestFile, TestFailure } from './types.ts'
-
-export { get_missing_scopes as missingScopes_ }
-
-function find_overlapping_tokens(tokens: tm.IToken[], from: number, to: number): tm.IToken[] {
-	return tokens.filter((t) => {
-		console.log(t)
-		return from < t.endIndex && to > t.startIndex
-	})
-}
 
 export class TestRunner {
 	test_case: GrammarTestFile
@@ -30,6 +22,7 @@ export class TestRunner {
 
 		this.test_case = test_case_r.value
 
+		// Load grammar
 		const grammar = await this.registry.loadGrammar(this.test_case.metadata.scope)
 		if (!grammar) {
 			return err(new Error(`Could not load scope ${this.test_case.metadata.scope}`))
@@ -38,8 +31,8 @@ export class TestRunner {
 		let prev_state = tm.INITIAL
 		const failures: TestFailure[] = []
 
-		for (const assertion of this.test_case.test_lines) {
-			const { line_nr, src: src_line, scope_asserts } = assertion
+		for (const line of this.test_case.test_lines) {
+			const { line_nr, src: src_line, scope_asserts } = line
 			const { tokens, ruleStack: new_state } = grammar.tokenizeLine(src_line, prev_state)
 			prev_state = new_state
 
@@ -83,25 +76,4 @@ export class TestRunner {
 
 		return ok(failures)
 	}
-}
-
-function get_unexpected_scopes(excluded: string[], actual: string[]): string[] {
-	return excluded.filter((scope) => actual.includes(scope))
-}
-
-// TODO won't this report false positives if required scopes are not contiguous in actual?
-function get_missing_scopes(required: string[], actual: string[]): string[] {
-	let required_idx = 0
-
-	for (const scope of actual) {
-		if (scope === required[required_idx]) {
-			required_idx++
-
-			if (required_idx === required.length) {
-				return []
-			}
-		}
-	}
-
-	return required.slice(required_idx)
 }
