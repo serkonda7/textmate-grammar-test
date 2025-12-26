@@ -5,6 +5,13 @@ import type { GrammarTestFile, TestFailure } from './types.ts'
 
 export { missingScopes_ }
 
+function find_overlapping_tokens(tokens: tm.IToken[], from: number, to: number): tm.IToken[] {
+	return tokens.filter((t) => {
+		console.log(t)
+		return from < t.endIndex && to > t.startIndex
+	})
+}
+
 export class TestRunner {
 	test_case: GrammarTestFile
 
@@ -28,47 +35,50 @@ export class TestRunner {
 			return err(new Error(`Could not load scope ${this.test_case.metadata.scope}`))
 		}
 
-		let ruleStack = tm.INITIAL
-
+		let prev_state = tm.INITIAL
 		const failures: TestFailure[] = []
 
 		for (const assertion of this.test_case.test_lines) {
-			const { line_nr: testCaseLineNumber, src: line, scope_asserts: scopeAssertions } = assertion
-			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
-			ruleStack = ruleStack1
+			const { line_nr, src: src_line, scope_asserts } = assertion
+			const { tokens, ruleStack: new_state } = grammar.tokenizeLine(src_line, prev_state)
+			prev_state = new_state
 
-			scopeAssertions.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
-				const xs = tokens.filter((t) => from < t.endIndex && to > t.startIndex)
-				if (xs.length === 0 && requiredScopes.length > 0) {
+			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
+				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
+
+				// No asserts matched to tokens
+				if (asserted_tokens.length === 0 && requiredScopes.length > 0) {
 					failures.push({
 						missing: requiredScopes,
 						unexpected: [],
 						actual: [],
-						line: testCaseLineNumber - 1,
-						srcLineText: line,
+						line: line_nr - 1,
+						srcLineText: src_line,
 						start: from,
 						end: to,
 					} as TestFailure)
-				} else {
-					xs.forEach((token) => {
-						const unexpected = excludedScopes.filter((s) => {
-							return token.scopes.includes(s)
-						})
-						const missing = missingScopes_(requiredScopes, token.scopes)
-
-						if (missing.length || unexpected.length) {
-							failures.push({
-								missing: missing,
-								actual: token.scopes,
-								unexpected: unexpected,
-								line: testCaseLineNumber - 1,
-								srcLineText: line,
-								start: token.startIndex,
-								end: token.endIndex,
-							} as TestFailure)
-						}
-					})
+					return
 				}
+
+				// Check each asserted token
+				asserted_tokens.forEach((token) => {
+					const unexpected = excludedScopes.filter((s) => {
+						return token.scopes.includes(s)
+					})
+					const missing = missingScopes_(requiredScopes, token.scopes)
+
+					if (missing.length || unexpected.length) {
+						failures.push({
+							missing: missing,
+							actual: token.scopes,
+							unexpected: unexpected,
+							line: line_nr - 1,
+							srcLineText: src_line,
+							start: token.startIndex,
+							end: token.endIndex,
+						} as TestFailure)
+					}
+				})
 			})
 		}
 
