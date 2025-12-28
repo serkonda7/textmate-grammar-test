@@ -29,11 +29,26 @@ npm install --save-dev textmate-grammar-test
 ```
 
 
-## Unit Testing
+## Usage
+THis package provides the commands `textmate-grammar-test` and `textmate-grammar-snap`.
+
+Add a package.json script like:
+```json
+"scripts": {
+  "test:grammar": "npx textmate-grammar-test syntax/tests/**/*.foo"
+}
+```
+
+To see all available command line options, run
+```sh
+npx textmate-grammar-test --help
+# or
+npx textmate-grammar-snap --help
+```
+
+
+## Unit Testing Syntax
 <!-- TODO example -->
-
-This section describes the syntax for writing unit tests.
-
 <!-- TODO small collapsible glossar -->
 
 
@@ -121,25 +136,25 @@ The configuration follows the format of vscode:
 
 ```json
 {
-    "contributes": {
-        "languages": [
-            {
-                "id": "scala",
-                "extensions": [
-                    ".scala",
-                    ".sbt",
-                    ".sc"
-                ]
-            }
-        ],
-        "grammars": [
-            {
-                "language": "scala",
-                "scopeName": "source.scala",
-                "path": "./syntaxes/Scala.tmLanguage.json"
-            }
-        ]
-    }
+  "contributes": {
+      "languages": [
+          {
+              "id": "scala",
+              "extensions": [
+                  ".scala",
+                  ".sbt",
+                  ".sc"
+              ]
+          }
+      ],
+      "grammars": [
+          {
+              "language": "scala",
+              "scopeName": "source.scala",
+              "path": "./syntaxes/Scala.tmLanguage.json"
+          }
+      ]
+  }
 }
 ```
 The idea is that for the average language extension all necessary information for tests are already included in the `package.json`.
@@ -147,48 +162,6 @@ It is optional, though. If the configuration is missing it is necessary to speci
 
 Right now only regular grammars and *Injection Grammars* via `injectTo` directive are supported.
 
-
-## Command Line Options
-Unit tests:
-```
-Usage: textmate-grammar-test [options] <testcases...>
-
-Run Textmate grammar test cases using vscode-textmate
-
-Arguments:
-  testcases                      A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!
-
-Options:
-  -g, --grammar <grammar>          Path to a grammar file. Multiple options supported. 'scopeName' is taken from the grammar (default: [])
-  --config <configuration.json>    Path to the language configuration, package.json by default
-  -c, --compact                    Display output in the compact format, which is easier to use with VSCode problem matchers
-  --xunit-report <report.xml>      Path to directory where test reports in the XUnit format will
-                                   be emitted in addition to console output
-  --xunit-format <generic|gitlab>  Format of XML reports generated when --xunit-report is used.
-                                   `gitlab` format is suitable for viewing the results in GitLab
-  -V, --version                    output the version number
-  -h, --help                       display help for command
-```
-
-Snapshot tests:
-```
-Usage: textmate-grammar-snap [options] <testcases...>
-
-Run VSCode textmate grammar snapshot tests
-
-Arguments:
-  testcases                      A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!
-
-Options:
-  -u, --updateSnapshot           overwrite all snap files with new changes
-  --config <configuration.json>  Path to the language configuration, package.json by default
-  --printNotModified             include not modified scopes in the output (default: false)
-  --expandDiff                   produce each diff on two lines prefixed with "++" and "--" (default: false)
-  -g, --grammar <grammar>        Path to a grammar file. Multiple options supported. 'scopeName' is taken from the grammar (default: [])
-  -s, --scope <scope>            Explicitly specify scope of testcases, e.g. source.dhall
-  -V, --version                  output the version number
-  -h, --help                     display help for command
-```
 
 ## Setup VSCode unit test task
 You can setup a vscode unit test task for convenience:
