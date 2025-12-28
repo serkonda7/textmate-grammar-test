@@ -6,7 +6,6 @@ import { program } from 'commander'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { loadConfiguration } from './common/index.ts'
-import { VERSION } from './common/version.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 import { createReporter } from './unit/reporter.ts'
 
@@ -55,7 +54,6 @@ async function main(): Promise<ExitCode> {
 			'--xunit-format <generic|gitlab>',
 			'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI',
 		)
-		.version(VERSION)
 		.argument(
 			'<testcases...>',
 			'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',

@@ -7,6 +7,7 @@ _unreleased_
 - Failure exit code is now `1` (before: `-1`)
 - Remove (the undocumented) support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
   - Workaround: split into multiple lines
+- Removed `--version` argument. You better control this via package.json
 
 **Other Changes**
 - readme: Clarify testing syntax
