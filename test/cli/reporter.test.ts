@@ -3,9 +3,8 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as p from 'node:path'
 import { XMLParser } from 'fast-xml-parser'
-import type { Reporter } from '../../../src/unit/reporter.ts'
-import { XunitGenericReporter, XunitGitlabReporter } from '../../../src/unit/reporter.ts'
-import type { FileMetadata, TestedLine, TestFailure } from '../../../src/unit/types.ts'
+import { type Reporter, XunitGenericReporter, XunitGitlabReporter } from '../../src/cli/reporter.ts'
+import type { FileMetadata, TestedLine, TestFailure } from '../../src/unit/types.ts'
 
 const sep = p.sep
 

@@ -5,9 +5,9 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
+import { createReporter } from './cli/reporter.ts'
 import { loadConfiguration } from './common/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
-import { createReporter } from './unit/reporter.ts'
 
 const MAX_CONCURRENT_TESTS = 8
 
