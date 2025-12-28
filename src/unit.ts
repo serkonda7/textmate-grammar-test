@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
-import { createRegistry, loadConfiguration } from './common/index.ts'
+import { loadConfiguration } from './common/index.ts'
 import { VERSION } from './common/version.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 import { createReporter } from './unit/reporter.ts'
@@ -74,10 +74,8 @@ async function main(): Promise<ExitCode> {
 		process.exit(ExitCode.Failure)
 	}
 
-	const registry = createRegistry(grammars)
+	const runner = new TestRunner(grammars)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
-
-	const runner = new TestRunner(registry)
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {
 		const text = fs.readFileSync(filename, 'utf8')

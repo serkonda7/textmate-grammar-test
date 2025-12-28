@@ -1,18 +1,17 @@
 import { describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs'
-import { createRegistry } from '../../src/common/index.ts'
 import { unwrap } from '../../src/lib/result.ts'
 import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
 import type { TestFailure } from '../../src/unit/types.ts'
 
-const registry = createRegistry([
+const grammars = [
 	{
 		scopeName: 'source.dhall',
 		path: './test/resources/dhall.tmLanguage.json',
 	},
-])
+]
 
-const runner = new TestRunner(registry)
+const runner = new TestRunner(grammars)
 
 function read_file(filename: string): string {
 	return fs.readFileSync(filename, 'utf-8')

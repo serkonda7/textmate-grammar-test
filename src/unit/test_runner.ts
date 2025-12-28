@@ -1,13 +1,17 @@
 import tm from 'vscode-textmate'
+import { createRegistry } from '../common/index.ts'
+import type { IGrammarConfig } from '../common/model.ts'
 import { err, ok, type Result } from '../lib/result.ts'
 import { parse_file, type ScopeRegexMode } from './index.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
 import type { GrammarTestFile, TestFailure } from './types.ts'
 
 export class TestRunner {
+	registry: tm.Registry
 	test_case: GrammarTestFile
 
-	constructor(private readonly registry: tm.Registry) {
+	constructor(grammars: IGrammarConfig[]) {
+		this.registry = createRegistry(grammars)
 		this.test_case = {} as GrammarTestFile
 	}
 
