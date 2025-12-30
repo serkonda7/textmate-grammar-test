@@ -1,0 +1,8 @@
+language js (typescript, jsx);
+
+`throw $expr` as $throw where {
+  register_diagnostic(
+    span = $throw,
+    message = "Use Result 'return err(...)' instead of `throw`"
+  )
+}

@@ -38,5 +38,6 @@
       "indentStyle": "space",
       "lineWidth": 100
     }
-  }
+  },
+  "plugins": ["./scripts/no-throw.grit"]
 }
