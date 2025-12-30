@@ -4,9 +4,8 @@ import * as p from 'node:path'
 import { sep } from 'node:path'
 import * as tty from 'node:tty'
 import chalk from 'chalk'
-import type { GrammarTestFile, TestedLine, TestFailure } from './types.ts'
+import type { GrammarTestFile, TestFailure } from '../unit/types.ts'
 
-// export needed for test
 export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void
 	reportParseError(filename: string, error: any): void
@@ -127,8 +126,8 @@ abstract class XunitReportPerTestReporter implements Reporter, Colorizer {
 		return suite
 	}
 
-	protected getCase(suite: XunitSuite, filename: string, assertion: TestedLine): XunitCase {
-		const name = `${filename}:${assertion.line_nr}`
+	protected getCase(suite: XunitSuite, filename: string, line_nr: number): XunitCase {
+		const name = `${filename}:${line_nr}`
 		for (const c of suite.cases) {
 			if (c.name === name) {
 				return c
@@ -203,7 +202,7 @@ export class XunitGenericReporter extends XunitReportPerTestReporter {
 		// and every failed assertion associated with this source line is failure in that testcase
 
 		for (const assertion of parsedFile.test_lines) {
-			const c = this.getCase(suite, filename, assertion)
+			const c = this.getCase(suite, filename, assertion.line_nr)
 			for (const failure of failures) {
 				if (failure.line !== assertion.line_nr - 1) {
 					continue
@@ -250,7 +249,7 @@ export class XunitGitlabReporter extends XunitReportPerTestReporter {
 		const suite = this.getSuite(filename, parsedFile)
 
 		for (const assertion of parsedFile.test_lines) {
-			const c = this.getCase(suite, filename, assertion)
+			const c = this.getCase(suite, filename, assertion.line_nr)
 			const bodyLines: string[] = []
 			for (const failure of failures) {
 				if (failure.line !== assertion.line_nr - 1) {

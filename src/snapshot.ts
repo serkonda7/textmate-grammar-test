@@ -9,7 +9,6 @@ import * as diff from 'diff'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { createRegistry, loadConfiguration } from './common/index.ts'
-import { VERSION } from './common/version.ts'
 import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
 import type { AnnotatedLine } from './snapshot/model.ts'
 
@@ -39,7 +38,6 @@ program
 		[],
 	)
 	.option('-s, --scope <scope>', 'Explicitly specify scope of testcases, e.g. source.dhall')
-	.version(VERSION)
 	.argument(
 		'<testcases...>',
 		'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',

@@ -5,13 +5,9 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
-import { createRegistry, loadConfiguration } from './common/index.ts'
-import { VERSION } from './common/version.ts'
-import { unwrap } from './lib/result.ts'
-import { runGrammarTestCase } from './unit/core.ts'
-import { parseTestFile } from './unit/index.ts'
-import { createReporter } from './unit/reporter.ts'
-import type { GrammarTestFile } from './unit/types.ts'
+import { createReporter } from './cli/reporter.ts'
+import { loadConfiguration } from './common/index.ts'
+import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 
 const MAX_CONCURRENT_TESTS = 8
 
@@ -23,6 +19,7 @@ enum ExitCode {
 interface CliOptions {
 	grammar: string[]
 	config: string
+	scopeParser: ScopeRegexMode
 	compact: boolean
 	xunitReport?: string
 	xunitFormat: 'generic' | 'gitlab'
@@ -32,42 +29,6 @@ function collectGrammarOpts(value: string, previous: string[]): string[] {
 	return previous.concat([value])
 }
 
-class TestCaseRunner {
-	constructor(
-		private readonly registry: ReturnType<typeof createRegistry>,
-		private readonly reporter: ReturnType<typeof createReporter>,
-	) {}
-
-	async runSingleTest(filename: string): Promise<ExitCode> {
-		let testCase: GrammarTestFile
-
-		// Read and parse test case
-		try {
-			// TODO actually allow the user to choose the mode via cli flag
-			testCase = unwrap(parseTestFile(fs.readFileSync(filename, 'utf8')))
-		} catch (error) {
-			this.reporter.reportParseError(filename, error)
-			return ExitCode.Failure
-		}
-
-		// Execute test case
-		try {
-			const failures = await runGrammarTestCase(this.registry, testCase)
-			this.reporter.reportTestResult(filename, testCase, failures)
-			return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
-		} catch (error: any) {
-			this.reporter.reportGrammarTestError(filename, testCase, error)
-			return ExitCode.Failure
-		}
-	}
-
-	async runTests(testFiles: string[]): Promise<ExitCode[]> {
-		const limit = pLimit(MAX_CONCURRENT_TESTS)
-		const tasks = testFiles.map((filename) => limit(() => this.runSingleTest(filename)))
-
-		return Promise.all(tasks)
-	}
-}
 async function main(): Promise<ExitCode> {
 	program
 		.description('Run Textmate grammar test cases using vscode-textmate')
@@ -83,6 +44,10 @@ async function main(): Promise<ExitCode> {
 			'package.json',
 		)
 		.option(
+			'--scope-parser <mode>',
+			'Mode for parsing scopes in assertion lines. Options: standard, permissive',
+		)
+		.option(
 			'-c, --compact',
 			'Display output in the compact format, which is easier to use with VSCode problem matchers',
 		)
@@ -94,7 +59,6 @@ async function main(): Promise<ExitCode> {
 			'--xunit-format <generic|gitlab>',
 			'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI',
 		)
-		.version(VERSION)
 		.argument(
 			'<testcases...>',
 			'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
@@ -102,6 +66,7 @@ async function main(): Promise<ExitCode> {
 		.parse(process.argv)
 
 	const options = program.opts<CliOptions>()
+	const scope_re_mode = options.scopeParser || ScopeRegexMode.standard
 
 	const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
 
@@ -113,11 +78,26 @@ async function main(): Promise<ExitCode> {
 		process.exit(ExitCode.Failure)
 	}
 
-	const registry = createRegistry(grammars)
+	const runner = new TestRunner(grammars)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
-	const runner = new TestCaseRunner(registry, reporter)
-	const results = await runner.runTests(rawTestCases)
+	async function runSingleTest(filename: string): Promise<ExitCode> {
+		const text = fs.readFileSync(filename, 'utf8')
+		const res = await runner.test_file(text, scope_re_mode)
+		if (res.error) {
+			reporter.reportParseError(filename, res.error)
+			return ExitCode.Failure
+		}
+
+		const failures = res.value
+		reporter.reportTestResult(filename, runner.test_case, failures)
+		return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
+	}
+
+	const limit = pLimit(MAX_CONCURRENT_TESTS)
+	const tasks = rawTestCases.map((filename) => limit(() => runSingleTest(filename)))
+
+	const results = await Promise.all(tasks)
 
 	reporter.reportSuiteResult()
 	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure

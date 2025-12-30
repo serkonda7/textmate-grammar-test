@@ -1,3 +1,5 @@
+export { unwrap, ok, err, type Result }
+
 type Ok<V> = {
 	value: V
 	error?: never
@@ -20,5 +22,3 @@ function unwrap<V, E extends Error>(result: Result<V, E>): V {
 
 	return result.value
 }
-
-export { unwrap, ok, err, type Result }
