@@ -17,6 +17,7 @@ const err = <E>(error: E): Err<E> => ({ error })
 
 function unwrap<V, E extends Error>(result: Result<V, E>): V {
 	if ('error' in result) {
+		// biome-ignore lint: intended behavior
 		throw result.error
 	}
 
