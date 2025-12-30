@@ -29,17 +29,13 @@ const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${
 
 // TODO add docs in readme explaining the modes
 export enum ScopeRegexMode {
-	standard,
-	legacy,
-	permissive,
+	standard = 'standard',
+	permissive = 'permissive',
 }
 
 const REGEX_BY_MODE: Record<ScopeRegexMode, RegExp> = {
 	// Names are lowercase alphanumeric, `-` and separated by dots
 	[ScopeRegexMode.standard]: /[-\w]+(?:\.[-\w]+)*/g,
-
-	// For legacy grammars allowing: `+`
-	[ScopeRegexMode.legacy]: /[+-\w]+(?:\.[+-\w]+)*/g,
 
 	// Any non-whitespace except dot
 	[ScopeRegexMode.permissive]: /[^.\s]+(?:\.[^.\s]+)*/g,

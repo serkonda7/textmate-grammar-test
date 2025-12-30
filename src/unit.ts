@@ -19,6 +19,7 @@ enum ExitCode {
 interface CliOptions {
 	grammar: string[]
 	config: string
+	scopeParser: ScopeRegexMode
 	compact: boolean
 	xunitReport?: string
 	xunitFormat: 'generic' | 'gitlab'
@@ -43,6 +44,10 @@ async function main(): Promise<ExitCode> {
 			'package.json',
 		)
 		.option(
+			'--scope-parser <mode>',
+			'Mode for parsing scopes in assertion lines. Options: standard, permissive',
+		)
+		.option(
 			'-c, --compact',
 			'Display output in the compact format, which is easier to use with VSCode problem matchers',
 		)
@@ -61,6 +66,7 @@ async function main(): Promise<ExitCode> {
 		.parse(process.argv)
 
 	const options = program.opts<CliOptions>()
+	const scope_re_mode = options.scopeParser || ScopeRegexMode.standard
 
 	const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
 
@@ -77,7 +83,7 @@ async function main(): Promise<ExitCode> {
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {
 		const text = fs.readFileSync(filename, 'utf8')
-		const res = await runner.test_file(text, ScopeRegexMode.standard)
+		const res = await runner.test_file(text, scope_re_mode)
 		if (res.error) {
 			reporter.reportParseError(filename, res.error)
 			return ExitCode.Failure

@@ -138,15 +138,13 @@ describe('AssertionParser scopes', () => {
 	})
 })
 
-describe('AssertionParser in different modes', () => {
-	const legacy_parser = new AssertionParser(1, ScopeRegexMode.legacy)
+describe('AssertionParser in permissive mode', () => {
+	const permissive_parser = new AssertionParser(1, ScopeRegexMode.permissive)
 
 	test('c++ scope', () => {
-		const res = unwrap(legacy_parser.parse_line('# ^ source.c++'))
+		const res = unwrap(permissive_parser.parse_line('# ^ source.c++'))
 		expect(res.scopes).toEqual(['source.c++'])
 	})
-
-	const permissive_parser = new AssertionParser(1, ScopeRegexMode.permissive)
 
 	test('Scope name with symbols', () => {
 		const res = unwrap(permissive_parser.parse_line('# ^ foo.$0.--.spam#25'))
