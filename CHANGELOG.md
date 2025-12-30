@@ -2,14 +2,14 @@
 ## 0.3.0
 _unreleased_
 
-**Breaking Changes**
+### Breaking Changes in 0.3.0
 - Negative scope assertions now use `!` (before: `-`)
 - Failure exit code is now `1` (before: `-1`)
 - Removed undocumented support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
   - Workaround: split into multiple lines
 - Removed `--version` flag. You can check this in your package.json
 
-**Other Changes**
+### Other Changes
 - Add `--scope-parser permissive` to support scopes containing symbols
 - readme: Clarify testing syntax
 - Replaced exception-based error handling with a Result type

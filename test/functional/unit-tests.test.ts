@@ -43,6 +43,7 @@ describe('unit test', async () => {
 			},
 		)
 			.then(() => {
+				// biome-ignore lint: exec must throw
 				throw new Error('should have failed')
 			})
 			.catch(({ stdout }) => {
