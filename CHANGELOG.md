@@ -3,17 +3,18 @@
 _unreleased_
 
 **Breaking Changes**
-- Character for negative scope tests is now `!` (before: `-`)
+- Negative scope assertions now use `!` (before: `-`)
 - Failure exit code is now `1` (before: `-1`)
-- Remove (the undocumented) support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
+- Removed undocumented support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
   - Workaround: split into multiple lines
-- Removed `--version` argument. You better control this via package.json
+- Removed `--version` flag. You can check this in your package.json
 
 **Other Changes**
+- Add `--scope-parser permissive` to support scopes containing symbols
 - readme: Clarify testing syntax
-- Change internal error handling to Result type instead of throwing
-- unit/parser: Complete code overhaul and refactor
-- Replace mocha/chai with bun:test
+- Replaced exception-based error handling with a Result type
+- Refactored lot's of code, especially the assertion parser
+- Replaced `mocha/chai` with `bun:test`
 
 
 ## 0.2.8 - 0.2.9

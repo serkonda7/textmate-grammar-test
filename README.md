@@ -39,7 +39,7 @@ Add a package.json script like:
 }
 ```
 
-To see all available command line options, run
+To see all available command line options, run:
 ```sh
 npx textmate-grammar-test --help
 # or
@@ -53,7 +53,7 @@ npx textmate-grammar-snap --help
 
 
 ### File Header
-All tests must start with a header line:
+Every test file must start with a header line in following format:
 ```
 <comment token> SYNTAX TEST "<scopeName>" "Optional description"
 ```
@@ -65,14 +65,15 @@ Example (TypeScript):
 
 
 ### Require specific scopes
-Require tokens to have a specific scope by using `^`:
+Assert that a tokens has a specific scope using `^`:
 ```ts
 let count: number = 1
 //  ^^^^^ variable.other.readwrite.ts
 //         ^^^^^^ support.type.primitive.ts
 ```
 
-You can test for multiple scopes too. The order must be from general scope to more specifc:
+You can also assert multiple scopes on the same token.
+Scopes must be ordered from most general to most specifc:
 ```ts
 let count: number = 1
 //         ^^^^^^ meta.type.annotation.ts meta.var-single-variable.expr.ts meta.var.expr.ts
@@ -80,13 +81,14 @@ let count: number = 1
 
 
 ### Prevent specific scopes
-To ensure tokens don't have a unexpected scope, add a `!` surrounded by spaces:
+To ensure a token does not receive an unexpected scope, use `!` (surrounded by spaces):
 ```ts
     / not a comment
 //  ^ ! comment.line.double-slash.ts
 ```
 
-You can combine positive and negative scopes too. The `!` is only needed to separate the groups:
+Positive and negative assertions can be combined.
+The `!` is only needed to separate the groups:
 ```ts
     / not a comment
 //  ^ source.ts ! comment.line.double-slash.ts storage.type.ts
@@ -94,9 +96,10 @@ You can combine positive and negative scopes too. The `!` is only needed to sepa
 
 
 ### Test the first token of a line
-To test a token at the beginning of the line, use `<-`.
-The number of `-` determines the token length.
-In case you need an offset, use `~`:
+To target a token at the start of a line, use `<-`.
+The number of `-` characters defines the token length.
+
+If an offset is needed, use `~`:
 ```ts
 let x = "a"
 // <--- storage.type.ts
@@ -105,6 +108,16 @@ let x = "a"
 x = "b"
 // <~~- keyword.operator.assignment.ts
 ```
+
+
+### Scope Parsing Modes
+By default, scopes may only contain:
+- lowercase alphanumeric characters
+- `-`
+- `.`
+
+If your grammar uses scopes with other characters (e.g. `source.c++`), run with this flag:
+`--scope-parser permissive`
 
 
 ## Snapshot tests
