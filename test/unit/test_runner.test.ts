@@ -17,5 +17,6 @@ test('line end', async () => {
 		await runner.test_file(read_testdata('line_end.testlang'), ScopeRegexMode.standard),
 	)
 
-	expect(res).toEqual([])
+	expect(res).toHaveLength(2)
+	expect(res[0].actual).toEqual(['EOL'])
 })

@@ -10,6 +10,7 @@ _unreleased_
 - Removed `--version` flag. You can check this in your package.json
 
 ### Other Changes
+- Fix incomplete EOL check if assertion starts on token
 - Add `--scope-parser permissive` to support scopes containing symbols
 - readme: Clarify testing syntax
 - Replaced exception-based error handling with a Result type
