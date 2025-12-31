@@ -19,6 +19,7 @@ export class TestRunner {
 		file_content: string,
 		parse_mode: ScopeRegexMode,
 	): Promise<Result<TestFailure[]>> {
+		// Parse file
 		const test_case_r = parse_file(file_content, parse_mode)
 		if (test_case_r.error) {
 			return err(test_case_r.error)

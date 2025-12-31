@@ -2,6 +2,8 @@ import type tm from 'vscode-textmate'
 
 export { find_overlapping_tokens, get_unexpected_scopes, get_missing_scopes }
 
+// Find all tokens that have a overlap with the given range.
+// Note: tokens may start before OR end after the range. See `token_overlap.test.ts`
 function find_overlapping_tokens(tokens: tm.IToken[], from: number, to: number): tm.IToken[] {
 	return tokens.filter((t) => {
 		return from < t.endIndex && to > t.startIndex
