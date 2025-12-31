@@ -11,7 +11,7 @@ export async function getVSCodeTokens(
 ): Promise<AnnotatedLine[]> {
 	return registry.loadGrammar(scope).then((grammar: tm.IGrammar | null) => {
 		if (!grammar) {
-			// biome-ignore lint: exec must throw
+			// biome-ignore lint: refactor still TODO
 			throw new Error(`Could not load scope ${scope}`)
 		}
 

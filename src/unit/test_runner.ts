@@ -45,8 +45,8 @@ export class TestRunner {
 			prev_state = new_state
 
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
-				// Fail on assertion beyond eol (exception: excluded scopes only)
-				if (to > line_length && requiredScopes.length > 0) {
+				// Fail on assertion beyond eol
+				if (to > line_length) {
 					this.eol_failure(line_nr, src_line, line_length, to)
 					return
 				}
