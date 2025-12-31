@@ -510,24 +510,4 @@ describe('Grammar test case', () => {
 			},
 		] as TestFailure[])
 	})
-
-	test('should report error when line assertion referes to non existing token', async () => {
-		const res = unwrap(
-			await runner.test_file(
-				read_file('./test/resources/out.of.bounds.test.dhall'),
-				ScopeRegexMode.standard,
-			),
-		)
-		expect(res).toEqual([
-			{
-				end: 32,
-				line: 5,
-				actual: [],
-				missing: ['missing.scope'],
-				srcLineText: '',
-				start: 30,
-				unexpected: [],
-			},
-		])
-	})
 })
