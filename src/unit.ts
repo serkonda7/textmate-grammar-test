@@ -78,12 +78,12 @@ async function main(): Promise<ExitCode> {
 		process.exit(ExitCode.Failure)
 	}
 
-	const runner = new TestRunner(grammars)
+	const runner = new TestRunner(grammars, scope_re_mode)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {
 		const text = fs.readFileSync(filename, 'utf8')
-		const res = await runner.test_file(text, scope_re_mode)
+		const res = await runner.test_file(text)
 		if (res.error) {
 			reporter.reportParseError(filename, res.error)
 			return ExitCode.Failure

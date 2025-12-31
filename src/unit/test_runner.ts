@@ -11,16 +11,16 @@ export class TestRunner {
 	test_case: GrammarTestFile = {} as GrammarTestFile
 	file_failures: TestFailure[] = []
 
-	constructor(grammars: IGrammarConfig[]) {
+	constructor(
+		grammars: IGrammarConfig[],
+		private parse_mode: ScopeRegexMode,
+	) {
 		this.registry = createRegistry(grammars)
 	}
 
-	async test_file(
-		file_content: string,
-		parse_mode: ScopeRegexMode,
-	): Promise<Result<TestFailure[]>> {
+	async test_file(file_content: string): Promise<Result<TestFailure[]>> {
 		// Parse file
-		const test_case_r = parse_file(file_content, parse_mode)
+		const test_case_r = parse_file(file_content, this.parse_mode)
 		if (test_case_r.error) {
 			return err(test_case_r.error)
 		}
