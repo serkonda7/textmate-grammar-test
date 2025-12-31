@@ -1,40 +1,54 @@
-import { describe, expect, it } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 
 import { get_missing_scopes } from '../../src/unit/index.ts'
 
-// FIXME: move somewhere..
-describe('scopesEqual_', () => {
-	it('should return [] on two empty arrays', () => {
+describe('get_missing_scopes: [] result', () => {
+	test('two empty arrays', () => {
 		expect(get_missing_scopes([], [])).toEqual([])
 	})
-	it('should return [] on empty requirements array', () => {
-		expect(get_missing_scopes([], ['a', 'b', 'c'])).toEqual([])
+
+	test('empty required', () => {
+		expect(get_missing_scopes([], ['a'])).toEqual([])
 	})
-	it('should return [] when requirements is a subset of a source array', () => {
-		expect(get_missing_scopes(['b', 'd', 'e'], ['a', 'b', 'c', 'd', 'e', 'f'])).toEqual([])
+
+	test('required is a subset of a source array', () => {
+		expect(get_missing_scopes(['b', 'd', 'e'], ['a', 'b', 'c', 'd', 'e'])).toEqual([])
 	})
-	it('should work with duplicate elements', () => {
-		expect(
-			get_missing_scopes(['a', 'b', 'd', 'e'], ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f']),
-		).toEqual([])
+
+	test('duplicate elements in actual', () => {
+		expect(get_missing_scopes(['a', 'b', 'd'], ['a', 'a', 'b', 'b', 'c', 'd'])).toEqual([])
 	})
-	it('should work with duplicate elements in requirements', () => {
+
+	test('duplicate elements in required', () => {
 		expect(
 			get_missing_scopes(['a', 'a', 'a', 'b', 'd', 'e'], ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f']),
 		).toEqual([])
 	})
-	it('should return [] when elements a bit misaligned', () => {
+
+	test('different elements order', () => {
 		expect(get_missing_scopes(['b', 'c', 'a'], ['a', 'a', 'b', 'c', 'd', 'a', 'a', 'f'])).toEqual(
 			[],
 		)
 	})
-	it('should return missing when actual array is empty', () => {
-		expect(get_missing_scopes(['b', 'c', 'a'], [])).toEqual(['b', 'c', 'a'])
+})
+
+describe('get_missing_scopes: returns missing', () => {
+	test('actual is empty', () => {
+		const required = ['b', 'c', 'a']
+		expect(get_missing_scopes(required, [])).toEqual(required)
 	})
-	it('should return missing when the arrays are different', () => {
-		expect(get_missing_scopes(['b', 'e', 'a'], ['b', 'c', 'a'])).toEqual(['e', 'a'])
+
+	// FIXME fix the reporting of 'a' as missing
+	// However this might be fine as the order is significant
+	test('return required that are not in actual', () => {
+		const req = ['b', 'e', 'a']
+		const act = ['b', 'c', 'a']
+		expect(get_missing_scopes(req, act)).toEqual(['e', 'a'])
 	})
-	it('should return missing when expected contains extra duplicate', () => {
-		expect(get_missing_scopes(['b', 'c', 'a', 'a'], ['b', 'c', 'a'])).toEqual(['a'])
+
+	test('duplicate required is missing', () => {
+		const req = ['b', 'c', 'a', 'a']
+		const act = ['b', 'c', 'a']
+		expect(get_missing_scopes(req, act)).toEqual(['a'])
 	})
 })

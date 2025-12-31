@@ -12,7 +12,6 @@ function get_unexpected_scopes(excluded: string[], actual: string[]): string[] {
 	return excluded.filter((scope) => actual.includes(scope))
 }
 
-// TODO won't this report false positives if required scopes are not contiguous in actual?
 function get_missing_scopes(required: string[], actual: string[]): string[] {
 	let required_idx = 0
 
