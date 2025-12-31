@@ -1,0 +1,7 @@
+# SYNTAX TEST "source.xy"
+
+var
+#   ^^ missing.scope
+
+"foo"
+#  ^^^ string.xy

@@ -8,17 +8,18 @@ import type { GrammarTestFile, TestFailure } from './types.ts'
 
 export class TestRunner {
 	registry: tm.Registry
-	test_case: GrammarTestFile
+	test_case: GrammarTestFile = {} as GrammarTestFile
+	file_failures: TestFailure[] = []
 
 	constructor(grammars: IGrammarConfig[]) {
 		this.registry = createRegistry(grammars)
-		this.test_case = {} as GrammarTestFile
 	}
 
 	async test_file(
 		file_content: string,
 		parse_mode: ScopeRegexMode,
 	): Promise<Result<TestFailure[]>> {
+		// Parse file
 		const test_case_r = parse_file(file_content, parse_mode)
 		if (test_case_r.error) {
 			return err(test_case_r.error)
@@ -33,29 +34,24 @@ export class TestRunner {
 		}
 
 		let prev_state = tm.INITIAL
-		const failures: TestFailure[] = []
+		this.file_failures = []
 
 		for (const line of this.test_case.test_lines) {
 			const { line_nr, src: src_line, scope_asserts } = line
+			const line_length = src_line.length
+
+			// Tokenize line
 			const { tokens, ruleStack: new_state } = grammar.tokenizeLine(src_line, prev_state)
 			prev_state = new_state
 
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
-				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
-
-				// No asserts matched to tokens
-				if (asserted_tokens.length === 0 && requiredScopes.length > 0) {
-					failures.push({
-						missing: requiredScopes,
-						unexpected: [],
-						actual: [],
-						line: line_nr - 1,
-						srcLineText: src_line,
-						start: from,
-						end: to,
-					})
+				// Fail on assertion beyond eol (exception: excluded scopes only)
+				if (to > line_length && requiredScopes.length > 0) {
+					this.eol_failure(line_nr, src_line, line_length, to)
 					return
 				}
+
+				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
 
 				// Check each asserted token
 				asserted_tokens.forEach((token) => {
@@ -64,7 +60,7 @@ export class TestRunner {
 
 					// Add failure if any scopes are missing or unexpected
 					if (missing.length || unexpected.length) {
-						failures.push({
+						this.file_failures.push({
 							missing: missing,
 							actual: token.scopes,
 							unexpected: unexpected,
@@ -78,6 +74,18 @@ export class TestRunner {
 			})
 		}
 
-		return ok(failures)
+		return ok(this.file_failures.slice())
+	}
+
+	private eol_failure(line: number, src: string, from: number, to: number) {
+		this.file_failures.push({
+			missing: [],
+			unexpected: [],
+			actual: ['EOL'],
+			line: line - 1,
+			srcLineText: src,
+			start: from,
+			end: to,
+		})
 	}
 }

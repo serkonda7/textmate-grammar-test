@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 
 const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
@@ -31,4 +32,8 @@ export function normalize(text: string): string {
 			// Trim whitespace
 			.trim()
 	)
+}
+
+export function read_testdata(file: string): string {
+	return fs.readFileSync(`./test/testdata/${file}`, 'utf-8')
 }

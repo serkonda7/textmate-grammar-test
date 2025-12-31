@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import util from 'node:util'
-import { normalize } from '../helpers.test.ts'
+import { normalize } from '../testutil.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
