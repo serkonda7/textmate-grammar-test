@@ -6,7 +6,7 @@
       "name": "textmate-grammar-test",
       "dependencies": {
         "chalk": "~5.6.2",
-        "commander": "^9.2.0",
+        "commander": "^9.5.0",
         "diff": "~8.0.2",
         "glob": "~13.0.0",
         "p-limit": "~7.2.0",

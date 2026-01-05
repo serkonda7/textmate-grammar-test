@@ -1,6 +1,6 @@
 # Changelog
 ## 0.3.0
-_unreleased_
+_2026-01-05_
 
 ### Breaking Changes in 0.3.0
 - Negative scope assertions now use `!` (before: `-`)
@@ -8,9 +8,9 @@ _unreleased_
 - Removed undocumented support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
   - Workaround: split into multiple lines
 - Removed `--version` flag. You can check this in your package.json
+- Fix incomplete EOL check if assertion starts on token
 
 ### Other Changes
-- Fix incomplete EOL check if assertion starts on token
 - Add `--scope-parser permissive` to support scopes containing symbols
 - readme: Clarify testing syntax
 - Replaced exception-based error handling with a Result type

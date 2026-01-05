@@ -3,7 +3,8 @@
 [![npm version][npm-badge]][npm-link]
 [![npm updated][npm-date-badge]][npm-link]
 
-Write unit and snapshot tests for TextMate grammars validated against the VS Code TextMate engine.
+Write unit and snapshot tests for TextMate grammars,
+validated against the VS Code TextMate engine.
 
 
 ## Installation
@@ -13,20 +14,21 @@ npm install --save-dev textmate-grammar-test
 
 
 ### Migrating from the unmaintained `vscode-tmgrammar-test`
-Looking for up-to-date dependencies, cleaner and fully refactored codebase, plus additional bug fixes and features?
+Looking for up-to-date dependencies, cleaner and fully refactored codebase,
+plus additional bug fixes and features?
 
 Migration is straightforward and should only take a few minutes:
 
-- Install new package: `npm i -D textmate-grammar-test`
-- Replace occurences of
+- Install the new package: `npm i -D textmate-grammar-test`
+- Replace occurrences of
   - `vscode-tmgrammar-test` -> `textmate-grammar-test`
   - `vscode-tmgrammar-snap` -> `textmate-grammar-snap`
-- Version `>= 0.3.0` includes a few minor breaking changes
-  - See [changelog](CHANGELOG.md#breaking-changes-in-030) for details and fixes
+- Version `>= 0.3.0` includes a few minor breaking changes:
+  - See the [changelog](CHANGELOG.md#breaking-changes-in-030) for migration notes
 
 
 ## Usage
-THis package provides the commands `textmate-grammar-test` and `textmate-grammar-snap`.
+This package provides the commands `textmate-grammar-test` and `textmate-grammar-snap`.
 
 Add a package.json script like:
 ```json
@@ -49,19 +51,17 @@ npx textmate-grammar-snap --help
 
 
 ### File Header
-Every test file must start with a header line in following format:
-```
-<comment token> SYNTAX TEST "<scopeName>" "Optional description"
-```
+Every test file must start with a header line in the format
+`<comment token> SYNTAX TEST "<scopeName>" "Optional description"`.
 
-Example (TypeScript):
+For example:
 ```ts
 // SYNTAX TEST "source.ts" "Example header for a TypeScript grammar test"
 ```
 
 
 ### Require specific scopes
-Assert that a tokens has a specific scope using `^`:
+Assert that a token has a specific scope using `^`:
 ```ts
 let count: number = 1
 //  ^^^^^ variable.other.readwrite.ts
@@ -77,7 +77,8 @@ let count: number = 1
 
 
 ### Prevent specific scopes
-To ensure a token does not receive an unexpected scope, use `!` (surrounded by spaces):
+To ensure a token does not receive an unexpected scope,
+use `!` (surrounded by spaces):
 ```ts
     / not a comment
 //  ^ ! comment.line.double-slash.ts
@@ -112,8 +113,8 @@ By default, scopes may only contain:
 - `-`
 - `.`
 
-If your grammar uses scopes with other characters (e.g. `source.c++`), run with this flag:
-`--scope-parser permissive`
+If your grammar uses scopes with other characters (e.g. `source.c++`),
+run with the option `--scope-parser permissive`.
 
 
 ## Snapshot tests
