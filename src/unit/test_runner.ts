@@ -11,16 +11,16 @@ export class TestRunner {
 	test_case: GrammarTestFile = {} as GrammarTestFile
 	file_failures: TestFailure[] = []
 
-	constructor(grammars: IGrammarConfig[]) {
+	constructor(
+		grammars: IGrammarConfig[],
+		private parse_mode: ScopeRegexMode,
+	) {
 		this.registry = createRegistry(grammars)
 	}
 
-	async test_file(
-		file_content: string,
-		parse_mode: ScopeRegexMode,
-	): Promise<Result<TestFailure[]>> {
+	async test_file(file_content: string): Promise<Result<TestFailure[]>> {
 		// Parse file
-		const test_case_r = parse_file(file_content, parse_mode)
+		const test_case_r = parse_file(file_content, this.parse_mode)
 		if (test_case_r.error) {
 			return err(test_case_r.error)
 		}
@@ -45,8 +45,8 @@ export class TestRunner {
 			prev_state = new_state
 
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
-				// Fail on assertion beyond eol (exception: excluded scopes only)
-				if (to > line_length && requiredScopes.length > 0) {
+				// Fail on assertion beyond eol
+				if (to > line_length) {
 					this.eol_failure(line_nr, src_line, line_length, to)
 					return
 				}

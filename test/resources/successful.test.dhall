@@ -10,7 +10,6 @@
 
 let user = "bill"
 --        ^ ! string.quoted.double.dhall
---               ^ ! string.quoted.double.dhall
 in  { home       = "/home/${user}"
 -- <~~~~- keyword.operator.record.begin.dhall ! foo
     , privateKey = "/home/${user}/id_ed25519"

@@ -10,12 +10,10 @@ const grammars = [
 	},
 ]
 
-const runner = new TestRunner(grammars)
+const runner = new TestRunner(grammars, ScopeRegexMode.standard)
 
 test('line end', async () => {
-	const res = unwrap(
-		await runner.test_file(read_testdata('line_end.testlang'), ScopeRegexMode.standard),
-	)
+	const res = unwrap(await runner.test_file(read_testdata('line_end.testlang')))
 
 	expect(res).toHaveLength(2)
 	expect(res[0].actual).toEqual(['EOL'])
