@@ -53,6 +53,8 @@ jobs:
         with:
           node-version-file: package.json
           registry-url: 'https://registry.npmjs.org'
+      - name: Update npm to latest
+        run: npm install -g npm@latest
       - name: Cache bun global cache
         uses: actions/cache@v4
         with:
@@ -63,7 +65,7 @@ jobs:
       - name: Build package
         run: bun pm pack --filename textmate-grammar-test.tgz
       - name: Publish to npmjs.org
-        run: npm publish ./textmate-grammar-test.tgz --access public --provenance
+        run: NODE_AUTH_TOKEN="" npm publish ./textmate-grammar-test.tgz --access public --provenance
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

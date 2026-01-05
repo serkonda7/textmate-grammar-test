@@ -1,5 +1,5 @@
 # Changelog
-## 0.3.0
+## 0.3.0 - 0.3.1
 _2026-01-05_
 
 ### Breaking Changes in 0.3.0
