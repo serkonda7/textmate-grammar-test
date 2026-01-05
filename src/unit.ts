@@ -75,7 +75,7 @@ async function main(): Promise<ExitCode> {
 	// Early exit if no test cases found
 	if (rawTestCases.length === 0) {
 		console.error(chalk.red('ERROR') + ' no test cases found')
-		process.exit(ExitCode.Failure)
+		return ExitCode.Failure
 	}
 
 	const runner = new TestRunner(grammars, scope_re_mode)
@@ -104,5 +104,5 @@ async function main(): Promise<ExitCode> {
 }
 
 main().then((code) => {
-	process.exit(code)
+	process.exitCode = code
 })

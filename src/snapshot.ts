@@ -129,11 +129,7 @@ const testResults: Promise<number[]> = Promise.all(
 
 testResults.then((xs) => {
 	const result = xs.reduce((a, b) => a + b, 0)
-	if (result === ExitCode.Success) {
-		process.exit(ExitCode.Success)
-	} else {
-		process.exit(ExitCode.Failure)
-	}
+	process.exitCode = result
 })
 
 function renderTestResult(
