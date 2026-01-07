@@ -90,7 +90,6 @@ async function main(): Promise<ExitCode> {
 		}
 
 		const test_res = res.value
-		console.log(`${filename}: ${test_res.failures.length}`)
 		reporter.reportTestResult(filename, test_res.test_case, test_res.failures)
 		return test_res.failures.length === 0 ? ExitCode.Success : ExitCode.Failure
 	}
