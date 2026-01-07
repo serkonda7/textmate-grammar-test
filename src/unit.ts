@@ -89,9 +89,10 @@ async function main(): Promise<ExitCode> {
 			return ExitCode.Failure
 		}
 
-		const failures = res.value
-		reporter.reportTestResult(filename, runner.test_case, failures)
-		return failures.length === 0 ? ExitCode.Success : ExitCode.Failure
+		const test_res = res.value
+		console.log(`${filename}: ${test_res.failures.length}`)
+		reporter.reportTestResult(filename, test_res.test_case, test_res.failures)
+		return test_res.failures.length === 0 ? ExitCode.Success : ExitCode.Failure
 	}
 
 	const limit = pLimit(MAX_CONCURRENT_TESTS)

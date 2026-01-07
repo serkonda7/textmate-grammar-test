@@ -1,7 +1,7 @@
 {
   "name": "textmate-grammar-test",
   "description": "Test runner for VSCode textmate grammars",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "license": "MIT",
   "author": "serkonda7",
   "homepage": "https://github.com/serkonda7/textmate-grammar-test",

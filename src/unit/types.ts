@@ -23,6 +23,11 @@ export interface GrammarTestFile {
 	test_lines: TestedLine[]
 }
 
+export interface TestResult {
+	test_case: GrammarTestFile
+	failures: TestFailure[]
+}
+
 export interface TestFailure {
 	missing: string[]
 	actual: string[]

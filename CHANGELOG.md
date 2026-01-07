@@ -1,4 +1,10 @@
 # Changelog
+## 0.3.2
+_2026-01-07_
+
+- unit: Fix incorrect reporting of test results due to concurrency
+
+
 ## 0.3.0 - 0.3.1
 _2026-01-05_
 
