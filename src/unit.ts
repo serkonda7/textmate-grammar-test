@@ -4,12 +4,9 @@ import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
-import pLimit from 'p-limit'
 import { createReporter } from './cli/reporter.ts'
 import { loadConfiguration } from './common/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
-
-const MAX_CONCURRENT_TESTS = 8
 
 enum ExitCode {
 	Success = 0,
@@ -94,12 +91,15 @@ async function main(): Promise<ExitCode> {
 		return test_res.failures.length === 0 ? ExitCode.Success : ExitCode.Failure
 	}
 
-	const limit = pLimit(MAX_CONCURRENT_TESTS)
-	const tasks = rawTestCases.map((filename) => limit(() => runSingleTest(filename)))
+	const results: ExitCode[] = []
 
-	const results = await Promise.all(tasks)
+	for (const filename of rawTestCases) {
+		const result = await runSingleTest(filename)
+		results.push(result)
+	}
 
 	reporter.reportSuiteResult()
+
 	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure
 }
 
