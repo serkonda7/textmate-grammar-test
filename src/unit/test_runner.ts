@@ -4,12 +4,10 @@ import type { IGrammarConfig } from '../common/model.ts'
 import { err, ok, type Result } from '../lib/result.ts'
 import { parse_file, type ScopeRegexMode } from './index.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
-import type { GrammarTestFile, TestFailure } from './types.ts'
+import type { TestFailure, TestResult } from './types.ts'
 
 export class TestRunner {
 	registry: tm.Registry
-	test_case: GrammarTestFile = {} as GrammarTestFile
-	file_failures: TestFailure[] = []
 
 	constructor(
 		grammars: IGrammarConfig[],
@@ -18,25 +16,25 @@ export class TestRunner {
 		this.registry = createRegistry(grammars)
 	}
 
-	async test_file(file_content: string): Promise<Result<TestFailure[]>> {
+	async test_file(file_content: string): Promise<Result<TestResult>> {
 		// Parse file
 		const test_case_r = parse_file(file_content, this.parse_mode)
 		if (test_case_r.error) {
 			return err(test_case_r.error)
 		}
 
-		this.test_case = test_case_r.value
+		const test_case = test_case_r.value
 
 		// Load grammar
-		const grammar = await this.registry.loadGrammar(this.test_case.metadata.scope)
+		const grammar = await this.registry.loadGrammar(test_case.metadata.scope)
 		if (!grammar) {
-			return err(new Error(`Could not load scope ${this.test_case.metadata.scope}`))
+			return err(new Error(`Could not load scope ${test_case.metadata.scope}`))
 		}
 
 		let prev_state = tm.INITIAL
-		this.file_failures = []
+		const failures: TestFailure[] = []
 
-		for (const line of this.test_case.test_lines) {
+		for (const line of test_case.test_lines) {
 			const { line_nr, src: src_line, scope_asserts } = line
 			const line_length = src_line.length
 
@@ -47,7 +45,7 @@ export class TestRunner {
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
 				// Fail on assertion beyond eol
 				if (to > line_length) {
-					this.eol_failure(line_nr, src_line, line_length, to)
+					failures.push(this.eol_failure(line_nr, src_line, line_length, to))
 					return
 				}
 
@@ -60,7 +58,7 @@ export class TestRunner {
 
 					// Add failure if any scopes are missing or unexpected
 					if (missing.length || unexpected.length) {
-						this.file_failures.push({
+						failures.push({
 							missing: missing,
 							actual: token.scopes,
 							unexpected: unexpected,
@@ -74,11 +72,14 @@ export class TestRunner {
 			})
 		}
 
-		return ok(this.file_failures.slice())
+		return ok({
+			test_case,
+			failures,
+		})
 	}
 
-	private eol_failure(line: number, src: string, from: number, to: number) {
-		this.file_failures.push({
+	private eol_failure(line: number, src: string, from: number, to: number): TestFailure {
+		return {
 			missing: [],
 			unexpected: [],
 			actual: ['EOL'],
@@ -86,6 +87,6 @@ export class TestRunner {
 			srcLineText: src,
 			start: from,
 			end: to,
-		})
+		}
 	}
 }

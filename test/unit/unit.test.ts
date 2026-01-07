@@ -20,14 +20,14 @@ function read_file(filename: string): string {
 describe('Grammar test case', () => {
 	test('should report no errors on correct grammar test', async () => {
 		const res = unwrap(await runner.test_file(read_file('./test/resources/successful.test.dhall')))
-		expect(res).toHaveLength(0)
+		expect(res.failures).toHaveLength(0)
 	})
 
 	test('should report missing scopes', async () => {
 		const res = unwrap(
 			await runner.test_file(read_file('./test/resources/missing.scopes.test.dhall')),
 		)
-		expect(res).toEqual([
+		expect(res.failures).toEqual([
 			{
 				missing: ['m1', 'keyword.operator.record.begin.dhall', 'm2.foo'],
 				actual: [
@@ -192,7 +192,7 @@ describe('Grammar test case', () => {
 		const res = unwrap(
 			await runner.test_file(read_file('./test/resources/unexpected.scopes.test.dhall')),
 		)
-		expect(res).toEqual([
+		expect(res.failures).toEqual([
 			{
 				missing: [],
 				actual: [
@@ -362,7 +362,7 @@ describe('Grammar test case', () => {
 		const res = unwrap(
 			await runner.test_file(read_file('./test/resources/misplaced.scopes.test.dhall')),
 		)
-		expect(res).toEqual([
+		expect(res.failures).toEqual([
 			{
 				missing: ['source.dhall'],
 				actual: [

@@ -1,4 +1,11 @@
 # Changelog
+## 0.3.2
+_2026-01-07_
+
+- unit: Fix incorrect test result reporting caused by concurrency
+- unit: Remove concurreny entirely due to negligible performance gain
+
+
 ## 0.3.0 - 0.3.1
 _2026-01-05_
 
