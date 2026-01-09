@@ -7,13 +7,13 @@ Write unit and snapshot tests for TextMate grammars,
 validated against the VS Code TextMate engine.
 
 
-## Installation
+## 📦 Installation
 ```sh
 npm install --save-dev textmate-grammar-test
 ```
 
 
-### Migrating from the unmaintained `vscode-tmgrammar-test`
+### 🔄 Migrating from `vscode-tmgrammar-test`
 Looking for up-to-date dependencies, cleaner and fully refactored codebase,
 plus additional bug fixes and features?
 
@@ -27,7 +27,7 @@ Migration is straightforward and should only take a few minutes:
   - See the [changelog](CHANGELOG.md#breaking-changes-in-030) for migration notes
 
 
-## Usage
+## 🚀 Usage
 This package provides the commands `textmate-grammar-test` and `textmate-grammar-snap`.
 
 Add a package.json script like:
@@ -45,7 +45,7 @@ npx textmate-grammar-snap --help
 ```
 
 
-## Unit Testing Syntax
+## 🧩 Unit Testing Syntax
 <!-- TODO example -->
 <!-- TODO small collapsible glossar -->
 
@@ -208,6 +208,10 @@ You can setup a vscode unit test task for convenience:
 ```
 
 Notice the `-c` option that will output messages in a handy format for the problemMatcher.
+
+
+## 📜 License
+This repo is licensed under the [MIT License](LICENSE.txt).
 
 
 <!-- links -->
