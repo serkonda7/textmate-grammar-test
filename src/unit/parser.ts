@@ -1,4 +1,4 @@
-import { err, ok, type Result } from '../lib/result.ts'
+import { err, ok, type Result } from '../common/result/index.ts'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
