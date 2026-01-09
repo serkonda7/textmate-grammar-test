@@ -4,8 +4,8 @@ import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
-import { loadConfiguration } from './lib/common/index.ts'
-import { createReporter } from './lib/reporter'
+import { loadConfiguration } from './common/common/index.ts'
+import { createReporter } from './common/reporter/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 
 enum ExitCode {
