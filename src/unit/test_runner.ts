@@ -1,6 +1,6 @@
 import tm from 'vscode-textmate'
-import { createRegistry } from '../common/index.ts'
-import type { IGrammarConfig } from '../common/model.ts'
+import { createRegistry } from '../lib/common/index.ts'
+import type { IGrammarConfig } from '../lib/common/model.ts'
 import { err, ok, type Result } from '../lib/result'
 import { parse_file, type ScopeRegexMode } from './index.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'

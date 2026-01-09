@@ -4,7 +4,7 @@ import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
-import { loadConfiguration } from './common/index.ts'
+import { loadConfiguration } from './lib/common/index.ts'
 import { createReporter } from './lib/reporter'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 

@@ -8,7 +8,7 @@ import { program } from 'commander'
 import * as diff from 'diff'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
-import { createRegistry, loadConfiguration } from './common/index.ts'
+import { createRegistry, loadConfiguration } from './lib/common/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
 import type { AnnotatedLine } from './snapshot/model.ts'
 
