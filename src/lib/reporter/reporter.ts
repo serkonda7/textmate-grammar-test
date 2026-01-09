@@ -4,7 +4,7 @@ import * as p from 'node:path'
 import { sep } from 'node:path'
 import * as tty from 'node:tty'
 import chalk from 'chalk'
-import type { GrammarTestFile, TestFailure } from '../unit/types.ts'
+import type { GrammarTestFile, TestFailure } from '../../unit/types.ts'
 
 export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void
