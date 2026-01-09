@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { unwrap } from '../../src/lib/result.ts'
+import { unwrap } from '../../src/lib/result'
 import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
 import { read_testdata } from '../testutil.ts'
 
