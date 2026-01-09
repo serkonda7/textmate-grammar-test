@@ -4,14 +4,10 @@ import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
+import { ExitCode } from './common/cli'
 import { loadConfiguration } from './common/common/index.ts'
 import { createReporter } from './common/reporter/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
-
-enum ExitCode {
-	Success = 0,
-	Failure = 1,
-}
 
 interface CliOptions {
 	grammar: string[]
