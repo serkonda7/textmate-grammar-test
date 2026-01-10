@@ -1,4 +1,10 @@
 # Changelog
+## 0.3.3
+_unreleased_
+
+- Dependency updates
+
+
 ## 0.3.2
 _2026-01-07_
 
