@@ -1,7 +1,6 @@
-import * as fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import oniguruma from 'vscode-oniguruma'
+import fs from 'node:fs'
 import tm from 'vscode-textmate'
+import { createOnigurumaLib } from './oniguruma.ts'
 import type { IGrammarConfig } from './types.ts'
 
 // TODO refactor and consider rename
@@ -37,23 +36,10 @@ function createRegistryFromGrammars(grammars: Array<{ grammar: IGrammarConfig; c
 		}
 	}
 
-	// TODO refactor below part
-	const wasmUrl = new URL(import.meta.resolve('vscode-oniguruma'))
-	const wasmPath = fileURLToPath(wasmUrl).replace(/main\.js$/, 'onig.wasm')
-	const wasmBin = fs.readFileSync(wasmPath).buffer
-	const vscodeOnigurumaLib = oniguruma.loadWASM(wasmBin).then(() => {
-		return {
-			createOnigScanner(patterns: string[]) {
-				return new oniguruma.OnigScanner(patterns)
-			},
-			createOnigString(s: string) {
-				return new oniguruma.OnigString(s)
-			},
-		}
-	})
+	const oniguruma_lib = createOnigurumaLib()
 
 	return new tm.Registry({
-		onigLib: vscodeOnigurumaLib,
+		onigLib: oniguruma_lib,
 		loadGrammar: (scopeName) => {
 			if (grammar_map.get(scopeName) !== undefined) {
 				return new Promise((fulfill) => {
