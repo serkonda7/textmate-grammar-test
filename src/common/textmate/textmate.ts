@@ -5,6 +5,8 @@ import type { IGrammarConfig } from './types.ts'
 
 // TODO refactor and consider rename
 export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
+	const onig_lib = createOnigurumaLib()
+
 	return createRegistryFromGrammars(
 		gs.map((grammar) => {
 			return {
@@ -12,12 +14,14 @@ export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 				content: fs.readFileSync(grammar.path).toString(),
 			}
 		}),
+		onig_lib,
 	)
 }
 
 // TODO consider rename to createTmRegistry
 function createRegistryFromGrammars(
 	grammars: Array<{ grammar: IGrammarConfig; content: string }>,
+	onig_lib: Promise<tm.IOnigLib>,
 ): tm.Registry {
 	const grammar_map = new Map<string, tm.IRawGrammar>()
 	const injection_map = new Map<string, string[]>()
@@ -41,10 +45,8 @@ function createRegistryFromGrammars(
 		}
 	}
 
-	const onigLib = createOnigurumaLib()
-
 	return new tm.Registry({
-		onigLib,
+		onigLib: onig_lib,
 
 		async loadGrammar(scopeName) {
 			const grammar = grammar_map.get(scopeName)
