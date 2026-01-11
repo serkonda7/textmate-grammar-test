@@ -9,8 +9,8 @@ import * as diff from 'diff'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { ExitCode } from './common/cli'
-import { createRegistry, loadConfiguration } from './common/common/index.ts'
-import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
+import { createRegistry, loadConfiguration } from './common/common/main.ts'
+import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/main.ts'
 import type { AnnotatedLine } from './snapshot/types.ts'
 
 interface CliOptions {

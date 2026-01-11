@@ -3,7 +3,7 @@ import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import oniguruma from 'vscode-oniguruma'
 import tm from 'vscode-textmate'
-import type { IGrammarConfig } from './model.ts'
+import type { IGrammarConfig } from './types.ts'
 
 export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 	return createRegistryFromGrammars(
