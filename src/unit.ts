@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import { ExitCode } from './common/cli'
-import { loadConfiguration } from './common/common/main.ts'
+import { loadConfiguration } from './common/textmate/main.ts'
 import { createReporter } from './common/reporter/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 
