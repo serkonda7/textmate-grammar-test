@@ -9,9 +9,10 @@ import * as diff from 'diff'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { ExitCode } from './common/cli'
-import { createRegistry, loadConfiguration } from './common/common/index.ts'
-import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
-import type { AnnotatedLine } from './snapshot/model.ts'
+import { loadConfiguration } from './common/textmate/main.ts'
+import { createRegistry } from './common/textmate/textmate.ts'
+import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/main.ts'
+import type { AnnotatedLine } from './snapshot/types.ts'
 
 interface CliOptions {
 	updateSnapshot: boolean

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs'
-import { unwrap } from '../../src/common/result/index.ts'
+import { unwrap } from '@serkonda7/ts-result'
 import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
 import type { TestFailure } from '../../src/unit/types.ts'
 
