@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import fs from 'node:fs'
-import { unwrap } from '../../src/common/result/index.ts'
+import { unwrap } from '../../src/common/result.ts'
 import { AssertionParser, parse_file, parseHeader, ScopeRegexMode } from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/types.ts'
 
