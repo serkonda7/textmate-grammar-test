@@ -3,22 +3,17 @@ import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { IGrammarConfig } from './types.ts'
 
-// TODO refactor and consider rename
 export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 	const onig_lib = createOnigurumaLib()
 
-	return createRegistryFromGrammars(
-		gs.map((grammar) => {
-			return {
-				grammar,
-				content: fs.readFileSync(grammar.path).toString(),
-			}
-		}),
-		onig_lib,
-	)
+	const grammars = gs.map((grammar) => ({
+		grammar,
+		content: fs.readFileSync(grammar.path, 'utf-8'),
+	}))
+
+	return createRegistryFromGrammars(grammars, onig_lib)
 }
 
-// TODO consider rename to createTmRegistry
 function createRegistryFromGrammars(
 	grammars: Array<{ grammar: IGrammarConfig; content: string }>,
 	onig_lib: Promise<tm.IOnigLib>,
