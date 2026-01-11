@@ -63,7 +63,7 @@ jobs:
       - name: Build package
         run: bun pm pack --filename textmate-grammar-test.tgz
       - name: Publish to npmjs.org
-        run: NODE_AUTH_TOKEN="" npm publish ./textmate-grammar-test.tgz --access public --provenance
+        run: NODE_AUTH_TOKEN="" npm publish ./textmate-grammar-test.tgz --access public
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
