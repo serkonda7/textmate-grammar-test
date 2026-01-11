@@ -1,5 +1,5 @@
 import type tm from 'vscode-textmate'
-import type { AnnotatedLine } from './model.ts'
+import type { AnnotatedLine } from './types.ts'
 
 export function parseSnap(s: string): AnnotatedLine[] {
 	const result: AnnotatedLine[] = []

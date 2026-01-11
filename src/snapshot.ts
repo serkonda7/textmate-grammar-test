@@ -11,7 +11,7 @@ import pLimit from 'p-limit'
 import { ExitCode } from './common/cli'
 import { createRegistry, loadConfiguration } from './common/common/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/index.ts'
-import type { AnnotatedLine } from './snapshot/model.ts'
+import type { AnnotatedLine } from './snapshot/types.ts'
 
 interface CliOptions {
 	updateSnapshot: boolean
