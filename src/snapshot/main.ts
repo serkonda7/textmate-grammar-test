@@ -1,8 +1,6 @@
 import tm from 'vscode-textmate'
-import { parseSnap, renderSnap } from './parsing.ts'
 import type { AnnotatedLine } from './types.ts'
 
-export { parseSnap, renderSnap }
 
 export async function getVSCodeTokens(
 	registry: tm.Registry,
