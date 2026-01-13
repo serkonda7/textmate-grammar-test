@@ -2,24 +2,42 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import type { IGrammarConfig } from './types.ts'
 
+function paths_to_grammars(paths: string[]) {
+	return paths.map((path) => ({ path, scopeName: '' }))
+}
+
+function createLangScopeMap(grammars: IGrammarConfig[]): Map<string, string> {
+	const map = new Map<string, string>()
+
+	for (const grammar of grammars) {
+		if (grammar.language && grammar.scopeName) {
+			map.set(grammar.language, grammar.scopeName)
+		}
+	}
+
+	return map
+}
+
 export function loadConfiguration(
 	packageJsonPath: string,
 	scope: string | undefined,
-	extra_grammars: string[],
+	extra_paths: string[],
 ): {
 	grammars: IGrammarConfig[]
 	extensionToScope: (ext: string) => string | undefined
 } {
 	const grammars: IGrammarConfig[] = []
-	let extensionToScope: (ext: string) => string | undefined = () => scope || undefined
 
-	if (extra_grammars.length > 0) {
-		const xs = extra_grammars.map((path: string) => ({ path, scopeName: '' }))
-		grammars.push(...xs)
+	if (extra_paths.length > 0) {
+		const extra_grammars = paths_to_grammars(extra_paths)
+		grammars.push(...extra_grammars)
 	}
 
 	if (!fs.existsSync(packageJsonPath)) {
-		return { grammars, extensionToScope }
+		return {
+			grammars,
+			extensionToScope: () => scope || undefined,
+		}
 	}
 
 	const json = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
@@ -32,15 +50,12 @@ export function loadConfiguration(
 	})
 	grammars.push(...contrib_grammars)
 
-	const langToScope = Object.assign(
-		{},
-		...grammars.filter((x) => x.language).map((x) => ({ [x.language || '']: x.scopeName })),
-	)
+	const langToScope = createLangScopeMap(grammars)
 	const extToLang = Object.assign(
 		{},
 		...contrib_langs.flatMap((x: any) => (x.extensions || []).map((e: any) => ({ [e]: x.id }))),
 	)
-	extensionToScope = (ext) => scope || langToScope[extToLang[ext]]
+	const extensionToScope = (ext: string) => scope || langToScope.get(extToLang[ext])
 
 	return { grammars, extensionToScope }
 }
