@@ -5,6 +5,7 @@ import { sep } from 'node:path'
 import * as tty from 'node:tty'
 import chalk from 'chalk'
 import type { GrammarTestFile, TestFailure } from '../../unit/types.ts'
+import { SYMBOLS } from '../cli'
 
 export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void
@@ -287,20 +288,6 @@ export class XunitGitlabReporter extends XunitReportPerTestReporter {
 	}
 }
 
-const symbols = {
-	ok: '✓',
-	err: '✖',
-	dot: '․',
-	comma: ',',
-	bang: '!',
-}
-
-if (process.platform === 'win32') {
-	symbols.ok = '\u221A'
-	symbols.err = '\u00D7'
-	symbols.dot = '.'
-}
-
 const Padding = '  '
 
 const isatty = tty.isatty(1) && tty.isatty(2)
@@ -312,7 +299,7 @@ if (isatty) {
 
 function handleGrammarTestError(filename: string, _testCase: GrammarTestFile, reason: any): void {
 	console.log(
-		chalk.red(symbols.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error',
+		chalk.red(SYMBOLS.err) + ' testcase ' + chalk.gray(filename) + ' aborted due to an error',
 	)
 	console.log(reason)
 }
@@ -325,7 +312,7 @@ function handleParseError(filename: string, error: any): void {
 class ConsoleCompactReporter implements Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void {
 		if (failures.length === 0) {
-			console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
+			console.log(chalk.green(SYMBOLS.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
 		} else {
 			failures.forEach((failure) => {
 				console.log(
@@ -359,9 +346,9 @@ class ConsoleCompactReporter implements Reporter {
 class ConsoleFullReporter implements Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void {
 		if (failures.length === 0) {
-			console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
+			console.log(chalk.green(SYMBOLS.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
 		} else {
-			console.log(chalk.red(symbols.err + ' ' + filename + ' failed'))
+			console.log(chalk.red(SYMBOLS.err + ' ' + filename + ' failed'))
 			failures.forEach((failure) => {
 				printAssertionLocation(filename, failure, Padding, console.log, chalk)
 				printSourceLine(failure, Padding, terminalWidth, console.log, chalk)

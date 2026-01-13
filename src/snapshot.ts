@@ -9,7 +9,7 @@ import { program } from 'commander'
 import * as diff from 'diff'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
-import { ExitCode } from './common/cli'
+import { ExitCode, SYMBOLS } from './common/cli'
 import { createRegistry, loadConfiguration } from './common/textmate/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
 
@@ -46,20 +46,6 @@ program
 	.parse(process.argv)
 
 const options = program.opts<CliOptions>()
-
-const symbols = {
-	ok: '✓',
-	err: '✖',
-	dot: '․',
-	comma: ',',
-	bang: '!',
-}
-
-if (process.platform === 'win32') {
-	symbols.ok = '\u221A'
-	symbols.err = '\u00D7'
-	symbols.dot = '.'
-}
 
 const Padding = '  '
 const MAX_CONCURRENT_TESTS = 8
@@ -254,7 +240,7 @@ function renderTestResult(
 		console.log()
 		return ExitCode.Failure
 	} else {
-		console.log(chalk.green(symbols.ok) + ' ' + chalk.whiteBright(filename) + ' run successfully.')
+		console.log(chalk.green(SYMBOLS.ok) + ' ' + chalk.whiteBright(filename) + ' run successfully.')
 		return ExitCode.Success
 	}
 }
