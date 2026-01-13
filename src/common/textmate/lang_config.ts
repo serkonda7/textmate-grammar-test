@@ -18,6 +18,18 @@ function createLangScopeMap(grammars: IGrammarConfig[]): Map<string, string> {
 	return map
 }
 
+function createExtToLangMap(languages: any[]): Map<string, string> {
+	const map = new Map<string, string>()
+
+	for (const lang of languages) {
+		for (const ext of lang.extensions) {
+			map.set(ext, lang.id)
+		}
+	}
+
+	return map
+}
+
 export function loadConfiguration(
 	packageJsonPath: string,
 	scope: string | undefined,
@@ -50,12 +62,10 @@ export function loadConfiguration(
 	})
 	grammars.push(...contrib_grammars)
 
+	// TODO consider directly creating extToScope Map
 	const langToScope = createLangScopeMap(grammars)
-	const extToLang = Object.assign(
-		{},
-		...contrib_langs.flatMap((x: any) => (x.extensions || []).map((e: any) => ({ [e]: x.id }))),
-	)
-	const extensionToScope = (ext: string) => scope || langToScope.get(extToLang[ext])
+	const extToLang = createExtToLangMap(contrib_langs)
+	const extensionToScope = (ext: string) => scope ?? langToScope.get(extToLang.get(ext) ?? '')
 
 	return { grammars, extensionToScope }
 }
