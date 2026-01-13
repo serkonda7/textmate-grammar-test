@@ -1,11 +1,11 @@
 import type tm from 'vscode-textmate'
-import type { AnnotatedLine } from './types.ts'
+import type { LineWithTokens } from './types.ts'
 
 const SRC_LINE_PREFIX = '>'
 const TEST_LINE_PREFIX = '#'
 
-export function parseSnap(s: string): AnnotatedLine[] {
-	const result: AnnotatedLine[] = []
+export function parseSnap(s: string): LineWithTokens[] {
+	const result: LineWithTokens[] = []
 	const ls = s.split(/\r\n|\n/)
 	let i = 0
 	while (i < ls.length) {
@@ -28,8 +28,8 @@ export function parseSnap(s: string): AnnotatedLine[] {
 				})
 				i++
 			}
-			result.push(<AnnotatedLine>{
-				src: src,
+			result.push(<LineWithTokens>{
+				line: src,
 				tokens: tokens,
 			})
 		} else {
@@ -40,21 +40,28 @@ export function parseSnap(s: string): AnnotatedLine[] {
 	return result
 }
 
-export function renderSnap(xs: AnnotatedLine[]): string {
-	const result: string[] = []
-	xs.forEach((line) => {
-		result.push(SRC_LINE_PREFIX + line.src)
-		if (line.src.trim().length > 0) {
-			line.tokens.forEach((token) => {
-				result.push(
-					TEST_LINE_PREFIX +
-						' '.repeat(token.startIndex) +
-						'^'.repeat(token.endIndex - token.startIndex) +
-						' ' +
-						token.scopes.join(' '),
-				)
-			})
-		}
-	})
-	return result.join('\n')
+export function renderSnapshot(lines_with_tokens: LineWithTokens[]): string {
+	const snap: string[] = []
+
+	for (const { line, tokens } of lines_with_tokens) {
+		snap.push(SRC_LINE_PREFIX + line)
+		snap.push(...render_tokens(tokens))
+	}
+
+	return snap.join('\n')
+}
+
+function render_tokens(tokens: tm.IToken[]) {
+	const lines: string[] = []
+
+	for (const token of tokens) {
+		let line = TEST_LINE_PREFIX
+		line += ' '.repeat(token.startIndex)
+		line += '^'.repeat(token.endIndex - token.startIndex)
+		line += ` ${token.scopes.join(' ')}`
+
+		lines.push(line)
+	}
+
+	return lines
 }

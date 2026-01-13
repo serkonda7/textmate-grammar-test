@@ -11,8 +11,8 @@ import pLimit from 'p-limit'
 import { ExitCode } from './common/cli'
 import { loadConfiguration } from './common/textmate/lang_config.ts'
 import { createRegistry } from './common/textmate/textmate.ts'
-import { getVSCodeTokens, parseSnap, renderSnap } from './snapshot/main.ts'
-import type { AnnotatedLine } from './snapshot/types.ts'
+import { getVSCodeTokens, parseSnap, renderSnapshot } from './snapshot/index.ts'
+import type { LineWithTokens } from './snapshot/types.ts'
 
 interface CliOptions {
 	updateSnapshot: boolean
@@ -102,7 +102,7 @@ const testResults: Promise<number[]> = Promise.all(
 						console.log(
 							chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
 						)
-						fs.writeFileSync(filename + '.snap', renderSnap(tokens), 'utf8')
+						fs.writeFileSync(filename + '.snap', renderSnapshot(tokens), 'utf8')
 						return ExitCode.Success
 					} else {
 						const expectedTokens = parseSnap(fs.readFileSync(filename + '.snap').toString())
@@ -112,7 +112,7 @@ const testResults: Promise<number[]> = Promise.all(
 					console.log(
 						chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
 					)
-					fs.writeFileSync(filename + '.snap', renderSnap(tokens))
+					fs.writeFileSync(filename + '.snap', renderSnapshot(tokens))
 					return ExitCode.Success
 				}
 			})
@@ -131,8 +131,8 @@ testResults.then((xs) => {
 
 function renderTestResult(
 	filename: string,
-	expected: AnnotatedLine[],
-	actual: AnnotatedLine[],
+	expected: LineWithTokens[],
+	actual: LineWithTokens[],
 ): number {
 	if (expected.length !== actual.length) {
 		console.log(
@@ -146,12 +146,12 @@ function renderTestResult(
 	for (let i = 0; i < expected.length; i++) {
 		const exp = expected[i]
 		const act = actual[i]
-		if (exp.src !== act.src) {
+		if (exp.line !== act.line) {
 			console.log(
 				chalk.red('ERROR running testcase ') +
 					chalk.whiteBright(filename) +
 					chalk.red(
-						` source different snapshot at line ${i + 1}.${EOL} expected: ${exp.src}${EOL} actual: ${act.src}${EOL}`,
+						` source different snapshot at line ${i + 1}.${EOL} expected: ${exp.line}${EOL} actual: ${act.line}${EOL}`,
 					),
 			)
 			return ExitCode.Failure
@@ -160,8 +160,8 @@ function renderTestResult(
 
 	// renderSnap won't produce assertions for empty lines, so we'll remove them here
 	// for both actual end expected
-	const actual1 = actual.filter((a) => a.src.trim().length > 0)
-	const expected1 = expected.filter((a) => a.src.trim().length > 0)
+	const actual1 = actual.filter((a) => a.line.trim().length > 0)
+	const expected1 = expected.filter((a) => a.line.trim().length > 0)
 
 	const wrongLines = flatten(
 		expected1.map((exp, i) => {
@@ -233,7 +233,7 @@ function renderTestResult(
 				.concat(removed)
 				.sort((x, y) => (x.from - y.from) * 10000 + (x.to - y.to))
 			if (allChanges.length > 0) {
-				return [[allChanges, exp.src, i] as [TChanges[], string, number]]
+				return [[allChanges, exp.line, i] as [TChanges[], string, number]]
 			} else {
 				return []
 			}
