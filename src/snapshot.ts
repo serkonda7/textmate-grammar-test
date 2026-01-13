@@ -3,6 +3,7 @@
 import * as fs from 'node:fs'
 import { EOL } from 'node:os'
 import * as path from 'node:path'
+import { unwrap } from '@serkonda7/ts-result'
 import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
@@ -11,8 +12,7 @@ import pLimit from 'p-limit'
 import { ExitCode } from './common/cli'
 import { loadConfiguration } from './common/textmate/lang_config.ts'
 import { createRegistry } from './common/textmate/textmate.ts'
-import { getVSCodeTokens, parseSnap, renderSnapshot } from './snapshot/index.ts'
-import type { LineWithTokens } from './snapshot/types.ts'
+import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
 
 interface CliOptions {
 	updateSnapshot: boolean
@@ -105,7 +105,7 @@ const testResults: Promise<number[]> = Promise.all(
 						fs.writeFileSync(filename + '.snap', renderSnapshot(tokens), 'utf8')
 						return ExitCode.Success
 					} else {
-						const expectedTokens = parseSnap(fs.readFileSync(filename + '.snap').toString())
+						const expectedTokens = unwrap(parseSnap(fs.readFileSync(filename + '.snap').toString()))
 						return renderTestResult(filename, expectedTokens, tokens)
 					}
 				} else {
@@ -131,8 +131,8 @@ testResults.then((xs) => {
 
 function renderTestResult(
 	filename: string,
-	expected: LineWithTokens[],
-	actual: LineWithTokens[],
+	expected: TokenizedLine[],
+	actual: TokenizedLine[],
 ): number {
 	if (expected.length !== actual.length) {
 		console.log(

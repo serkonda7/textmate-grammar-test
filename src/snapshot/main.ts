@@ -1,11 +1,11 @@
 import tm from 'vscode-textmate'
-import type { LineWithTokens } from './types.ts'
+import type { TokenizedLine } from './types.ts'
 
 export async function getVSCodeTokens(
 	registry: tm.Registry,
 	scope: string,
 	source: string,
-): Promise<LineWithTokens[]> {
+): Promise<TokenizedLine[]> {
 	return registry.loadGrammar(scope).then((grammar: tm.IGrammar | null) => {
 		if (!grammar) {
 			// biome-ignore lint: refactor still TODO
@@ -18,7 +18,7 @@ export async function getVSCodeTokens(
 			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 			ruleStack = ruleStack1
 
-			return <LineWithTokens>{
+			return <TokenizedLine>{
 				line: line,
 				tokens: tokens,
 			}

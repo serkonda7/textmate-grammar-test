@@ -1,67 +1,61 @@
+import { err, ok, type Result } from '@serkonda7/ts-result'
 import type tm from 'vscode-textmate'
-import type { LineWithTokens } from './types.ts'
+import { SRC_PREFIX, TEST_PREFIX, TEST_PREFIX_LEN, type TokenizedLine } from './types.ts'
 
-const SRC_LINE_PREFIX = '>'
-const TEST_LINE_PREFIX = '#'
+/**
+ * Parse existing snapshot file into tokenized lines.
+ * Used for comparing to newly generated snapshots.
+ */
+export function parseSnap(text: string): Result<TokenizedLine[], Error> {
+	const tokenized_lines: TokenizedLine[] = []
 
-export function parseSnap(s: string): LineWithTokens[] {
-	const result: LineWithTokens[] = []
-	const ls = s.split(/\r\n|\n/)
+	const lines = text.split(/\n|\r\n/)
+
 	let i = 0
-	while (i < ls.length) {
-		const l = ls[i]
-		if (l.startsWith(SRC_LINE_PREFIX)) {
-			const src = l.substring(1)
-			i++
-			const tokens: tm.IToken[] = []
-			while (i < ls.length && ls[i].startsWith(TEST_LINE_PREFIX)) {
-				const startIndex = ls[i].indexOf('^')
-				const endIndex = ls[i].indexOf(' ', startIndex)
-				const scopes = ls[i]
-					.substring(endIndex + 1)
-					.split(/\s+/)
-					.filter((x) => x !== '')
-				tokens.push({
-					startIndex: startIndex - 1,
-					endIndex: endIndex - 1,
-					scopes: scopes,
-				})
-				i++
-			}
-			result.push(<LineWithTokens>{
-				line: src,
-				tokens: tokens,
-			})
-		} else {
-			i++
+	while (i < lines.length) {
+		const src_line = lines[i]
+		i++ // Point to first test line
+
+		// This should never happen in valid snapshot files
+		if (!src_line.startsWith(SRC_PREFIX)) {
+			return err(new Error(`Expected source line starting with '${SRC_PREFIX}'`))
 		}
+
+		// Get token tests for this source line
+		const tokens: tm.IToken[] = []
+		while (i < lines.length) {
+			const line = lines[i]
+
+			if (!line.startsWith(TEST_PREFIX)) {
+				break
+			}
+
+			// Parse line
+			const assert_start = line.indexOf('^')
+			const assert_end = line.indexOf(' ', assert_start)
+			const scopes = extract_scopes(line, assert_end + 1)
+
+			tokens.push({
+				startIndex: assert_start - TEST_PREFIX_LEN,
+				endIndex: assert_end - TEST_PREFIX_LEN,
+				scopes: scopes,
+			})
+
+			i++ // Next line
+		}
+
+		tokenized_lines.push({
+			line: src_line.slice(1),
+			tokens: tokens,
+		})
 	}
 
-	return result
+	return ok(tokenized_lines)
 }
 
-export function renderSnapshot(lines_with_tokens: LineWithTokens[]): string {
-	const snap: string[] = []
-
-	for (const { line, tokens } of lines_with_tokens) {
-		snap.push(SRC_LINE_PREFIX + line)
-		snap.push(...render_tokens(tokens))
-	}
-
-	return snap.join('\n')
-}
-
-function render_tokens(tokens: tm.IToken[]) {
-	const lines: string[] = []
-
-	for (const token of tokens) {
-		let line = TEST_LINE_PREFIX
-		line += ' '.repeat(token.startIndex)
-		line += '^'.repeat(token.endIndex - token.startIndex)
-		line += ` ${token.scopes.join(' ')}`
-
-		lines.push(line)
-	}
-
-	return lines
+function extract_scopes(line: string, scopes_idx: number): string[] {
+	return line
+		.slice(scopes_idx)
+		.split(' ')
+		.filter((scope) => scope.length > 0)
 }

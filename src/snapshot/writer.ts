@@ -1,0 +1,33 @@
+import type tm from 'vscode-textmate'
+import { SRC_PREFIX, TEST_PREFIX, type TokenizedLine } from './types.ts'
+/**
+ * Creates snapshot file content from tokenized lines.
+ */
+export function renderSnapshot(tokenized_line: TokenizedLine[]): string {
+	const snap: string[] = []
+
+	for (const { line, tokens } of tokenized_line) {
+		snap.push(SRC_PREFIX + line) // Write source line
+		snap.push(...render_tokens(tokens)) // For every token write a assertion line
+	}
+
+	return snap.join('\n')
+}
+
+/**
+ * Creates assertion lines for tokens.
+ */
+function render_tokens(tokens: tm.IToken[]) {
+	const lines: string[] = []
+
+	for (const token of tokens) {
+		let line = TEST_PREFIX
+		line += ' '.repeat(token.startIndex)
+		line += '^'.repeat(token.endIndex - token.startIndex)
+		line += ` ${token.scopes.join(' ')}`
+
+		lines.push(line)
+	}
+
+	return lines
+}
