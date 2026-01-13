@@ -1,14 +1,11 @@
 import tm from 'vscode-textmate'
-import { parseSnap, renderSnap } from './parsing.ts'
-import type { AnnotatedLine } from './types.ts'
-
-export { parseSnap, renderSnap }
+import type { TokenizedLine } from './types.ts'
 
 export async function getVSCodeTokens(
 	registry: tm.Registry,
 	scope: string,
 	source: string,
-): Promise<AnnotatedLine[]> {
+): Promise<TokenizedLine[]> {
 	return registry.loadGrammar(scope).then((grammar: tm.IGrammar | null) => {
 		if (!grammar) {
 			// biome-ignore lint: refactor still TODO
@@ -21,8 +18,8 @@ export async function getVSCodeTokens(
 			const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 			ruleStack = ruleStack1
 
-			return <AnnotatedLine>{
-				src: line,
+			return <TokenizedLine>{
+				line: line,
 				tokens: tokens,
 			}
 		})
