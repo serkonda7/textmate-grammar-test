@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import * as fs from 'node:fs'
+import fs from 'node:fs'
 import { EOL } from 'node:os'
-import * as path from 'node:path'
+import path from 'node:path'
 import { unwrap } from '@serkonda7/ts-result'
 import chalk from 'chalk'
 import { program } from 'commander'
@@ -10,8 +10,7 @@ import * as diff from 'diff'
 import { globSync } from 'glob'
 import pLimit from 'p-limit'
 import { ExitCode } from './common/cli'
-import { loadConfiguration } from './common/textmate/lang_config.ts'
-import { createRegistry } from './common/textmate/textmate.ts'
+import { createRegistry, loadConfiguration } from './common/textmate/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
 
 interface CliOptions {
@@ -138,7 +137,7 @@ function renderTestResult(
 		console.log(
 			chalk.red('ERROR running testcase ') +
 				chalk.whiteBright(filename) +
-				chalk.red(` snapshot and actual file contain different number of lines.${EOL}`),
+				chalk.red(` snapshot and actual file contain different number of lines.`),
 		)
 		return ExitCode.Failure
 	}
