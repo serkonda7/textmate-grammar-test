@@ -13,13 +13,9 @@ change is meaningful.
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/multiple.groups.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/misplaced.scopes.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/out.of.bounds.test.dhall
-node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/simple.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/successful.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/unexpected.scopes.test.dhall
 node ./dist/unit.js --grammar ./test/resources/dhall.tmLanguage.json  ./test/resources/misplaced.scopes.test.dhall
-
-node ./dist/snapshot.js  --scope source.dhall -g ./test/resources/dhall.tmLanguage.json  ./test/resources/snaps/simple.dhall
-
 ```
 
 ## Packaging:
