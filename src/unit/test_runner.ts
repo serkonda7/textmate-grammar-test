@@ -43,13 +43,13 @@ export class TestRunner {
 			prev_state = new_state
 
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
+				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
+
 				// Fail on assertion beyond eol
-				if (to > line_length) {
+				if (to > line_length && !is_root_scope_token(tokens, src_line.length)) {
 					failures.push(this.eol_failure(line_nr, src_line, line_length, to))
 					return
 				}
-
-				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
 
 				// Check each asserted token
 				asserted_tokens.forEach((token) => {
@@ -89,4 +89,19 @@ export class TestRunner {
 			end: to,
 		}
 	}
+}
+
+// Entire line is one token
+function is_root_scope_token(tokens: tm.IToken[], line_length: number): boolean {
+	if (tokens.length !== 1) {
+		return false
+	}
+
+	const tok = tokens[0]
+
+	if (tok.startIndex > 0 || tok.endIndex < line_length) {
+		return false
+	}
+
+	return tok.scopes.length === 1
 }
