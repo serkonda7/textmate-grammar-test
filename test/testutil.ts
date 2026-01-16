@@ -6,7 +6,7 @@ const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
 export const TESTLANG_GRAMMARS = [
 	{
 		scopeName: 'source.xy',
-		path: './test/resources/testlang.tmLanguage.json',
+		path: './test/data/testlang.tmLanguage.json',
 	},
 ]
 

@@ -1,16 +1,9 @@
 import { expect, test } from 'bun:test'
 import { unwrap } from '@serkonda7/ts-result'
 import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
-import { read_data } from '../testutil.ts'
+import { read_data, TESTLANG_GRAMMARS } from '../testutil.ts'
 
-const grammars = [
-	{
-		scopeName: 'source.xy',
-		path: './test/resources/testlang.tmLanguage.json',
-	},
-]
-
-const runner = new TestRunner(grammars, ScopeRegexMode.standard)
+const runner = new TestRunner(TESTLANG_GRAMMARS, ScopeRegexMode.standard)
 
 test('line end', async () => {
 	const res = unwrap(await runner.test_file(read_data('line_end.testlang')))
