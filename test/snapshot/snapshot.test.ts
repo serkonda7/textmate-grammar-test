@@ -1,16 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 import { createRegistry } from '../../src/common/textmate/index.ts'
 import { getVSCodeTokens, renderSnapshot } from '../../src/snapshot/index.ts'
-import { read_testdata } from '../testutil.ts'
+import { read_testdata, TESTLANG_GRAMMARS } from '../testutil.ts'
 
-const grammars = [
-	{
-		scopeName: 'source.xy',
-		path: './test/resources/testlang.tmLanguage.json',
-	},
-]
 const SCOPE = 'source.xy'
-const registry = createRegistry(grammars)
+const registry = createRegistry(TESTLANG_GRAMMARS)
 
 describe('test snapshot testing', () => {
 	test('report OK', async () => {
@@ -22,6 +16,4 @@ describe('test snapshot testing', () => {
 		const expected = read_testdata('snap/snap.testlang.snap')
 		expect(res).toEqual(expected)
 	})
-
-	// TODO add test for header (syntax test)
 })
