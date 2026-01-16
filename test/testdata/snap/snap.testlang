@@ -1,6 +1,4 @@
-if (true) {
-  var y = 4
-}
+var y = 4
 
 # Another normal comment
 
