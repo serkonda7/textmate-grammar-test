@@ -41,6 +41,6 @@ export function normalize(text: string): string {
 	)
 }
 
-export function read_testdata(file: string): string {
-	return fs.readFileSync(`./test/testdata/${file}`, 'utf-8')
+export function read_data(file: string): string {
+	return fs.readFileSync(`./test/data/${file}`, 'utf-8')
 }
