@@ -1,6 +1,6 @@
 # Changelog
 ## 0.3.3
-_unreleased_
+_2026-01-16_
 
 - unit: Fix incorrect EOL error for entire lines that only have the root scope
 - snap: Adjust `.snap` file format to pass unit tests
