@@ -5,3 +5,12 @@ var
 
 "foo"
 #  ^^^ string.xy
+
+#
+# Test edge cases with root scope and \n. These should pass!
+#
+
+# <- source.xy
+
+garbage
+# ^^^^^^ source.xy

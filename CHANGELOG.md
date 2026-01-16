@@ -2,6 +2,7 @@
 ## 0.3.3
 _unreleased_
 
+- unit: Fix incorrect EOL error for entire lines that only have the root scope
 - Dependency updates
 
 

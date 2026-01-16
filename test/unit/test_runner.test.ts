@@ -16,5 +16,6 @@ test('line end', async () => {
 	const res = unwrap(await runner.test_file(read_testdata('line_end.testlang')))
 
 	expect(res.failures).toHaveLength(2)
-	expect(res.failures[0].actual).toEqual(['EOL'])
+	expect(res.failures[0].line).toEqual(2)
+	expect(res.failures[1].line).toEqual(5)
 })
