@@ -3,6 +3,13 @@ import path from 'node:path'
 
 const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
 
+export const TESTLANG_GRAMMARS = [
+	{
+		scopeName: 'source.xy',
+		path: './test/resources/testlang.tmLanguage.json',
+	},
+]
+
 /**
  * Normalize various items in the unit tests, such as:
  *  - line endings

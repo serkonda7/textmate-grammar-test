@@ -12,6 +12,12 @@ export function parseSnap(text: string): Result<TokenizedLine[], Error> {
 	const lines = text.split(/\n|\r\n/)
 
 	let i = 0
+
+	// Skip header. This check is for migration from older versions
+	if (lines[0].startsWith('#')) {
+		i++
+	}
+
 	while (i < lines.length) {
 		const src_line = lines[i]
 		i++ // Point to first test line

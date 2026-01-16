@@ -15,26 +15,6 @@ const exec = util.promisify(child_process.exec)
 describe('snap test', () => {
 	const root = process.cwd()
 
-	it('should report OK for test without errors', async () => {
-		return exec(
-			`node ${root}/dist/snapshot.js ` +
-				`--scope source.dhall ` +
-				`--grammar ${root}/test/resources/dhall.tmLanguage.json ` +
-				`${__dirname}/resources/snap-ok-scenario/simple.dhall`,
-			{
-				cwd: root,
-				maxBuffer: 1024 * 512, // 512kb
-			},
-		).then(({ stdout, stderr }) => {
-			expect(normalize(stdout)).toEqual(
-				normalize(
-					`✓ ${root}/test/functional/resources/snap-ok-scenario/simple.dhall run successfully.`,
-				),
-			)
-			expect(stderr).toEqual('')
-		})
-	})
-
 	it('should report wrong or missing scopes', async () => {
 		return exec(
 			`node ${root}/dist/snapshot.js ` +

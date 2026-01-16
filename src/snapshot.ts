@@ -87,7 +87,8 @@ const testResults: Promise<number[]> = Promise.all(
 						console.log(
 							chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
 						)
-						fs.writeFileSync(filename + '.snap', renderSnapshot(tokens), 'utf8')
+						const text = renderSnapshot(tokens, scope)
+						fs.writeFileSync(filename + '.snap', text, 'utf8')
 						return ExitCode.Success
 					} else {
 						const expectedTokens = unwrap(parseSnap(fs.readFileSync(filename + '.snap').toString()))
@@ -97,7 +98,8 @@ const testResults: Promise<number[]> = Promise.all(
 					console.log(
 						chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
 					)
-					fs.writeFileSync(filename + '.snap', renderSnapshot(tokens))
+					const text = renderSnapshot(tokens, scope)
+					fs.writeFileSync(filename + '.snap', text)
 					return ExitCode.Success
 				}
 			})

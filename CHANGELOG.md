@@ -3,6 +3,7 @@
 _unreleased_
 
 - unit: Fix incorrect EOL error for entire lines that only have the root scope
+- snap: Adjust `.snap` file format to pass unit tests
 - Dependency updates
 
 
