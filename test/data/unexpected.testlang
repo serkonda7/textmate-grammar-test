@@ -1,0 +1,5 @@
+# SYNTAX TEST "source.xy"
+
+  var n = 4
+#    ^^^ ! source.xy
+#         ^ ! constant.int.xy
