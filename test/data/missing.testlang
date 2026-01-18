@@ -1,0 +1,4 @@
+# SYNTAX TEST "source.xy"
+
+  var s = "oh no where are they"
+# ^^^ source.xy string.xy variable.interpolation.xy

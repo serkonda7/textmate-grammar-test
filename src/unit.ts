@@ -22,42 +22,42 @@ function collectGrammarOpts(value: string, previous: string[]): string[] {
 	return previous.concat([value])
 }
 
-async function main(): Promise<ExitCode> {
-	program
-		.description('Run Textmate grammar test cases using vscode-textmate')
-		.option(
-			'-g, --grammar <grammar>',
-			"Path to a grammar file. Multiple options supported. 'scopeName' is taken from the grammar",
-			collectGrammarOpts,
-			[],
-		)
-		.option(
-			'--config <configuration.json>',
-			'Path to language configuration. Default: `package.json`',
-			'package.json',
-		)
-		.option(
-			'--scope-parser <mode>',
-			'Mode for parsing scopes in assertion lines. Options: standard, permissive',
-		)
-		.option(
-			'-c, --compact',
-			'Display output in the compact format, which is easier to use with VSCode problem matchers',
-		)
-		.option(
-			'--xunit-report <report.xml>',
-			'Path to directory where test reports in the XUnit format will be emitted in addition to console output',
-		)
-		.option(
-			'--xunit-format <generic|gitlab>',
-			'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI',
-		)
-		.argument(
-			'<testcases...>',
-			'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
-		)
-		.parse(process.argv)
+program
+	.description('Run Textmate grammar test cases using vscode-textmate')
+	.option(
+		'-g, --grammar <grammar>',
+		"Path to a grammar file. Multiple options supported. 'scopeName' is taken from the grammar",
+		collectGrammarOpts,
+		[],
+	)
+	.option(
+		'--config <configuration.json>',
+		'Path to language configuration. Default: `package.json`',
+		'package.json',
+	)
+	.option(
+		'--scope-parser <mode>',
+		'Mode for parsing scopes in assertion lines. Options: standard, permissive',
+	)
+	.option(
+		'-c, --compact',
+		'Display output in the compact format, which is easier to use with VSCode problem matchers',
+	)
+	.option(
+		'--xunit-report <report.xml>',
+		'Path to directory where test reports in the XUnit format will be emitted in addition to console output',
+	)
+	.option(
+		'--xunit-format <generic|gitlab>',
+		'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI',
+	)
+	.argument(
+		'<testcases...>',
+		'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
+	)
+	.parse(process.argv)
 
+async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 	const scope_re_mode = options.scopeParser || ScopeRegexMode.standard
 

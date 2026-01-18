@@ -8,7 +8,6 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
 import { globSync } from 'glob'
-import pLimit from 'p-limit'
 import { ExitCode, SYMBOLS } from './common/cli'
 import { createRegistry, loadConfiguration } from './common/textmate/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
@@ -45,81 +44,78 @@ program
 	)
 	.parse(process.argv)
 
-const options = program.opts<CliOptions>()
+async function main(): Promise<ExitCode> {
+	const options = program.opts<CliOptions>()
 
-const Padding = '  '
-const MAX_CONCURRENT_TESTS = 8
+	const rawTestCases = program.args.flatMap((x) => globSync(x))
 
-const rawTestCases = program.args.flatMap((x) => globSync(x))
+	const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 
-const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
+	// Early exit if no test cases found
+	if (testCases.length === 0) {
+		console.log(
+			chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'",
+		)
+		process.exit(ExitCode.Failure)
+	}
 
-// Early exit if no test cases found
-if (testCases.length === 0) {
-	console.log(
-		chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'",
+	const { grammars, extensionToScope } = loadConfiguration(
+		options.config,
+		options.scope,
+		options.grammar,
 	)
-	process.exit(ExitCode.Failure)
-}
 
-const { grammars, extensionToScope } = loadConfiguration(
-	options.config,
-	options.scope,
-	options.grammar,
-)
+	const registry = createRegistry(grammars)
 
-const limit = pLimit(MAX_CONCURRENT_TESTS)
+	const results: ExitCode[] = []
 
-const registry = createRegistry(grammars)
-const testResults: Promise<number[]> = Promise.all(
-	testCases.map((filename) => {
+	for (const filename of testCases) {
 		const src = fs.readFileSync(filename).toString()
 		const scope = extensionToScope(path.extname(filename))
 		if (scope === undefined) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
 			console.log('No scope is associated with the file.')
-			return ExitCode.Failure
+			results.push(ExitCode.Failure)
+			continue
 		}
-		return limit(() => getVSCodeTokens(registry, scope, src))
-			.then((tokens) => {
-				if (fs.existsSync(filename + '.snap')) {
-					if (options.updateSnapshot) {
-						console.log(
-							chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
-						)
-						const text = renderSnapshot(tokens, scope)
-						fs.writeFileSync(filename + '.snap', text, 'utf8')
-						return ExitCode.Success
-					} else {
-						const expectedTokens = unwrap(parseSnap(fs.readFileSync(filename + '.snap').toString()))
-						return renderTestResult(filename, expectedTokens, tokens)
-					}
-				} else {
-					console.log(
-						chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
-					)
-					const text = renderSnapshot(tokens, scope)
-					fs.writeFileSync(filename + '.snap', text)
-					return ExitCode.Success
-				}
-			})
-			.catch((error) => {
-				console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
-				console.log(error)
-				return ExitCode.Failure
-			})
-	}),
-)
 
-testResults.then((xs) => {
-	const result = xs.reduce((a, b) => a + b, 0)
-	process.exitCode = result
+		const tokens = await getVSCodeTokens(registry, scope, src)
+		if (fs.existsSync(filename + '.snap')) {
+			if (options.updateSnapshot) {
+				console.log(
+					chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
+				)
+				const text = renderSnapshot(tokens, scope)
+				fs.writeFileSync(filename + '.snap', text, 'utf8')
+				results.push(ExitCode.Success)
+			} else {
+				const expectedTokens = unwrap(parseSnap(fs.readFileSync(filename + '.snap').toString()))
+				results.push(renderTestResult(filename, expectedTokens, tokens, options))
+			}
+		} else {
+			console.log(
+				chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
+			)
+			const text = renderSnapshot(tokens, scope)
+			fs.writeFileSync(filename + '.snap', text)
+			results.push(ExitCode.Success)
+		}
+	}
+
+	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure
+}
+
+main().then((code) => {
+	process.exitCode = code
 })
+
+const Padding = '  '
 
 function renderTestResult(
 	filename: string,
 	expected: TokenizedLine[],
 	actual: TokenizedLine[],
+	options: CliOptions,
 ): number {
 	if (expected.length !== actual.length) {
 		console.log(
@@ -234,9 +230,9 @@ function renderTestResult(
 		console.log()
 
 		if (options.expandDiff) {
-			printDiffOnTwoLines(wrongLines)
+			printDiffOnTwoLines(wrongLines, options)
 		} else {
-			printDiffInline(wrongLines)
+			printDiffInline(wrongLines, options)
 		}
 
 		console.log()
@@ -247,7 +243,7 @@ function renderTestResult(
 	}
 }
 
-function printDiffInline(wrongLines: [TChanges[], string, number][]) {
+function printDiffInline(wrongLines: [TChanges[], string, number][], options: CliOptions) {
 	wrongLines.forEach(([changes, src, i]) => {
 		const lineNumberOffset = printSourceLine(src, i)
 		changes.forEach((tchanges) => {
@@ -265,7 +261,7 @@ function printDiffInline(wrongLines: [TChanges[], string, number][]) {
 	})
 }
 
-function printDiffOnTwoLines(wrongLines: [TChanges[], string, number][]) {
+function printDiffOnTwoLines(wrongLines: [TChanges[], string, number][], options: CliOptions) {
 	wrongLines.forEach(([changes, src, i]) => {
 		const lineNumberOffset = printSourceLine(src, i)
 		changes.forEach((tchanges) => {

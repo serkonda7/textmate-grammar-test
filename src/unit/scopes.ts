@@ -15,17 +15,22 @@ function get_unexpected_scopes(excluded: string[], actual: string[]): string[] {
 }
 
 function get_missing_scopes(required: string[], actual: string[]): string[] {
-	let required_idx = 0
+	if (required.length === 0) {
+		return []
+	}
 
+	let found = 0
+
+	// Only one iteration as the order is important!
 	for (const scope of actual) {
-		if (scope === required[required_idx]) {
-			required_idx++
+		if (scope === required[found]) {
+			found++
 
-			if (required_idx === required.length) {
+			if (found === required.length) {
 				return []
 			}
 		}
 	}
 
-	return required.slice(required_idx)
+	return required.slice(found)
 }

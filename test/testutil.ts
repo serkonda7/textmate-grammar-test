@@ -6,7 +6,7 @@ const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
 export const TESTLANG_GRAMMARS = [
 	{
 		scopeName: 'source.xy',
-		path: './test/resources/testlang.tmLanguage.json',
+		path: './test/data/testlang.tmLanguage.json',
 	},
 ]
 
@@ -41,6 +41,6 @@ export function normalize(text: string): string {
 	)
 }
 
-export function read_testdata(file: string): string {
-	return fs.readFileSync(`./test/testdata/${file}`, 'utf-8')
+export function read_data(file: string): string {
+	return fs.readFileSync(`./test/data/${file}`, 'utf-8')
 }

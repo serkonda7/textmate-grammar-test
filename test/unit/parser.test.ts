@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import fs from 'node:fs'
 import { unwrap } from '@serkonda7/ts-result'
 import { AssertionParser, parse_file, parseHeader, ScopeRegexMode } from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/types.ts'
+import { read_data } from '../testutil.ts'
 
 describe('parseHeader', () => {
 	test('one char comment token', () => {
@@ -30,7 +30,7 @@ describe('parseHeader', () => {
 })
 
 describe('parseTestFile', () => {
-	const input = fs.readFileSync('./test/resources/parser.testlang', 'utf-8')
+	const input = read_data('parser.testlang')
 
 	test('valid test file', () => {
 		const res = unwrap(parse_file(input))
