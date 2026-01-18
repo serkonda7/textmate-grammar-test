@@ -53,9 +53,7 @@ async function main(): Promise<ExitCode> {
 
 	// Early exit if no test cases found
 	if (testCases.length === 0) {
-		console.log(
-			chalk.red('ERROR') + " No testcases found. Got: '" + chalk.gray(program.args.join(',')) + "'",
-		)
+		console.log(chalk.red('ERROR') + " No testcases found. Got: '" + program.args.join(',') + "'")
 		process.exit(ExitCode.Failure)
 	}
 
