@@ -8,7 +8,6 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
 import { globSync } from 'glob'
-import pLimit from 'p-limit'
 import { ExitCode, SYMBOLS } from './common/cli'
 import { createRegistry, loadConfiguration } from './common/textmate/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
@@ -48,8 +47,6 @@ program
 async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 
-	const MAX_CONCURRENT_TESTS = 8
-
 	const rawTestCases = program.args.flatMap((x) => globSync(x))
 
 	const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
@@ -68,57 +65,44 @@ async function main(): Promise<ExitCode> {
 		options.grammar,
 	)
 
-	const limit = pLimit(MAX_CONCURRENT_TESTS)
-
 	const registry = createRegistry(grammars)
-	const testResults: Promise<ExitCode[]> = Promise.all(
-		testCases.map((filename) => {
-			const src = fs.readFileSync(filename).toString()
-			const scope = extensionToScope(path.extname(filename))
-			if (scope === undefined) {
-				console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
-				console.log('No scope is associated with the file.')
-				return ExitCode.Failure
+
+	const results: ExitCode[] = []
+
+	for (const filename of testCases) {
+		const src = fs.readFileSync(filename).toString()
+		const scope = extensionToScope(path.extname(filename))
+		if (scope === undefined) {
+			console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
+			console.log('No scope is associated with the file.')
+			results.push(ExitCode.Failure)
+			continue
+		}
+
+		const tokens = await getVSCodeTokens(registry, scope, src)
+		if (fs.existsSync(filename + '.snap')) {
+			if (options.updateSnapshot) {
+				console.log(
+					chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
+				)
+				const text = renderSnapshot(tokens, scope)
+				fs.writeFileSync(filename + '.snap', text, 'utf8')
+				results.push(ExitCode.Success)
+			} else {
+				const expectedTokens = unwrap(parseSnap(fs.readFileSync(filename + '.snap').toString()))
+				results.push(renderTestResult(filename, expectedTokens, tokens, options))
 			}
-			return limit(() => getVSCodeTokens(registry, scope, src))
-				.then((tokens) => {
-					if (fs.existsSync(filename + '.snap')) {
-						if (options.updateSnapshot) {
-							console.log(
-								chalk.yellowBright('Updating snapshot for ') +
-									chalk.whiteBright(filename + '.snap'),
-							)
-							const text = renderSnapshot(tokens, scope)
-							fs.writeFileSync(filename + '.snap', text, 'utf8')
-							return ExitCode.Success
-						} else {
-							const expectedTokens = unwrap(
-								parseSnap(fs.readFileSync(filename + '.snap').toString()),
-							)
-							return renderTestResult(filename, expectedTokens, tokens, options)
-						}
-					} else {
-						console.log(
-							chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
-						)
-						const text = renderSnapshot(tokens, scope)
-						fs.writeFileSync(filename + '.snap', text)
-						return ExitCode.Success
-					}
-				})
-				.catch((error) => {
-					console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
-					console.log(error)
-					return ExitCode.Failure
-				})
-		}),
-	)
+		} else {
+			console.log(
+				chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
+			)
+			const text = renderSnapshot(tokens, scope)
+			fs.writeFileSync(filename + '.snap', text)
+			results.push(ExitCode.Success)
+		}
+	}
 
-	const result = await testResults.then((xs) => {
-		return xs.reduce((a, b) => a + b, 0)
-	})
-
-	return result
+	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure
 }
 
 main().then((code) => {
