@@ -63,10 +63,10 @@ async function main(): Promise<ExitCode> {
 
 	const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
 
-	const rawTestCases = program.args.flatMap((x) => globSync(x))
+	const test_cases = program.args.flatMap((x) => globSync(x))
 
 	// Early exit if no test cases found
-	if (rawTestCases.length === 0) {
+	if (test_cases.length === 0) {
 		console.error(chalk.red('ERROR') + ' no test cases found')
 		return ExitCode.Failure
 	}
@@ -89,7 +89,7 @@ async function main(): Promise<ExitCode> {
 
 	const results: ExitCode[] = []
 
-	for (const filename of rawTestCases) {
+	for (const filename of test_cases) {
 		const result = await runSingleTest(filename)
 		results.push(result)
 	}

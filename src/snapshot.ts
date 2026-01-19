@@ -68,7 +68,7 @@ async function main(): Promise<ExitCode> {
 	const results: ExitCode[] = []
 
 	for (const filename of testCases) {
-		const src = fs.readFileSync(filename).toString()
+		const src = fs.readFileSync(filename, 'utf-8')
 		const scope = extensionToScope(path.extname(filename))
 		if (scope === undefined) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
@@ -84,10 +84,11 @@ async function main(): Promise<ExitCode> {
 					chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
 				)
 				const text = renderSnapshot(tokens, scope)
-				fs.writeFileSync(filename + '.snap', text, 'utf8')
+				fs.writeFileSync(filename + '.snap', text, 'utf-8')
 				results.push(ExitCode.Success)
 			} else {
-				const expectedTokens = unwrap(parseSnap(fs.readFileSync(filename + '.snap').toString()))
+				const snap_text = fs.readFileSync(filename + '.snap', 'utf-8')
+				const expectedTokens = unwrap(parseSnap(snap_text))
 				results.push(renderTestResult(filename, expectedTokens, tokens, options))
 			}
 		} else {
@@ -95,7 +96,7 @@ async function main(): Promise<ExitCode> {
 				chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
 			)
 			const text = renderSnapshot(tokens, scope)
-			fs.writeFileSync(filename + '.snap', text)
+			fs.writeFileSync(filename + '.snap', text, 'utf-8')
 			results.push(ExitCode.Success)
 		}
 	}
