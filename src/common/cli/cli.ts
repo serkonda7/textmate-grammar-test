@@ -15,3 +15,7 @@ if (process.platform === 'win32') {
 	SYMBOLS.ok = '\u221A'
 	SYMBOLS.err = '\u00D7'
 }
+
+export function array_opt(val: string, total: string[]): string[] {
+	return total.concat([val])
+}

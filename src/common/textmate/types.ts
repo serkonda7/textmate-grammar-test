@@ -1,4 +1,4 @@
-export interface IGrammarConfig {
+export interface Grammar {
 	path: string
 	language?: string
 	scopeName: string

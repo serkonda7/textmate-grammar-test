@@ -1,12 +1,8 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import type { IGrammarConfig } from './types.ts'
+import type { Grammar } from './types.ts'
 
-function paths_to_grammars(paths: string[]) {
-	return paths.map((path) => ({ path, scopeName: '' }))
-}
-
-function createLangScopeMap(grammars: IGrammarConfig[]): Map<string, string> {
+function createLangScopeMap(grammars: Grammar[]): Map<string, string> {
 	const map = new Map<string, string>()
 
 	for (const grammar of grammars) {
@@ -30,31 +26,38 @@ function createExtToLangMap(languages: any[]): Map<string, string> {
 	return map
 }
 
-export function loadConfiguration(
+export function read_package_json(
 	packageJsonPath: string,
-	scope: string | undefined,
-	extra_paths: string[],
+	default_scope: string | undefined,
+	extra_grammar_paths: string[],
 ): {
-	grammars: IGrammarConfig[]
+	grammars: Grammar[]
 	extensionToScope: (ext: string) => string | undefined
 } {
-	const grammars: IGrammarConfig[] = []
+	const grammars: Grammar[] = []
 
-	if (extra_paths.length > 0) {
-		const extra_grammars = paths_to_grammars(extra_paths)
+	// Add extra grammars provided via CLI options
+	if (extra_grammar_paths.length > 0) {
+		const extra_grammars = extra_grammar_paths.map((path) => {
+			return {
+				path,
+				scopeName: '',
+			}
+		})
 		grammars.push(...extra_grammars)
 	}
 
 	if (!fs.existsSync(packageJsonPath)) {
 		return {
 			grammars,
-			extensionToScope: () => scope || undefined,
+			extensionToScope: () => default_scope || undefined,
 		}
 	}
 
+	// Read and parse package.json
 	const json = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
-	const contrib_grammars: IGrammarConfig[] = json?.contributes?.grammars || []
-	const contrib_langs = json?.contributes?.languages || []
+	const contrib_grammars: Grammar[] = json.contributes?.grammars ?? []
+	const contrib_langs = json.contributes?.languages ?? []
 	const root_dir = path.dirname(packageJsonPath)
 
 	contrib_grammars.forEach((gr) => {
@@ -65,7 +68,8 @@ export function loadConfiguration(
 	// TODO consider directly creating extToScope Map
 	const langToScope = createLangScopeMap(grammars)
 	const extToLang = createExtToLangMap(contrib_langs)
-	const extensionToScope = (ext: string) => scope ?? langToScope.get(extToLang.get(ext) ?? '')
+	const extensionToScope = (ext: string) =>
+		default_scope ?? langToScope.get(extToLang.get(ext) ?? '')
 
 	return { grammars, extensionToScope }
 }

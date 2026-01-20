@@ -1,9 +1,9 @@
 import fs from 'node:fs'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
-import type { IGrammarConfig } from './types.ts'
+import type { Grammar } from './types.ts'
 
-export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
+export function createRegistry(gs: Grammar[]): tm.Registry {
 	const onig_lib = createOnigurumaLib()
 
 	const grammars = gs.map((grammar) => ({
@@ -15,7 +15,7 @@ export function createRegistry(gs: IGrammarConfig[]): tm.Registry {
 }
 
 function createRegistryFromGrammars(
-	grammars: Array<{ grammar: IGrammarConfig; content: string }>,
+	grammars: { grammar: Grammar; content: string }[],
 	onig_lib: Promise<tm.IOnigLib>,
 ): tm.Registry {
 	const grammar_map = new Map<string, tm.IRawGrammar>()

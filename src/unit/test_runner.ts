@@ -1,7 +1,7 @@
 import { err, ok, type Result } from '@serkonda7/ts-result'
 import tm from 'vscode-textmate'
 import { createRegistry } from '../common/textmate/textmate.ts'
-import type { IGrammarConfig } from '../common/textmate/types.ts'
+import type { Grammar } from '../common/textmate/types.ts'
 import { parse_file, type ScopeRegexMode } from './index.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
 import type { TestFailure, TestResult } from './types.ts'
@@ -10,7 +10,7 @@ export class TestRunner {
 	registry: tm.Registry
 
 	constructor(
-		grammars: IGrammarConfig[],
+		grammars: Grammar[],
 		private parse_mode: ScopeRegexMode,
 	) {
 		this.registry = createRegistry(grammars)

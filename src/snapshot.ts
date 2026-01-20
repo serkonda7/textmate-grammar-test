@@ -8,8 +8,8 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import * as diff from 'diff'
 import { globSync } from 'glob'
-import { ExitCode, SYMBOLS } from './common/cli'
-import { createRegistry, loadConfiguration } from './common/textmate/index.ts'
+import { array_opt, ExitCode, SYMBOLS } from './common/cli'
+import { createRegistry, read_package_json } from './common/textmate/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
 
 interface CliOptions {
@@ -33,8 +33,8 @@ program
 	.option('--expandDiff', 'produce each diff on two lines prefixed with "++" and "--"', false)
 	.option(
 		'-g, --grammar <grammar>',
-		"Path to a grammar file. Multiple options supported. 'scopeName' is taken from the grammar",
-		(x, xs: string[]) => xs.concat([x]),
+		'Path to a grammar file. Multiple options supported.',
+		array_opt,
 		[],
 	)
 	.option('-s, --scope <scope>', 'Explicitly specify scope of testcases, e.g. source.dhall')
@@ -48,16 +48,15 @@ async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 
 	const rawTestCases = program.args.flatMap((x) => globSync(x))
-
 	const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 
 	// Early exit if no test cases found
 	if (testCases.length === 0) {
-		console.log(chalk.red('ERROR') + " No testcases found. Got: '" + program.args.join(',') + "'")
-		process.exit(ExitCode.Failure)
+		console.error(chalk.red('ERROR') + ' no test cases found')
+		return ExitCode.Failure
 	}
 
-	const { grammars, extensionToScope } = loadConfiguration(
+	const { grammars, extensionToScope } = read_package_json(
 		options.config,
 		options.scope,
 		options.grammar,
@@ -71,7 +70,7 @@ async function main(): Promise<ExitCode> {
 		const src = fs.readFileSync(filename, 'utf-8')
 		const scope = extensionToScope(path.extname(filename))
 		if (scope === undefined) {
-			console.log(chalk.red('ERROR') + " can't run testcase: " + chalk.whiteBright(filename))
+			console.log(chalk.red('ERROR') + " can't run testcase: " + filename)
 			console.log('No scope is associated with the file.')
 			results.push(ExitCode.Failure)
 			continue
