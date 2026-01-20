@@ -66,7 +66,7 @@ function grammars_from_paths(paths: string[]): Grammar[] {
 	}))
 }
 
-function createRegistry(gs: Grammar[]): tm.Registry {
+export function createRegistry(gs: Grammar[]): tm.Registry {
 	const onig_lib = createOnigurumaLib()
 
 	const grammars = gs.map((grammar) => ({

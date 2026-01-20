@@ -1,0 +1,17 @@
+{
+  "contributes": {
+    "languages": [{
+      "id": "dhall",
+      "extensions": [
+        ".dhall"
+      ]
+    }],
+    "grammars": [
+      {
+        "language": "dhall",
+        "scopeName": "source.dhall",
+        "path": "./dhall.tmLanguage.json"
+      }
+    ]
+  }
+}

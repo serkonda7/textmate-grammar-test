@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
 import { unwrap } from '@serkonda7/ts-result'
 import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
-import { read_data, TESTLANG_GRAMMARS } from '../testutil.ts'
+import { REGISTRY, read_data } from '../testutil.ts'
 
-const runner = new TestRunner(TESTLANG_GRAMMARS, ScopeRegexMode.standard)
+const runner = new TestRunner(REGISTRY, ScopeRegexMode.standard)
 
 test('.snap files pass unit test', async () => {
 	const text = read_data('snap/snap.testlang.snap')

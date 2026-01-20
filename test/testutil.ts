@@ -1,14 +1,17 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { createRegistry } from '../src/common/textmate/index.ts'
 
 const root = path.resolve(process.cwd()).replace(/[/\\]+/g, '/') + '/'
 
-export const TESTLANG_GRAMMARS = [
+const TESTLANG_GRAMMARS = [
 	{
 		scopeName: 'source.xy',
+		language: 'testlang',
 		path: './test/data/testlang.tmLanguage.json',
 	},
 ]
+export const REGISTRY = createRegistry(TESTLANG_GRAMMARS)
 
 /**
  * Normalize various items in the unit tests, such as:
