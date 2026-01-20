@@ -4,7 +4,6 @@ import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { Grammar, Language } from './types.ts'
 
-// TODO fix tests
 export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI

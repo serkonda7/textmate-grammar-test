@@ -118,93 +118,57 @@ run with the option `--scope-parser permissive`.
 
 
 ## Snapshot tests
-<!-- TODO rewrite and cleanup -->
-Snapshot tests are like `functional tests` but you don't have to write outputs explicitly.
-All you have to do is to provide a source files, scopes of which you want to test. Then on
-the first run `textmate-grammar-snap` will generate a set of `.snap` files which are an
-instant snapshot of lines of the source files together with corresponding scopes.
+As alternative to manually writing test files, you can use `textmate-grammar-snap` to generate snapshots for the provied source files including tests for all scopes.
+The resulting  `.snap` files should be commited to version control alongside the test sources.
 
-Then if you change the grammar and run the test again, the program will output the changes between
-the `.snap` file and the real output.
-If you satisfied with the changes you can `commit` them by running
-```bash
-textmate-grammar-snap --updateSnapshot ....
+After making changes to a grammar, rerun the tool and review the diff.
+If the changes are expected, update the snapshots:
+```sh
+textmate-grammar-snap --updateSnapshot ...
 ```
-this will overwrite the existing `.snap` files with a new ones.
-After this you should commit them alongside with the source code test cases.
 
-You can read more about them at [snapshot testing](https://jestjs.io/docs/en/snapshot-testing)
-
-To run snapshot test:
-```bash
-textmate-grammar-snap 'tests/snap/**/*.scala'
-```
 
 ## Language configuration via package.json
-<!-- TODO rewrite and cleanup, possibly remove -->
-The configuration follows the format of vscode:
+Needed information about the grammars is read from the `package.json` contribution points `contributes.grammars` and `contributes.languages`.
 
-```json
-{
-  "contributes": {
-      "languages": [
-          {
-              "id": "scala",
-              "extensions": [
-                  ".scala",
-                  ".sbt",
-                  ".sc"
-              ]
-          }
-      ],
-      "grammars": [
-          {
-              "language": "scala",
-              "scopeName": "source.scala",
-              "path": "./syntaxes/Scala.tmLanguage.json"
-          }
-      ]
-  }
-}
-```
-The idea is that for the average language extension all necessary information for tests are already included in the `package.json`.
-It is optional, though. If the configuration is missing it is necessary to specify grammars and scopeName of testcases via command line options.
+If it's not in your project root, provide the path with the `--config` option.
 
-Right now only regular grammars and *Injection Grammars* via `injectTo` directive are supported.
+You can also pass the path to a custom json file imitating the structure.
 
 
 ## Setup VSCode unit test task
+<!-- TODO test and rework this section -->
 You can setup a vscode unit test task for convenience:
 
 ```json
-        {
-            "label": "Run tests",
-            "type": "shell",
-            "command": "textmate-grammar-test -c -g testcase/dhall.tmLanguage.json '**/*.dhall'",
-            "group": "test",
-            "presentation": {
-                "reveal": "always",
-                "panel":"new",
-            },
-            "problemMatcher": {
-                "owner": "textmate-grammar-test",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}",
-                ],
-                "pattern": [
-                    {
-                        "regexp": "^(ERROR)\\s([^:]+):(\\d+):(\\d+):(\\d+)\\s(.*)$",
-                        "severity": 1,
-                        "file": 2,
-                        "line": 3,
-                        "column": 4,
-                        "endColumn": 5,
-                        "message": 6,
-                    },
-                ],
-            },
-        },
+{
+  "label": "Run tests",
+  "type": "shell",
+  "command": "textmate-grammar-test -c -g testcase/dhall.tmLanguage.json '**/*.dhall'",
+  "group": "test",
+  "presentation": {
+    "reveal": "always",
+    "panel":"new",
+  },
+  "problemMatcher": {
+    "owner": "textmate-grammar-test",
+    "fileLocation": [
+      "relative",
+      "${workspaceFolder}",
+    ],
+    "pattern": [
+      {
+        "regexp": "^(ERROR)\\s([^:]+):(\\d+):(\\d+):(\\d+)\\s(.*)$",
+        "severity": 1,
+        "file": 2,
+        "line": 3,
+        "column": 4,
+        "endColumn": 5,
+        "message": 6,
+      },
+    ],
+  },
+},
 ```
 
 Notice the `-c` option that will output messages in a handy format for the problemMatcher.
