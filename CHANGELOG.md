@@ -1,4 +1,12 @@
 # Changelog
+## 0.4.0
+_unreleased_
+
+### Breaking Changes in 0.4.0
+- snapshot: Remove `--scope` option
+  - Scopes are now taken from package.json or the file specified with `--config`
+
+
 ## 0.3.3
 _2026-01-16_
 

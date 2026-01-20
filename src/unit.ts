@@ -4,9 +4,9 @@ import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
-import { ExitCode } from './common/cli'
+import { array_opt, ExitCode } from './common/cli'
 import { createReporter } from './common/reporter/index.ts'
-import { loadConfiguration } from './common/textmate/lang_config.ts'
+import { register_grammars } from './common/textmate/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 
 interface CliOptions {
@@ -18,16 +18,12 @@ interface CliOptions {
 	xunitFormat: 'generic' | 'gitlab'
 }
 
-function collectGrammarOpts(value: string, previous: string[]): string[] {
-	return previous.concat([value])
-}
-
 program
 	.description('Run Textmate grammar test cases using vscode-textmate')
 	.option(
 		'-g, --grammar <grammar>',
 		"Path to a grammar file. Multiple options supported. 'scopeName' is taken from the grammar",
-		collectGrammarOpts,
+		array_opt,
 		[],
 	)
 	.option(
@@ -61,8 +57,6 @@ async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 	const scope_re_mode = options.scopeParser || ScopeRegexMode.standard
 
-	const { grammars } = loadConfiguration(options.config, undefined, options.grammar)
-
 	const test_cases = program.args.flatMap((x) => globSync(x))
 
 	// Early exit if no test cases found
@@ -71,7 +65,8 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const runner = new TestRunner(grammars, scope_re_mode)
+	const { registry } = register_grammars(options.config, options.grammar)
+	const runner = new TestRunner(registry, scope_re_mode)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {

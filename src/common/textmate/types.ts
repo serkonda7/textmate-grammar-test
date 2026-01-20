@@ -1,8 +1,14 @@
-export interface IGrammarConfig {
+export interface Language {
+	id: string
+	extensions: string[]
+	aliases: string[]
+}
+
+export interface Grammar {
 	path: string
-	language?: string
 	scopeName: string
-	embeddedLanguages?: { [scopeName: string]: string }
-	tokenTypes?: { [selector: string]: string }
+	language: string
+	embeddedLanguages?: Record<string, string>
+	tokenTypes?: Record<string, string>
 	injectTo?: string[]
 }
