@@ -9,7 +9,7 @@ import { program } from 'commander'
 import * as diff from 'diff'
 import { globSync } from 'glob'
 import { array_opt, ExitCode, SYMBOLS } from './common/cli'
-import { createRegistry, read_package_json } from './common/textmate/index.ts'
+import { register_grammars } from './common/textmate/index.ts'
 import { getVSCodeTokens, parseSnap, renderSnapshot, type TokenizedLine } from './snapshot/index.ts'
 
 interface CliOptions {
@@ -18,7 +18,6 @@ interface CliOptions {
 	printNotModified: boolean
 	expandDiff: boolean
 	grammar: string[]
-	scope?: string
 }
 
 program
@@ -37,7 +36,6 @@ program
 		array_opt,
 		[],
 	)
-	.option('-s, --scope <scope>', 'Explicitly specify scope of testcases, e.g. source.dhall')
 	.argument(
 		'<testcases...>',
 		'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
@@ -56,19 +54,13 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const { grammars, extensionToScope } = read_package_json(
-		options.config,
-		options.scope,
-		options.grammar,
-	)
-
-	const registry = createRegistry(grammars)
+	const { registry, extToScope } = register_grammars(options.config, options.grammar)
 
 	const results: ExitCode[] = []
 
 	for (const filename of testCases) {
 		const src = fs.readFileSync(filename, 'utf-8')
-		const scope = extensionToScope(path.extname(filename))
+		const scope = extToScope(path.extname(filename))
 		if (scope === undefined) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + filename)
 			console.log('No scope is associated with the file.')

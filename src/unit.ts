@@ -6,7 +6,7 @@ import { program } from 'commander'
 import { globSync } from 'glob'
 import { array_opt, ExitCode } from './common/cli'
 import { createReporter } from './common/reporter/index.ts'
-import { read_package_json } from './common/textmate/lang_config.ts'
+import { register_grammars } from './common/textmate/index.ts'
 import { ScopeRegexMode, TestRunner } from './unit/index.ts'
 
 interface CliOptions {
@@ -57,8 +57,6 @@ async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 	const scope_re_mode = options.scopeParser || ScopeRegexMode.standard
 
-	const { grammars } = read_package_json(options.config, undefined, options.grammar)
-
 	const test_cases = program.args.flatMap((x) => globSync(x))
 
 	// Early exit if no test cases found
@@ -67,7 +65,8 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const runner = new TestRunner(grammars, scope_re_mode)
+	const { registry } = register_grammars(options.config, options.grammar)
+	const runner = new TestRunner(registry, scope_re_mode)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {
