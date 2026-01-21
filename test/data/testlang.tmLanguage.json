@@ -2,6 +2,9 @@
   "$schema": "https://www.schemastore.org/tmlanguage.json",
   "name": "Testlang",
   "scopeName": "source.xy",
+  "fileTypes": [
+    ".testlang"
+  ],
   "patterns": [
     { "include": "#comments" },
     { "include": "#keywords" },

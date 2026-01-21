@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { err, ok, type Result } from '@serkonda7/ts-result'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { Grammar, Language } from './types.ts'
@@ -7,10 +8,10 @@ import type { Grammar, Language } from './types.ts'
 export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI
-): {
+): Result<{
 	registry: tm.Registry
 	extToScope: (ext: string) => string
-} {
+}> {
 	const grammars: Grammar[] = grammars_from_paths(extra_grammar_paths)
 
 	const json = JSON.parse(fs.readFileSync(package_json_path, 'utf-8'))
@@ -26,6 +27,10 @@ export function register_grammars(
 
 	grammars.push(...contrib_grammars)
 
+	if (grammars.length === 0) {
+		return err(new Error('No grammars provided'))
+	}
+
 	// TODO further optimization as extToScope is only used in snapshot tests
 
 	// Map grammar languages to scopes
@@ -40,7 +45,7 @@ export function register_grammars(
 		const scope = lang_to_scope.get(lang.id)
 
 		if (!scope) {
-			// TODO return error
+			// TODO ? return error
 			continue
 		}
 
@@ -51,10 +56,10 @@ export function register_grammars(
 
 	const registry = createRegistry(grammars)
 
-	return {
+	return ok({
 		registry,
 		extToScope: (ext: string) => extension_to_scope.get(ext) || '',
-	}
+	})
 }
 
 function grammars_from_paths(paths: string[]): Grammar[] {
