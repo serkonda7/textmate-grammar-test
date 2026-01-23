@@ -47,7 +47,7 @@ export function register_grammars(
 		}
 
 		for (const ext of lang.extensions) {
-			extension_to_scope.set(ext, scope)
+			extension_to_scope.set(ext.toLowerCase(), scope)
 		}
 
 		if (!Array.isArray(lang.filenames)) {
@@ -63,7 +63,7 @@ export function register_grammars(
 
 	return {
 		registry,
-		filenameToScope: (filename: string) => filename_to_scope.get(filename.toLowerCase()) || extension_to_scope.get(path.extname(filename)) || '',
+		filenameToScope: (filename: string) => filename_to_scope.get(filename.toLowerCase()) || [...extension_to_scope].find(extensionScope => filename.toLowerCase().endsWith(extensionScope[0]))?.[1] || '',
 	}
 }
 
