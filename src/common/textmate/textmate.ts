@@ -9,7 +9,7 @@ export function register_grammars(
 	extra_grammar_paths: string[], // Optionally added via CLI
 ): {
 	registry: tm.Registry
-		filenameToScope: (filename: string) => string
+	filenameToScope: (filename: string) => string
 } {
 	const grammars: Grammar[] = grammars_from_paths(extra_grammar_paths)
 
@@ -51,11 +51,11 @@ export function register_grammars(
 		}
 
 		if (!Array.isArray(lang.filenames)) {
-			continue;
+			continue
 		}
 
 		for (const filename of lang.filenames) {
-			filename_to_scope.set(filename.toLowerCase(), scope);
+			filename_to_scope.set(filename.toLowerCase(), scope)
 		}
 	}
 
