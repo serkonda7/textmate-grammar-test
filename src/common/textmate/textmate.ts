@@ -9,7 +9,7 @@ export function register_grammars(
 	extra_grammar_paths: string[], // Optionally added via CLI
 ): {
 	registry: tm.Registry
-	extToScope: (ext: string) => string
+		filenameToScope: (filename: string) => string
 } {
 	const grammars: Grammar[] = grammars_from_paths(extra_grammar_paths)
 
@@ -36,6 +36,8 @@ export function register_grammars(
 
 	// Map file extensions to scopes
 	const extension_to_scope = new Map<string, string>()
+	// Map filenames to languages
+	const filename_to_scope = new Map<string, string>()
 	for (const lang of contrib_langs) {
 		const scope = lang_to_scope.get(lang.id)
 
@@ -47,13 +49,21 @@ export function register_grammars(
 		for (const ext of lang.extensions) {
 			extension_to_scope.set(ext, scope)
 		}
+
+		if (!Array.isArray(lang.filenames)) {
+			continue;
+		}
+
+		for (const filename of lang.filenames) {
+			filename_to_scope.set(filename.toLowerCase(), scope);
+		}
 	}
 
 	const registry = createRegistry(grammars)
 
 	return {
 		registry,
-		extToScope: (ext: string) => extension_to_scope.get(ext) || '',
+		filenameToScope: (filename: string) => filename_to_scope.get(filename.toLowerCase()) || extension_to_scope.get(path.extname(filename)) || '',
 	}
 }
 

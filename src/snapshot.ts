@@ -54,13 +54,13 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const { registry, extToScope } = register_grammars(options.config, options.grammar)
+	const { registry, filenameToScope } = register_grammars(options.config, options.grammar)
 
 	const results: ExitCode[] = []
 
 	for (const filename of testCases) {
 		const src = fs.readFileSync(filename, 'utf-8')
-		const scope = extToScope(path.extname(filename))
+		const scope = filenameToScope(path.basename(filename))
 		if (scope === undefined) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + filename)
 			console.log('No scope is associated with the file.')

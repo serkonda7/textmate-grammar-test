@@ -2,6 +2,7 @@ export interface Language {
 	id: string
 	extensions: string[]
 	aliases: string[]
+	filenames?: string[]
 }
 
 export interface Grammar {
