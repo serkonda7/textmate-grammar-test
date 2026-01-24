@@ -1,9 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { globSync } from 'glob'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { Grammar, Language } from './types.ts'
-import { globSync } from 'glob';
 
 export function register_grammars(
 	package_json_path: string,
@@ -60,7 +60,7 @@ export function register_grammars(
 
 function grammars_from_paths(paths: string[]): Grammar[] {
 	return paths
-		.map(path => globSync(path)).flat()
+		.flatMap((path) => globSync(path))
 		.map((path) => ({
 			path,
 			scopeName: '',
