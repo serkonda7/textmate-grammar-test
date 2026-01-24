@@ -1,0 +1,14 @@
+{
+  "[typescript]": {
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
+  "[json][jsonc][markdown]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  "typescript.format.semicolons": "remove",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.eol": "\n",
+}
