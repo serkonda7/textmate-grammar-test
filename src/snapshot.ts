@@ -18,7 +18,7 @@ interface CliOptions {
 	printNotModified: boolean
 	expandDiff: boolean
 	grammar: string[]
-	outdir: string;
+	outdir: string
 }
 
 program
@@ -37,7 +37,7 @@ program
 		array_opt,
 		[],
 	)
-	.option('-o, --outdir <outdir>', 'Specify output directory of testcases')
+	.option('-o, --outdir <outdir>', 'Specify output directory of testcases', '')
 	.argument(
 		'<testcases...>',
 		'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
@@ -71,7 +71,8 @@ async function main(): Promise<ExitCode> {
 		}
 
 		const tokens = await getVSCodeTokens(registry, scope, src)
-		const newFilename = `${options.outdir ? path.join(options.outdir, path.basename(filename)) : filename}`;
+		const newFilename =
+			options.outdir.length > 0 ? path.join(options.outdir, path.basename(filename)) : filename
 		if (fs.existsSync(newFilename + '.snap')) {
 			if (options.updateSnapshot) {
 				console.log(
