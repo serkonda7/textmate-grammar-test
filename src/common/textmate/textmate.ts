@@ -58,6 +58,7 @@ export function register_grammars(
 	}
 }
 
+// Create Grammar objects from file paths or glob patterns
 function grammars_from_paths(paths: string[]): Grammar[] {
 	return paths
 		.flatMap((path) => globSync(path))

@@ -60,38 +60,35 @@ async function main(): Promise<ExitCode> {
 
 	const results: ExitCode[] = []
 
-	for (const filename of testCases) {
-		const src = fs.readFileSync(filename, 'utf-8')
-		const scope = extToScope(path.extname(filename))
+	for (const test_file of testCases) {
+		const src = fs.readFileSync(test_file, 'utf-8')
+		const scope = extToScope(path.extname(test_file))
 		if (scope === undefined) {
-			console.log(chalk.red('ERROR') + " can't run testcase: " + filename)
+			console.log(chalk.red('ERROR') + " can't run testcase: " + test_file)
 			console.log('No scope is associated with the file.')
 			results.push(ExitCode.Failure)
 			continue
 		}
 
 		const tokens = await getVSCodeTokens(registry, scope, src)
-		const newFilename =
-			options.outdir.length > 0 ? path.join(options.outdir, path.basename(filename)) : filename
-		if (fs.existsSync(newFilename + '.snap')) {
+		const out_name =
+			options.outdir.length > 0 ? path.join(options.outdir, path.basename(test_file)) : test_file
+		const out_file = out_name + '.snap'
+		if (fs.existsSync(out_file)) {
 			if (options.updateSnapshot) {
-				console.log(
-					chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(newFilename + '.snap'),
-				)
+				console.log(chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(out_file))
 				const text = renderSnapshot(tokens, scope)
-				fs.writeFileSync(newFilename + '.snap', text, 'utf-8')
+				fs.writeFileSync(out_file, text, 'utf-8')
 				results.push(ExitCode.Success)
 			} else {
-				const snap_text = fs.readFileSync(newFilename + '.snap', 'utf-8')
+				const snap_text = fs.readFileSync(out_file, 'utf-8')
 				const expectedTokens = unwrap(parseSnap(snap_text))
-				results.push(renderTestResult(newFilename, expectedTokens, tokens, options))
+				results.push(renderTestResult(out_name, expectedTokens, tokens, options))
 			}
 		} else {
-			console.log(
-				chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(newFilename + '.snap'),
-			)
+			console.log(chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(out_file))
 			const text = renderSnapshot(tokens, scope)
-			fs.writeFileSync(newFilename + '.snap', text, 'utf-8')
+			fs.writeFileSync(out_file, text, 'utf-8')
 			results.push(ExitCode.Success)
 		}
 	}
