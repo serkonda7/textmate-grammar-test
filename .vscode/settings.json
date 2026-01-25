@@ -3,12 +3,12 @@
     "editor.insertSpaces": false,
     "editor.tabSize": 4
   },
-  "[json][jsonc][markdown]": {
+  "[typescript][json][jsonc][json-textmate][markdown]": {
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
     "editor.insertSpaces": true,
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
   },
   "typescript.format.semicolons": "remove",
-  "files.insertFinalNewline": true,
-  "files.trimTrailingWhitespace": true,
   "files.eol": "\n",
 }
