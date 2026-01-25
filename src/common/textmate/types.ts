@@ -1,8 +1,15 @@
+export type ExtensionManifest = Partial<{
+	contributes: Partial<{
+		grammars: Partial<Grammar>[]
+		languages: Partial<Language>[]
+	}>
+}>
+
 export interface Language {
 	id: string
 	extensions: string[]
 	aliases: string[]
-	filenames?: string[]
+	filenames: string[]
 }
 
 export interface Grammar {

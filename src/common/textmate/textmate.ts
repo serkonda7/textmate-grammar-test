@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
-import type { Grammar, Language } from './types.ts'
+import type { ExtensionManifest, Grammar } from './types.ts'
 
 export function register_grammars(
 	package_json_path: string,
@@ -13,20 +13,31 @@ export function register_grammars(
 } {
 	const grammars: Grammar[] = grammars_from_paths(extra_grammar_paths)
 
-	const json = JSON.parse(fs.readFileSync(package_json_path, 'utf-8'))
-	const contrib_grammars: Grammar[] = json.contributes?.grammars ?? []
-	const contrib_langs: Language[] = json.contributes?.languages ?? []
+	const json = JSON.parse(fs.readFileSync(package_json_path, 'utf-8')) as ExtensionManifest
+	const contrib_grammars = json.contributes?.grammars
+	const contrib_langs = json.contributes?.languages
 
 	// Set contributed grammar paths to absolute.
 	// Reason: package.json could not be in cwd
-	const root_dir = path.dirname(package_json_path)
-	contrib_grammars.forEach((gr) => {
-		gr.path = path.join(root_dir, gr.path)
-	})
+	if (Array.isArray(contrib_grammars)) {
+		const root_dir = path.dirname(package_json_path)
+		for (const contrib_grammar of contrib_grammars) {
+			if (typeof contrib_grammar.path === 'string') {
+				contrib_grammar.path = path.join(root_dir, contrib_grammar.path)
+			} else {
+				contrib_grammar.path = ''
+			}
+			if (typeof contrib_grammar.scopeName !== 'string') {
+				contrib_grammar.scopeName = ''
+			}
+			if (typeof contrib_grammar.language !== 'string') {
+				contrib_grammar.language = ''
+			}
+			grammars.push(contrib_grammar as Grammar)
+		}
+	}
 
-	grammars.push(...contrib_grammars)
-
-	// TODO further optimization as extToScope is only used in snapshot tests
+	// TODO: further optimization as filenameToScope is only used in snapshot tests
 
 	// Map grammar languages to scopes
 	const lang_to_scope = new Map<string, string>()
@@ -36,26 +47,31 @@ export function register_grammars(
 
 	// Map file extensions to scopes
 	const extension_to_scope = new Map<string, string>()
-	// Map filenames to languages
+	// Map filenames to scopes
 	const filename_to_scope = new Map<string, string>()
-	for (const lang of contrib_langs) {
-		const scope = lang_to_scope.get(lang.id)
+	if (Array.isArray(contrib_langs)) {
+		for (const lang of contrib_langs) {
+			if (typeof lang.id !== 'string') {
+				continue
+			}
+			const scope = lang_to_scope.get(lang.id)
 
-		if (!scope) {
-			// TODO return error
-			continue
-		}
+			if (!scope) {
+				// TODO: return warning
+				continue
+			}
 
-		for (const ext of lang.extensions) {
-			extension_to_scope.set(ext.toLowerCase(), scope)
-		}
+			if (Array.isArray(lang.extensions)) {
+				for (const ext of lang.extensions) {
+					extension_to_scope.set(ext.toLowerCase(), scope)
+				}
+			}
 
-		if (!Array.isArray(lang.filenames)) {
-			continue
-		}
-
-		for (const filename of lang.filenames) {
-			filename_to_scope.set(filename.toLowerCase(), scope)
+			if (Array.isArray(lang.filenames)) {
+				for (const filename of lang.filenames) {
+					filename_to_scope.set(filename.toLowerCase(), scope)
+				}
+			}
 		}
 	}
 
@@ -63,7 +79,12 @@ export function register_grammars(
 
 	return {
 		registry,
-		filenameToScope: (filename: string) => filename_to_scope.get(filename.toLowerCase()) || [...extension_to_scope].find(extensionScope => filename.toLowerCase().endsWith(extensionScope[0]))?.[1] || '',
+		filenameToScope: (filename: string) =>
+			filename_to_scope.get(filename.toLowerCase()) ||
+			[...extension_to_scope].find((extensionScope) =>
+				filename.toLowerCase().endsWith(extensionScope[0]),
+			)?.[1] ||
+			'',
 	}
 }
 
