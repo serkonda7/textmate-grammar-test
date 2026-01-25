@@ -18,6 +18,7 @@ interface CliOptions {
 	printNotModified: boolean
 	expandDiff: boolean
 	grammar: string[]
+	outdir: string
 }
 
 program
@@ -36,6 +37,7 @@ program
 		array_opt,
 		[],
 	)
+	.option('-o, --outdir <outdir>', 'Specify output directory of testcases', '')
 	.argument(
 		'<testcases...>',
 		'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
@@ -69,25 +71,27 @@ async function main(): Promise<ExitCode> {
 		}
 
 		const tokens = await getVSCodeTokens(registry, scope, src)
-		if (fs.existsSync(filename + '.snap')) {
+		const newFilename =
+			options.outdir.length > 0 ? path.join(options.outdir, path.basename(filename)) : filename
+		if (fs.existsSync(newFilename + '.snap')) {
 			if (options.updateSnapshot) {
 				console.log(
-					chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(filename + '.snap'),
+					chalk.yellowBright('Updating snapshot for ') + chalk.whiteBright(newFilename + '.snap'),
 				)
 				const text = renderSnapshot(tokens, scope)
-				fs.writeFileSync(filename + '.snap', text, 'utf-8')
+				fs.writeFileSync(newFilename + '.snap', text, 'utf-8')
 				results.push(ExitCode.Success)
 			} else {
-				const snap_text = fs.readFileSync(filename + '.snap', 'utf-8')
+				const snap_text = fs.readFileSync(newFilename + '.snap', 'utf-8')
 				const expectedTokens = unwrap(parseSnap(snap_text))
-				results.push(renderTestResult(filename, expectedTokens, tokens, options))
+				results.push(renderTestResult(newFilename, expectedTokens, tokens, options))
 			}
 		} else {
 			console.log(
-				chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(filename + '.snap'),
+				chalk.yellowBright('Generating snapshot ') + chalk.whiteBright(newFilename + '.snap'),
 			)
 			const text = renderSnapshot(tokens, scope)
-			fs.writeFileSync(filename + '.snap', text, 'utf-8')
+			fs.writeFileSync(newFilename + '.snap', text, 'utf-8')
 			results.push(ExitCode.Success)
 		}
 	}
