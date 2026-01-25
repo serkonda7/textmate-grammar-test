@@ -25,6 +25,7 @@ function render_tokens(tokens: tm.IToken[]) {
 		line += ' '.repeat(token.startIndex)
 		line += '^'.repeat(token.endIndex - token.startIndex)
 		line += ` ${token.scopes.join(' ')}`
+
 		lines.push(line)
 	}
 
