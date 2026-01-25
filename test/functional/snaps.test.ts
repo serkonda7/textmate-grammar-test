@@ -74,38 +74,4 @@ describe('snap test', () => {
 		})
 		fs.unlinkSync(`${__dirname}/resources/snap-update-snapshot/simple.dhall.snap`)
 	})
-
-	it('should gracefully parse whitespace scopes', async () => {
-		fs.copyFileSync(
-			`${__dirname}/resources/snap-whitespace-scopes/ref.dhall.snap`,
-			`${__dirname}/resources/snap-whitespace-scopes/whitespace.scopes.dhall.snap`
-		)
-		await exec(
-			`node ${root}/dist/snapshot.js ` +
-			`--config ${root}/test/resources/package.json ` +
-			`--updateSnapshot ` +
-			`${__dirname}/resources/snap-whitespace-scopes/whitespace.scopes.dhall`,
-			{
-				cwd: root,
-				maxBuffer: 1024 * 512, // 512kb
-			}
-		)
-
-		await exec(
-			`node ${root}/dist/snapshot.js ` +
-			`--config ${root}/test/resources/package.json ` +
-			`${__dirname}/resources/snap-whitespace-scopes/whitespace.scopes.dhall`,
-			{
-				cwd: root
-			}
-		).then(({ stdout, stderr }) => {
-			expect(normalize(stdout)).toEqual(
-				normalize(
-					`✓ ${root}/test/functional/resources/snap-whitespace-scopes/whitespace.scopes.dhall run successfully.\n`
-				),
-			)
-			expect(stderr).toEqual('')
-		})
-		fs.unlinkSync(`${__dirname}/resources/snap-whitespace-scopes/whitespace.scopes.dhall.snap`)
-	})
 })

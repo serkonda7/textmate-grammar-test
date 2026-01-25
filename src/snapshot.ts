@@ -176,7 +176,7 @@ function renderTestResult(
 				act.tokens.map((a) => {
 					const e = expTokenMap[`${a.startIndex}:${a.startIndex}`]
 					if (e !== undefined) {
-						const changes = diff.diffArrays(e.scopes, a.scopes.map(scope => scope.replaceAll(/\s+/g, '')).filter(scope => scope))
+						const changes = diff.diffArrays(e.scopes, a.scopes)
 						if (changes.length === 1 && !changes[0].added && !changes[0].removed) {
 							return []
 						}

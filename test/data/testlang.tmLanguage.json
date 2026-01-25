@@ -6,7 +6,8 @@
     { "include": "#comments" },
     { "include": "#keywords" },
     { "include": "#strings" },
-    { "include": "#numbers" }
+    { "include": "#numbers" },
+    { "include": "#whitespace-scopes" }
   ],
   "repository": {
     "comments": {
@@ -52,6 +53,10 @@
           "match": "\\b\\d+\\b"
         }
       ]
+    },
+    "whitespace-scopes": {
+      "match": "@scope-whitespace@",
+      "name": "  scope\t  \t whitespace\ns  "
     }
   }
 }

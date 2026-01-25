@@ -153,9 +153,9 @@ export class AssertionParser {
 		this.pos = 0
 
 		// Skip comment token and spaces around it
-		this.skip_spaces()
+		this.skip_whitespace()
 		this.pos += this.comment_offset
-		this.skip_spaces()
+		this.skip_whitespace()
 
 		const assert_range = this.parse_assertion_range()
 		if (assert_range.error) {
@@ -172,8 +172,8 @@ export class AssertionParser {
 		return ok({ from, to, scopes, excludes })
 	}
 
-	private skip_spaces(): void {
-		while (this.line[this.pos] === ' ') {
+	private skip_whitespace(): void {
+		while (this.line[this.pos].match(/^\s$/)) {
 			this.pos++
 		}
 	}

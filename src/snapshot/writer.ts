@@ -24,8 +24,7 @@ function render_tokens(tokens: tm.IToken[]) {
 		let line = TEST_PREFIX
 		line += ' '.repeat(token.startIndex)
 		line += '^'.repeat(token.endIndex - token.startIndex)
-		line += ` ${token.scopes.join(' ').replaceAll(/[\r\n\t]+/g, '')}`
-
+		line += ` ${token.scopes.join(' ')}`
 		lines.push(line)
 	}
 

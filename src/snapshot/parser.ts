@@ -62,7 +62,6 @@ export function parseSnap(text: string): Result<TokenizedLine[], Error> {
 function extract_scopes(line: string, scopes_idx: number): string[] {
 	return line
 		.slice(scopes_idx)
-		.replaceAll(/[\r\n\t]+/g, '')
 		.split(' ')
 		.filter((scope) => scope.length > 0)
 }
