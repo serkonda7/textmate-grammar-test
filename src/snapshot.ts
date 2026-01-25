@@ -32,7 +32,7 @@ program
 	.option('--expandDiff', 'produce each diff on two lines prefixed with "++" and "--"', false)
 	.option(
 		'-g, --grammar <grammar>',
-		'Path to a grammar file. Multiple options supported.',
+		'A glob pattern to grammar file(s). Multiple options supported.',
 		array_opt,
 		[],
 	)
