@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
 import { unwrap } from '@serkonda7/ts-result'
-import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
+import { TestRunner } from '../../src/unit/index.ts'
 import { REGISTRY, read_data } from '../testutil.ts'
 
-const runner = new TestRunner(REGISTRY, ScopeRegexMode.standard)
+const runner = new TestRunner(REGISTRY)
 
 test('OK on correct grammar test', async () => {
 	const res = unwrap(await runner.test_file(read_data('parser.testlang')))
