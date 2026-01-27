@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs'
 import { unwrap } from '@serkonda7/ts-result'
 import { createRegistry } from '../../src/common/textmate/index.ts'
-import { ScopeRegexMode, TestRunner } from '../../src/unit/index.ts'
+import { TestRunner } from '../../src/unit/index.ts'
 import type { TestFailure } from '../../src/unit/types.ts'
 
 const grammars = [
@@ -14,7 +14,7 @@ const grammars = [
 ]
 
 const registry = createRegistry(grammars)
-const runner = new TestRunner(registry, ScopeRegexMode.standard)
+const runner = new TestRunner(registry)
 
 function read_file(filename: string): string {
 	return fs.readFileSync(filename, 'utf-8')

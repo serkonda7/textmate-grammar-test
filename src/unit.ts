@@ -7,12 +7,11 @@ import { globSync } from 'glob'
 import { array_opt, ExitCode } from './common/cli'
 import { createReporter } from './common/reporter/index.ts'
 import { register_grammars } from './common/textmate/index.ts'
-import { ScopeRegexMode, TestRunner } from './unit/index.ts'
+import { TestRunner } from './unit/index.ts'
 
 interface CliOptions {
 	grammar: string[]
 	config: string
-	scopeParser: ScopeRegexMode
 	compact: boolean
 	xunitReport?: string
 	xunitFormat: 'generic' | 'gitlab'
@@ -30,10 +29,6 @@ program
 		'--config <configuration.json>',
 		'Path to language configuration. Default: `package.json`',
 		'package.json',
-	)
-	.option(
-		'--scope-parser <mode>',
-		'Mode for parsing scopes in assertion lines. Options: standard, permissive',
 	)
 	.option(
 		'-c, --compact',
@@ -55,7 +50,6 @@ program
 
 async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
-	const scope_re_mode = options.scopeParser || ScopeRegexMode.standard
 
 	const test_cases = program.args.flatMap((x) => globSync(x))
 
@@ -66,7 +60,7 @@ async function main(): Promise<ExitCode> {
 	}
 
 	const { registry } = register_grammars(options.config, options.grammar)
-	const runner = new TestRunner(registry, scope_re_mode)
+	const runner = new TestRunner(registry)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {

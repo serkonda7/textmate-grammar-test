@@ -1,18 +1,15 @@
 import { err, ok, type Result } from '@serkonda7/ts-result'
 import tm from 'vscode-textmate'
-import { parse_file, type ScopeRegexMode } from './index.ts'
+import { parse_file } from './index.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
 import type { TestFailure, TestResult } from './types.ts'
 
 export class TestRunner {
-	constructor(
-		private registry: tm.Registry,
-		private parse_mode: ScopeRegexMode,
-	) {}
+	constructor(private registry: tm.Registry) {}
 
 	async test_file(file_content: string): Promise<Result<TestResult>> {
 		// Parse file
-		const test_case_r = parse_file(file_content, this.parse_mode)
+		const test_case_r = parse_file(file_content)
 		if (test_case_r.error) {
 			return err(test_case_r.error)
 		}

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { unwrap } from '@serkonda7/ts-result'
-import { AssertionParser, parse_file, parseHeader, ScopeRegexMode } from '../../src/unit/index.ts'
+import { AssertionParser, parse_file, parseHeader } from '../../src/unit/index.ts'
 import type { GrammarTestFile } from '../../src/unit/types.ts'
 import { read_data } from '../testutil.ts'
 
@@ -57,7 +57,7 @@ describe('parseTestFile', () => {
 })
 
 describe('AssertionParser assert kinds', () => {
-	const assert_parser = new AssertionParser(1, ScopeRegexMode.standard)
+	const assert_parser = new AssertionParser(1)
 
 	test('single ^', () => {
 		expect(unwrap(assert_parser.parse_line('#^ source.xy'))).toStrictEqual({
@@ -104,12 +104,22 @@ describe('AssertionParser assert kinds', () => {
 })
 
 describe('AssertionParser scopes', () => {
-	const assert_parser = new AssertionParser(1, ScopeRegexMode.standard)
+	const assert_parser = new AssertionParser(1)
 
 	test('multiple scopes', () => {
 		const res = unwrap(assert_parser.parse_line('# ^ constant.int.xy'))
 		expect(res.scopes).toHaveLength(1)
 		expect(res.excludes).toHaveLength(0)
+	})
+
+	test('c++ scope', () => {
+		const res = unwrap(assert_parser.parse_line('# ^ source.c++'))
+		expect(res.scopes).toEqual(['source.c++'])
+	})
+
+	test('Scope name with symbols', () => {
+		const res = unwrap(assert_parser.parse_line('# ^ foo.$0.--.spam#25'))
+		expect(res.scopes).toEqual(['foo.$0.--.spam#25'])
 	})
 
 	test('exclusions', () => {
@@ -135,19 +145,5 @@ describe('AssertionParser scopes', () => {
 		expect(assert_parser.parse_line('# ^ ').error).toBeInstanceOf(SyntaxError)
 
 		expect(assert_parser.parse_line('# <-- ').error).toBeInstanceOf(SyntaxError)
-	})
-})
-
-describe('AssertionParser in permissive mode', () => {
-	const permissive_parser = new AssertionParser(1, ScopeRegexMode.permissive)
-
-	test('c++ scope', () => {
-		const res = unwrap(permissive_parser.parse_line('# ^ source.c++'))
-		expect(res.scopes).toEqual(['source.c++'])
-	})
-
-	test('Scope name with symbols', () => {
-		const res = unwrap(permissive_parser.parse_line('# ^ foo.$0.--.spam#25'))
-		expect(res.scopes).toEqual(['foo.$0.--.spam#25'])
 	})
 })

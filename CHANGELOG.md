@@ -3,12 +3,15 @@
 _unreleased_
 
 ### Breaking Changes in 0.4.0
-- snapshot: Remove `--scope` option
+- snap: Remove `--scope` option
   - Scopes are now taken from package.json or the file specified with `--config`
+- unit: Remove `--scope-parser permissive` but make it the default
+  - This project should just test the grammar and try not to judge the design
 
 ### Other changes
 - snap: Add glob support to `--grammar`, e.g. `--grammar syntaxes/*.yml`
 - snap: Add `--outdir <dir>` option to pass a specific output directory for .snap files
+- Handle whitespace type characters in scope names
 
 
 ## 0.3.3

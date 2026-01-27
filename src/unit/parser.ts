@@ -27,18 +27,7 @@ const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
 const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
 
-export enum ScopeRegexMode {
-	standard = 'standard',
-	permissive = 'permissive',
-}
-
-const REGEX_BY_MODE: Record<ScopeRegexMode, RegExp> = {
-	// Names are lowercase alphanumeric, `-` and separated by dots
-	[ScopeRegexMode.standard]: /[-\w]+(?:\.[-\w]+)*/g,
-
-	// Any non-whitespace except dot
-	[ScopeRegexMode.permissive]: /[^.\s]+(?:\.[^.\s]+)*/g,
-}
+const SCOPE_REGEX = /[^.\s]+(?:\.[^.\s]+)*/g
 
 // RegExp.escape polyfill for Node.js <= 24
 if (!RegExp.escape) {
@@ -70,10 +59,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	})
 }
 
-export function parse_file(
-	str: string,
-	mode: ScopeRegexMode = ScopeRegexMode.standard,
-): Result<GrammarTestFile, Error> {
+export function parse_file(str: string): Result<GrammarTestFile, Error> {
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
@@ -92,7 +78,7 @@ export function parse_file(
 		return line_assert_re.test(s)
 	}
 
-	const assert_parser = new AssertionParser(comment_token.length, mode)
+	const assert_parser = new AssertionParser(comment_token.length)
 
 	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
@@ -139,13 +125,11 @@ export function parse_file(
 
 export class AssertionParser {
 	private comment_offset: number
-	private scope_re: RegExp
 	private line: string = ''
 	private pos: number = 0
 
-	constructor(comment_length: number, mode: ScopeRegexMode) {
+	constructor(comment_length: number) {
 		this.comment_offset = comment_length
-		this.scope_re = REGEX_BY_MODE[mode]
 	}
 
 	parse_line(_line: string): Result<ScopeAssertion, SyntaxError> {
@@ -222,11 +206,11 @@ export class AssertionParser {
 		let excludes: string[] = []
 
 		if (scopes_part) {
-			scopes = [...scopes_part.matchAll(this.scope_re)].map((m) => m[0])
+			scopes = [...scopes_part.matchAll(SCOPE_REGEX)].map((m) => m[0])
 		}
 
 		if (excludes_part) {
-			excludes = [...excludes_part.matchAll(this.scope_re)].map((m) => m[0])
+			excludes = [...excludes_part.matchAll(SCOPE_REGEX)].map((m) => m[0])
 		}
 
 		return { scopes, excludes }
