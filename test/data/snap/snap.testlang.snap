@@ -20,3 +20,7 @@
 #                   ^ source.xy string.xy
 >
 #^ source.xy
+>@scope-whitespace@
+#^^^^^^^^^^^^^^^^^^ source.xy scope whitespaces
+>
+#^ source.xy

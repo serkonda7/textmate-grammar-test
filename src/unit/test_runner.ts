@@ -36,6 +36,18 @@ export class TestRunner {
 			const { tokens, ruleStack: new_state } = grammar.tokenizeLine(src_line, prev_state)
 			prev_state = new_state
 
+			for (const token of tokens) {
+				const scopes = token.scopes
+				for (let index = scopes.length - 1; index >= 0; index--) {
+					const scope = scopes[index].replaceAll(/\s+/g, '')
+					if (scope) {
+						scopes[index] = scope
+					} else {
+						scopes.splice(index, 1)
+					}
+				}
+			}
+
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
 				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
 

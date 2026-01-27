@@ -3,3 +3,5 @@ var y = 4
 # Another normal comment
 
 var s = "hi @{name}"
+
+@scope-whitespace@

@@ -18,6 +18,18 @@ export async function getVSCodeTokens(
 		const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
 		ruleStack = ruleStack1
 
+		for (const token of tokens) {
+			const scopes = token.scopes
+			for (let index = scopes.length - 1; index >= 0; index--) {
+				const scope = scopes[index].replaceAll(/\s+/g, '')
+				if (scope) {
+					scopes[index] = scope
+				} else {
+					scopes.splice(index, 1)
+				}
+			}
+		}
+
 		return <TokenizedLine>{
 			line: line,
 			tokens: tokens,

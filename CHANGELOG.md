@@ -6,6 +6,10 @@ _unreleased_
 - snapshot: Remove `--scope` option
   - Scopes are now taken from package.json or the file specified with `--config`
 
+### Other changes
+- snap: Add glob support to `--grammar`, e.g. `--grammar syntaxes/*.yml`
+- snap: Add `--outdir <dir>` option to pass a specific output directory for .snap files
+
 
 ## 0.3.3
 _2026-01-16_

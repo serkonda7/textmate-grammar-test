@@ -1,0 +1,4 @@
+# SYNTAX TEST "source.xy" "File with simple but complete test syntax"
+
+@scope-whitespace@
+# <------------------ source.xy scope whitespaces
