@@ -10,6 +10,11 @@ test('OK on correct grammar test', async () => {
 	expect(res.failures).toHaveLength(0)
 })
 
+test('OK on whitespace scopes', async () => {
+	const res = unwrap(await runner.test_file(read_data('whitespace_scope.testlang')))
+	expect(res.failures).toHaveLength(0)
+})
+
 test('report missing scopes', async () => {
 	const res = unwrap(await runner.test_file(read_data('missing.testlang')))
 	expect(res.failures[0].missing).toEqual(['string.xy', 'variable.interpolation.xy'])
