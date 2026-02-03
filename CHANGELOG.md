@@ -1,12 +1,12 @@
 # Changelog
 ## 0.4.0
-_unreleased_
+_2026-02-03_
 
 ### Breaking Changes in 0.4.0
 - snap: Remove `--scope` option
-  - Scopes are now taken from package.json or the file specified with `--config`
+  - Scopes are now taken from package.json or the grammar
 - unit: Remove `--scope-parser permissive` but make it the default
-  - This project should just test the grammar and try not to judge the design
+  - This project should just test the grammar and try not to influence the design
 
 ### Other changes
 - snap: Add glob support to `--grammar`, e.g. `--grammar syntaxes/*.yml`
