@@ -39,9 +39,9 @@ export function register_grammars(
 		}
 	}
 
-	// if (grammars.length === 0) {
-	// 	return err(new Error('no grammars found in package.json'))
-	// }
+	if (grammars.length === 0) {
+		return err(new Error('no grammars found in package.json'))
+	}
 
 	// TODO: further optimization as filenameToScope is only used in snapshot tests
 
