@@ -6,6 +6,9 @@ import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { ExtensionManifest, Grammar } from './types.ts'
 
+// Map file extensions to scopes
+const extension_to_scope = new Map<string, string>()
+
 export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI
@@ -51,8 +54,6 @@ export function register_grammars(
 		lang_to_scope.set(grammar.language, grammar.scopeName)
 	}
 
-	// Map file extensions to scopes
-	const extension_to_scope = new Map<string, string>()
 	// Map filenames to scopes
 	const filename_to_scope = new Map<string, string>()
 	if (Array.isArray(contrib_langs)) {
@@ -125,7 +126,19 @@ function createRegistryFromGrammars(
 
 	for (const { grammar, content } of grammars) {
 		const raw = tm.parseRawGrammar(content, grammar.path)
-		grammar_map.set(grammar.scopeName || raw.scopeName, raw)
+
+		if (grammar.scopeName.length === 0) {
+			grammar.scopeName = raw.scopeName
+		}
+
+		// Update extension-scope mapping
+		if (raw.fileTypes) {
+			for (const ext of raw.fileTypes) {
+				extension_to_scope.set(ext.toLowerCase(), grammar.scopeName)
+			}
+		}
+
+		grammar_map.set(grammar.scopeName, raw)
 
 		if (!grammar.injectTo) {
 			continue
