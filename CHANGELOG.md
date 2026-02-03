@@ -11,6 +11,7 @@ _unreleased_
 ### Other changes
 - snap: Add glob support to `--grammar`, e.g. `--grammar syntaxes/*.yml`
 - snap: Add `--outdir <dir>` option to pass a specific output directory for .snap files
+- Respect a grammar's `fileTypes` property to select scope name
 - Handle whitespace type characters in scope names
 
 
