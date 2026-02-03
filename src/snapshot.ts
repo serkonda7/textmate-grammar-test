@@ -56,7 +56,7 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const { registry, filenameToScope } = register_grammars(options.config, options.grammar)
+	const { registry, filenameToScope } = unwrap(register_grammars(options.config, options.grammar))
 
 	const results: ExitCode[] = []
 

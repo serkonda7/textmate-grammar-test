@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { err, ok, type Result } from '@serkonda7/ts-result'
 import { globSync } from 'glob'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
@@ -8,10 +9,10 @@ import type { ExtensionManifest, Grammar } from './types.ts'
 export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI
-): {
+): Result<{
 	registry: tm.Registry
 	filenameToScope: (filename: string) => string
-} {
+}> {
 	const grammars: Grammar[] = grammars_from_paths(extra_grammar_paths)
 
 	const json = JSON.parse(fs.readFileSync(package_json_path, 'utf-8')) as ExtensionManifest
@@ -37,6 +38,10 @@ export function register_grammars(
 			grammars.push(contrib_grammar as Grammar)
 		}
 	}
+
+	// if (grammars.length === 0) {
+	// 	return err(new Error('no grammars found in package.json'))
+	// }
 
 	// TODO: further optimization as filenameToScope is only used in snapshot tests
 
@@ -78,7 +83,7 @@ export function register_grammars(
 
 	const registry = createRegistry(grammars)
 
-	return {
+	return ok({
 		registry,
 		filenameToScope: (filename: string) =>
 			filename_to_scope.get(filename.toLowerCase()) ||
@@ -86,7 +91,7 @@ export function register_grammars(
 				filename.toLowerCase().endsWith(extensionScope[0]),
 			)?.[1] ||
 			'',
-	}
+	})
 }
 
 // Create Grammar objects from file paths or glob patterns

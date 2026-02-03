@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as fs from 'node:fs'
+import { unwrap } from '@serkonda7/ts-result'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
@@ -59,7 +60,7 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const { registry } = register_grammars(options.config, options.grammar)
+	const { registry } = unwrap(register_grammars(options.config, options.grammar))
 	const runner = new TestRunner(registry)
 	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
 
