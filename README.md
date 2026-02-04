@@ -23,8 +23,9 @@ Migration is straightforward and should only take a few minutes:
 - Replace occurrences of
   - `vscode-tmgrammar-test` -> `textmate-grammar-test`
   - `vscode-tmgrammar-snap` -> `textmate-grammar-snap`
-- Version `>= 0.3.0` includes a few minor breaking changes:
-  - See the [changelog](CHANGELOG.md#breaking-changes-in-030) for migration notes
+- Newer versions include a few minor breaking changes. For migration notes see:
+  - [0.3.0](CHANGELOG.md#breaking-changes-in-030)
+  - [0.4.0](CHANGELOG.md#breaking-changes-in-040)
 
 
 ## 🚀 Usage
@@ -105,16 +106,6 @@ let x = "a"
 x = "b"
 // <~~- keyword.operator.assignment.ts
 ```
-
-
-### Scope Parsing Modes
-By default, scopes may only contain:
-- lowercase alphanumeric characters
-- `-`
-- `.`
-
-If your grammar uses scopes with other characters (e.g. `source.c++`),
-run with the option `--scope-parser permissive`.
 
 
 ## Snapshot tests
