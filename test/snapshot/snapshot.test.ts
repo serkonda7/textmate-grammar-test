@@ -26,7 +26,7 @@ test('multiple grammars for same file extension', async () => {
 })
 
 async function json_grammars_test_helper(grammar: string, in_file: string) {
-	const reg = unwrap(register_grammars('package.json', [grammar]))
+	const reg = unwrap(register_grammars('test/data/json_jsonc/package.json', [grammar]))
 	const src = read_data(in_file)
 	const scope = reg.filenameToScope('.json')
 	const tokens = await getVSCodeTokens(reg.registry, scope, src)

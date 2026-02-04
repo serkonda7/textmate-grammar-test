@@ -16,7 +16,7 @@ export function register_grammars(
 	registry: tm.Registry
 	filenameToScope: (filename: string) => string
 }> {
-	const grammars: Grammar[] = grammars_from_paths(extra_grammar_paths)
+	const grammars: Grammar[] = []
 
 	const json = JSON.parse(fs.readFileSync(package_json_path, 'utf-8')) as ExtensionManifest
 	const contrib_grammars = json.contributes?.grammars
@@ -41,6 +41,9 @@ export function register_grammars(
 			grammars.push(contrib_grammar as Grammar)
 		}
 	}
+
+	// Push explicitly added grammars so they can override package.json ones
+	grammars.push(...grammars_from_paths(extra_grammar_paths))
 
 	if (grammars.length === 0) {
 		return err(new Error('no grammars found in package.json'))

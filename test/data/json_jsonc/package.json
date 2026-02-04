@@ -1,0 +1,26 @@
+{
+  "contributes": {
+    "languages": [
+      {
+        "id": "json",
+        "extensions": [".json"]
+      },
+      {
+        "id": "jsonc",
+        "extensions": [".json"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "json",
+        "scopeName": "source.json.embedded",
+        "path": "./json.tmLanguage.json"
+      },
+      {
+        "language": "jsonc",
+        "scopeName": "source.json.comments.embedded",
+        "path": "./jsonc.tmLanguage.json"
+      }
+    ]
+  }
+}
