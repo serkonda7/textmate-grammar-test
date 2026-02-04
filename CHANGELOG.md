@@ -1,4 +1,10 @@
 # Changelog
+## 0.4.1
+_2026-02-04_
+
+- Change grammar source priority: CLI > package.json
+
+
 ## 0.4.0
 _2026-02-03_
 
