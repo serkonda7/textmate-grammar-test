@@ -25,7 +25,6 @@ Migration is straightforward and should only take a few minutes:
   - `vscode-tmgrammar-snap` -> `textmate-grammar-snap`
 - Newer versions include a few minor breaking changes. For migration notes see:
   - [0.3.0](CHANGELOG.md#breaking-changes-in-030)
-  - [0.4.0](CHANGELOG.md#breaking-changes-in-040)
 
 
 ## 🚀 Usage
