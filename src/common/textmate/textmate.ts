@@ -95,6 +95,7 @@ export function register_grammars(
 			[...extension_to_scope].find((extensionScope) =>
 				filename.toLowerCase().endsWith(extensionScope[0]),
 			)?.[1] ||
+			force_scope ||
 			'',
 	})
 }
