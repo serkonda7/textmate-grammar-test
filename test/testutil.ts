@@ -11,7 +11,7 @@ const TESTLANG_GRAMMARS = [
 		path: './test/data/testlang.tmLanguage.json',
 	},
 ]
-export const REGISTRY = createRegistry(TESTLANG_GRAMMARS, false)
+export const REGISTRY = createRegistry(TESTLANG_GRAMMARS)
 
 /**
  * Normalize various items in the unit tests, such as:
