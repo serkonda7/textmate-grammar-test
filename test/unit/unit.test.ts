@@ -13,7 +13,7 @@ const grammars = [
 	},
 ]
 
-const registry = createRegistry(grammars)
+const registry = createRegistry(grammars, false)
 const runner = new TestRunner(registry)
 
 function read_file(filename: string): string {

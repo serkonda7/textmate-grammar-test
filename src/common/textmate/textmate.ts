@@ -12,6 +12,7 @@ const extension_to_scope = new Map<string, string>()
 export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI
+	force_scope: string | undefined = undefined,
 ): Result<{
 	registry: tm.Registry
 	filenameToScope: (filename: string) => string
@@ -64,7 +65,7 @@ export function register_grammars(
 			if (typeof lang.id !== 'string') {
 				continue
 			}
-			const scope = lang_to_scope.get(lang.id)
+			const scope = force_scope ?? lang_to_scope.get(lang.id)
 
 			if (!scope) {
 				// TODO: return warning
@@ -85,7 +86,7 @@ export function register_grammars(
 		}
 	}
 
-	const registry = createRegistry(grammars)
+	const registry = createRegistry(grammars, force_scope !== undefined)
 
 	return ok({
 		registry,
@@ -109,7 +110,7 @@ function grammars_from_paths(paths: string[]): Grammar[] {
 		}))
 }
 
-export function createRegistry(gs: Grammar[]): tm.Registry {
+export function createRegistry(gs: Grammar[], has_force_scope: boolean): tm.Registry {
 	const onig_lib = createOnigurumaLib()
 
 	const grammars = gs.map((grammar) => ({
@@ -117,12 +118,13 @@ export function createRegistry(gs: Grammar[]): tm.Registry {
 		content: fs.readFileSync(grammar.path, 'utf-8'),
 	}))
 
-	return createRegistryFromGrammars(grammars, onig_lib)
+	return createRegistryFromGrammars(grammars, onig_lib, has_force_scope)
 }
 
 function createRegistryFromGrammars(
 	grammars: { grammar: Grammar; content: string }[],
 	onig_lib: Promise<tm.IOnigLib>,
+	has_force_scope: boolean,
 ): tm.Registry {
 	const grammar_map = new Map<string, tm.IRawGrammar>()
 	const injection_map = new Map<string, string[]>()
@@ -135,7 +137,7 @@ function createRegistryFromGrammars(
 		}
 
 		// Update extension-scope mapping
-		if (raw.fileTypes) {
+		if (raw.fileTypes && !has_force_scope) {
 			for (const ext of raw.fileTypes) {
 				extension_to_scope.set(ext.toLowerCase(), grammar.scopeName)
 			}

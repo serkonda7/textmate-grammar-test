@@ -1,4 +1,10 @@
 # Changelog
+## 0.4.2
+_2026-02-05_
+
+- Readd `--scope` for rare use cases that cannot be worked around
+
+
 ## 0.4.1
 _2026-02-04_
 
@@ -9,8 +15,8 @@ _2026-02-04_
 _2026-02-03_
 
 ### Breaking Changes in 0.4.0
-- snap: Remove `--scope` option
-  - Scopes are now taken from package.json or the grammar
+- ~~snap: Remove `--scope` option~~ _Reverted in 0.4.2_
+  - ~~Scopes are now taken from package.json or the grammar~~
 - unit: Remove `--scope-parser permissive` but make it the default
   - This project should just test the grammar and try not to influence the design
 

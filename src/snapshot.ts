@@ -19,6 +19,7 @@ interface CliOptions {
 	expandDiff: boolean
 	grammar: string[]
 	outdir: string
+	scope?: string
 }
 
 program
@@ -38,6 +39,7 @@ program
 		[],
 	)
 	.option('-o, --outdir <outdir>', 'Specify output directory of testcases', '')
+	.option('-s, --scope <scope>', 'Explicitly specify scope of testcases, e.g. source.xy')
 	.argument(
 		'<testcases...>',
 		'A glob pattern(s) which specifies testcases to run, e.g. "./tests/**/test*.dhall". Quotes are important!',
@@ -56,7 +58,9 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const { registry, filenameToScope } = unwrap(register_grammars(options.config, options.grammar))
+	const { registry, filenameToScope } = unwrap(
+		register_grammars(options.config, options.grammar, options.scope),
+	)
 
 	const results: ExitCode[] = []
 
