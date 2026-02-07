@@ -1,6 +1,6 @@
 # Changelog
 ## 0.4.2
-_2026-02-05_
+_2026-02-07_
 
 - Readd `--scope` for rare use cases that cannot be worked around
 
