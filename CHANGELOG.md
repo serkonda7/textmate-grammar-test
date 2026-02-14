@@ -1,4 +1,12 @@
 # Changelog
+## 0.5.0
+_unreleased_
+
+### Breaking Changes in 0.5.0
+- unit: Remove `--xunit-report` and `--xunit-format`
+  - On GitHub no usage of this feature was observable
+
+
 ## 0.4.2
 _2026-02-07_
 

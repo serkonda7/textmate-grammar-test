@@ -6,7 +6,7 @@ import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
 import { array_opt, ExitCode } from './common/cli'
-import { createReporter } from './common/reporter/index.ts'
+import { createConsoleReporter } from './common/reporter/index.ts'
 import { register_grammars } from './common/textmate/index.ts'
 import { TestRunner } from './unit/index.ts'
 
@@ -14,8 +14,6 @@ interface CliOptions {
 	grammar: string[]
 	config: string
 	compact: boolean
-	xunitReport?: string
-	xunitFormat: 'generic' | 'gitlab'
 }
 
 program
@@ -34,14 +32,6 @@ program
 	.option(
 		'-c, --compact',
 		'Display output in the compact format, which is easier to use with VSCode problem matchers',
-	)
-	.option(
-		'--xunit-report <report.xml>',
-		'Path to directory where test reports in the XUnit format will be emitted in addition to console output',
-	)
-	.option(
-		'--xunit-format <generic|gitlab>',
-		'Format of XML reports generated when --xunit-report is used. `gitlab` format is suitable for viewing the results in GitLab CI/CD web GUI',
 	)
 	.argument(
 		'<testcases...>',
@@ -62,7 +52,7 @@ async function main(): Promise<ExitCode> {
 
 	const { registry } = unwrap(register_grammars(options.config, options.grammar))
 	const runner = new TestRunner(registry)
-	const reporter = createReporter(options.compact, options.xunitFormat, options.xunitReport)
+	const reporter = createConsoleReporter(options.compact)
 
 	async function runSingleTest(filename: string): Promise<ExitCode> {
 		const text = fs.readFileSync(filename, 'utf8')
