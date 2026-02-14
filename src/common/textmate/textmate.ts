@@ -11,7 +11,8 @@ const extension_to_scope = new Map<string, string>()
 
 export function register_grammars(
 	package_json_path: string,
-	extra_grammar_paths: string[], // Optionally added via CLI
+	extra_grammar_paths: string[], // Optionally added via CLI --grammar
+	force_scope?: string, // Optionally added via CLI --scope
 ): Result<{
 	registry: tm.Registry
 	filenameToScope: (filename: string) => string
@@ -90,6 +91,7 @@ export function register_grammars(
 	return ok({
 		registry,
 		filenameToScope: (filename: string) =>
+			force_scope ||
 			filename_to_scope.get(filename.toLowerCase()) ||
 			[...extension_to_scope].find((extensionScope) =>
 				filename.toLowerCase().endsWith(extensionScope[0]),

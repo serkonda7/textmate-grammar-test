@@ -16,6 +16,20 @@ test('report OK', async () => {
 	expect(res).toEqual(expected)
 })
 
+test('force use of specific scope', async () => {
+	const src = read_data('snap/scope_flag.any')
+	const reg = unwrap(
+		register_grammars('package.json', ['test/data/testlang.tmLanguage.json'], 'source.xy'),
+	)
+
+	const scope = reg.filenameToScope('.any')
+	const tokens = await getVSCodeTokens(reg.registry, scope, src)
+	const res = renderSnapshot(tokens, scope)
+
+	const expected = read_data('snap/scope_flag.any.snap')
+	expect(res).toEqual(expected)
+})
+
 test('multiple grammars for same file extension', async () => {
 	json_grammars_test_helper(
 		'test/data/json_jsonc/json.tmLanguage.json',
