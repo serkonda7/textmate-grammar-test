@@ -15,6 +15,11 @@ test('OK on whitespace scopes', async () => {
 	expect(res.failures).toHaveLength(0)
 })
 
+test('correct tab handling', async () => {
+	const res = unwrap(await runner.test_file(read_data('tab.testlang')))
+	expect(res.failures).toHaveLength(0)
+})
+
 test('report missing scopes', async () => {
 	const res = unwrap(await runner.test_file(read_data('missing.testlang')))
 	expect(res.failures[0].missing).toEqual(['string.xy', 'variable.interpolation.xy'])
