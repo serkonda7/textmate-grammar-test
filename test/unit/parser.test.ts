@@ -33,13 +33,13 @@ describe('parseTestFile', () => {
 	const input = read_data('parser.testlang')
 
 	test('valid test file', () => {
-		const res = unwrap(parse_file(input))
+		const res = unwrap(parse_file(input, 4))
 		check_result(res)
 	})
 
 	test('windows line endings', () => {
 		const ctrl_input = input.replace(/\r?\n/g, '\n')
-		const res = unwrap(parse_file(ctrl_input))
+		const res = unwrap(parse_file(ctrl_input, 4))
 		check_result(res)
 	})
 
@@ -57,7 +57,7 @@ describe('parseTestFile', () => {
 })
 
 describe('AssertionParser assert kinds', () => {
-	const assert_parser = new AssertionParser(1)
+	const assert_parser = new AssertionParser(1, 4)
 
 	test('single ^', () => {
 		expect(unwrap(assert_parser.parse_line('#^ source.xy'))).toStrictEqual({
@@ -104,7 +104,7 @@ describe('AssertionParser assert kinds', () => {
 })
 
 describe('AssertionParser scopes', () => {
-	const assert_parser = new AssertionParser(1)
+	const assert_parser = new AssertionParser(1, 4)
 
 	test('multiple scopes', () => {
 		const res = unwrap(assert_parser.parse_line('# ^ constant.int.xy'))

@@ -1,4 +1,4 @@
-const DEFAULT_TAB_SIZE = 4
+export const DEFAULT_TAB_SIZE = 4
 
 export function raw_index_to_visual_column(
 	line: string,
