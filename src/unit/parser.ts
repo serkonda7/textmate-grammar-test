@@ -1,4 +1,5 @@
 import { err, ok, type Result } from '@serkonda7/ts-result'
+import { raw_index_to_visual_column } from './columns.ts'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
@@ -59,7 +60,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	})
 }
 
-export function parse_file(str: string): Result<GrammarTestFile, Error> {
+export function parse_file(str: string, tab_size: number): Result<GrammarTestFile, Error> {
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
@@ -78,7 +79,7 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 		return line_assert_re.test(s)
 	}
 
-	const assert_parser = new AssertionParser(comment_token.length)
+	const assert_parser = new AssertionParser(comment_token.length, tab_size)
 
 	const lineAssertions: TestedLine[] = []
 	let scope_assertions: ScopeAssertion[] = []
@@ -127,9 +128,11 @@ export class AssertionParser {
 	private comment_offset: number
 	private line: string = ''
 	private pos: number = 0
+	private tab_size: number
 
-	constructor(comment_length: number) {
+	constructor(comment_length: number, tab_size: number) {
 		this.comment_offset = comment_length
+		this.tab_size = tab_size
 	}
 
 	parse_line(_line: string): Result<ScopeAssertion, SyntaxError> {
@@ -173,7 +176,10 @@ export class AssertionParser {
 				this.pos++
 			}
 
-			return ok({ from: start, to: this.pos })
+			return ok({
+				from: this.visual_column(start),
+				to: this.visual_column(this.pos),
+			})
 		}
 
 		if (c === '<') {
@@ -196,6 +202,10 @@ export class AssertionParser {
 		}
 
 		return err(new SyntaxError(ERR_ASSERT_PARSE))
+	}
+
+	private visual_column(raw_index: number): number {
+		return raw_index_to_visual_column(this.line, raw_index, this.tab_size)
 	}
 
 	private parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {

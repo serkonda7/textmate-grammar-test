@@ -6,6 +6,9 @@ _unreleased_
 - unit: Remove `--xunit-report` and `--xunit-format`
   - On GitHub no usage of this feature was observable
 
+### Other changes
+- unit: Handle tabs in test files based on CLI argument `--tabsize <n>` (default: 4)
+
 
 ## 0.4.2
 _2026-02-07_

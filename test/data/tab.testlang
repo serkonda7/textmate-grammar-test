@@ -1,0 +1,8 @@
+# SYNTAX TEST "source.xy" "Tabs for indentation"
+
+	var
+	# <~~~~--- keyword.control.xy
+
+		var
+	#   ^^^ keyword.control.xy
+#       ^^^ keyword.control.xy
