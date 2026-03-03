@@ -11,8 +11,6 @@ import { SnapshotRunner } from './snapshot/index.ts'
 interface CliOptions {
 	updateSnapshot: boolean
 	config: string
-	printNotModified: boolean
-	expandDiff: boolean
 	grammar: string[]
 	outdir: string
 	scope?: string
@@ -26,8 +24,6 @@ program
 		'Path to language configuration. Default: `package.json`',
 		'package.json',
 	)
-	.option('--printNotModified', 'include not modified scopes in the output', false)
-	.option('--expandDiff', 'produce each diff on two lines prefixed with "++" and "--"', false)
 	.option(
 		'-g, --grammar <grammar>',
 		'A glob pattern to grammar file(s). Multiple options supported.',
