@@ -17,6 +17,7 @@ const ERR_INVALID_HEADER_MSG =
 const ERR_EMPTY_TEST = 'Expected non-empty test'
 const ERR_ASSERT_NO_SCOPES = 'Assertion requires a scope'
 const ERR_ASSERT_PARSE = 'Cannot parse assertion'
+const ERR_TAB_INDENTATION = 'Tabs are not supported for indentation. Use spaces instead'
 
 //
 // Regex definitions
@@ -39,6 +40,14 @@ if (!RegExp.escape) {
 //
 
 type AssertPos = { from: number; to: number }
+
+function err_tab_indent(line: string, line_nr: number): Result<null, SyntaxError> {
+	if (line[0] === '\t') {
+		return err(new SyntaxError(`${ERR_TAB_INDENTATION} (line ${line_nr})`))
+	}
+
+	return ok(null)
+}
 
 /**
  * Parse header into metadata.
@@ -100,6 +109,11 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 
 		// Store previous line assertion
 		if (scope_assertions.length > 0) {
+			const tab_check = err_tab_indent(lines[src_line_nr], src_line_nr + 1)
+			if (tab_check.error) {
+				return err(tab_check.error)
+			}
+
 			lineAssertions.push(
 				new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 			)
@@ -112,6 +126,11 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 
 	// Handle remaining assertions at EOF
 	if (scope_assertions.length > 0) {
+		const tab_check = err_tab_indent(lines[src_line_nr], src_line_nr + 1)
+		if (tab_check.error) {
+			return err(tab_check.error)
+		}
+
 		lineAssertions.push(
 			new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 		)
