@@ -1,5 +1,6 @@
 import { err, ok, type Result } from '@serkonda7/ts-result'
 import type tm from 'vscode-textmate'
+import { err_tab_indent } from '../common/indent.ts'
 import { SRC_PREFIX, TEST_PREFIX, TEST_PREFIX_LEN, type TokenizedLine } from './types.ts'
 
 /**
@@ -25,6 +26,11 @@ export function parseSnap(text: string): Result<TokenizedLine[], Error> {
 		// This should never happen in valid snapshot files
 		if (!src_line.startsWith(SRC_PREFIX)) {
 			return err(new Error(`Expected source line starting with '${SRC_PREFIX}'`))
+		}
+
+		const check = err_tab_indent(src_line.slice(SRC_PREFIX.length), i)
+		if (check.error) {
+			return err(check.error)
 		}
 
 		// Get token tests for this source line
