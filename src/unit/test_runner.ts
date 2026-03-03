@@ -1,6 +1,7 @@
 import { err, ok, type Result } from '@serkonda7/ts-result'
 import tm from 'vscode-textmate'
 import { parse_file } from './index.ts'
+import { raw_index_to_visual_column, visual_column_to_raw_index } from './columns.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
 import type { TestFailure, TestResult } from './types.ts'
 
@@ -27,7 +28,7 @@ export class TestRunner {
 
 		for (const line of test_case.test_lines) {
 			const { line_nr, src: src_line, scope_asserts } = line
-			const line_length = src_line.length
+			const visual_line_length = raw_index_to_visual_column(src_line, src_line.length)
 
 			// Tokenize line
 			const { tokens, ruleStack: new_state } = grammar.tokenizeLine(src_line, prev_state)
@@ -46,11 +47,13 @@ export class TestRunner {
 			}
 
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
-				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
+				const from_raw = visual_column_to_raw_index(src_line, from)
+				const to_raw = visual_column_to_raw_index(src_line, to)
+				const asserted_tokens = find_overlapping_tokens(tokens, from_raw, to_raw)
 
 				// Fail on assertion beyond eol
-				if (to > line_length && !is_root_scope_token(tokens, src_line.length)) {
-					failures.push(this.eol_failure(line_nr, src_line, line_length, to))
+				if (to > visual_line_length && !is_root_scope_token(tokens, src_line.length)) {
+					failures.push(this.eol_failure(line_nr, src_line, visual_line_length, to))
 					return
 				}
 

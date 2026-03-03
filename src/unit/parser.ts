@@ -6,6 +6,7 @@ import {
 	type ScopeAssertion,
 	type TestedLine,
 } from './types.ts'
+import { raw_index_to_visual_column } from './columns.ts'
 
 //
 // String definitions
@@ -173,7 +174,10 @@ export class AssertionParser {
 				this.pos++
 			}
 
-			return ok({ from: start, to: this.pos })
+			return ok({
+				from: this.visual_column(start),
+				to: this.visual_column(this.pos),
+			})
 		}
 
 		if (c === '<') {
@@ -196,6 +200,10 @@ export class AssertionParser {
 		}
 
 		return err(new SyntaxError(ERR_ASSERT_PARSE))
+	}
+
+	private visual_column(raw_index: number): number {
+		return raw_index_to_visual_column(this.line, raw_index)
 	}
 
 	private parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {
