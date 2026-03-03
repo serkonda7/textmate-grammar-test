@@ -3,6 +3,8 @@
 _unreleased_
 
 ### Breaking Changes in 0.5.0
+- unit/snap: Throw error on tab indentation
+  - This wasn't working before and is now properly banned
 - unit: Remove `--xunit-report` and `--xunit-format`
   - On GitHub no usage of this feature was observable
 
