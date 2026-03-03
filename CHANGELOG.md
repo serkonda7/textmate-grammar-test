@@ -3,6 +3,8 @@
 _unreleased_
 
 ### Breaking Changes in 0.5.0
+- snapshot remove printing diff to terminal
+  - Use git or your editor to check the diff of updated .snap files
 - unit: Remove `--xunit-report` and `--xunit-format`
   - On GitHub no usage of this feature was observable
 
