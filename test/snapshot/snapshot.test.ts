@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import { unwrap } from '@serkonda7/ts-result'
 import { register_grammars } from '../../src/common/textmate/textmate.ts'
-import { getVSCodeTokens, parseSnap, renderSnapshot } from '../../src/snapshot/index.ts'
+import { getVSCodeTokens, renderSnapshot } from '../../src/snapshot/index.ts'
 import { REGISTRY, read_data } from '../testutil.ts'
 
 const SCOPE = 'source.xy'
@@ -28,13 +28,6 @@ test('force use of specific scope', async () => {
 
 	const expected = read_data('snap/scope_flag.any.snap')
 	expect(res).toEqual(expected)
-})
-
-test('error on tab', () => {
-	const snap = `\tvar`
-
-	const res = parseSnap(snap)
-	expect(res.error).toBeInstanceOf(Error)
 })
 
 test('multiple grammars for same file extension', async () => {

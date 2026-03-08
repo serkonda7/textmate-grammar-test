@@ -18,8 +18,6 @@ const ERR_EMPTY_TEST = 'Expected non-empty test'
 const ERR_ASSERT_NO_SCOPES = 'Assertion requires a scope'
 const ERR_ASSERT_PARSE = 'Cannot parse assertion'
 
-import { err_tab_indent } from '../common/indent.ts'
-
 //
 // Regex definitions
 //
@@ -102,11 +100,6 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 
 		// Store previous line assertion
 		if (scope_assertions.length > 0) {
-			const tab_check = err_tab_indent(lines[src_line_nr], src_line_nr + 1)
-			if (tab_check.error) {
-				return err(tab_check.error)
-			}
-
 			lineAssertions.push(
 				new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 			)
@@ -119,11 +112,6 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 
 	// Handle remaining assertions at EOF
 	if (scope_assertions.length > 0) {
-		const tab_check = err_tab_indent(lines[src_line_nr], src_line_nr + 1)
-		if (tab_check.error) {
-			return err(tab_check.error)
-		}
-
 		lineAssertions.push(
 			new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 		)

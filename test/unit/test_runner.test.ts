@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { unwrap } from '@serkonda7/ts-result'
-import { parse_file, TestRunner } from '../../src/unit/index.ts'
+import { TestRunner } from '../../src/unit/index.ts'
 import { REGISTRY, read_data } from '../testutil.ts'
 
 const runner = new TestRunner(REGISTRY)
@@ -32,10 +32,4 @@ test('line end', async () => {
 	expect(res.failures).toHaveLength(2)
 	expect(res.failures[0].line).toEqual(2)
 	expect(res.failures[1].line).toEqual(5)
-})
-
-test('error on tabs', () => {
-	const data = '# SYNTAX TEST "source.xy" "Tabs"\n\tvar\n# ^^^ source.xy\n'
-	const res = parse_file(data)
-	expect(res.error).toBeInstanceOf(SyntaxError)
 })
