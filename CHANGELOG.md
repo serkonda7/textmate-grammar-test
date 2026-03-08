@@ -1,6 +1,6 @@
 # Changelog
 ## 0.5.0
-_unreleased_
+_2026-03-08_
 
 ### Breaking Changes in 0.5.0
 - snapshot remove printing diff to terminal
