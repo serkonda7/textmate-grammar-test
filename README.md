@@ -29,6 +29,9 @@ Migration is straightforward and should only take a few minutes:
 
 
 ## 🚀 Usage
+> [!NOTE]
+> Spaces are recommended indentation for test files.
+
 This package provides the commands `textmate-grammar-test` and `textmate-grammar-snap`.
 
 Add a package.json script like:
@@ -45,10 +48,21 @@ npx textmate-grammar-test --help
 npx textmate-grammar-snap --help
 ```
 
+## 📸 Snapshot Testing
+Snapshot tests are a simple and fast way to test your grammar.
+
+1. Create small source files for your test cases
+1. Run `npx textmate-grammar-snap "tests/**/*.foo"`
+2. Review the generated `.snap` files
+3. Commit them to your version control
+
+After grammar changes, update snapshots and review the diffs:
+```sh
+npx textmate-grammar-snap --updateSnapshot "tests/**/*.foo"
+```
+
 
 ## 🧩 Unit Testing Syntax
-> Note: Spaces are recommended for indentation.
-
 <!-- TODO example -->
 <!-- TODO small collapsible glossar -->
 
@@ -110,15 +124,6 @@ x = "b"
 ```
 
 
-## Snapshot tests
-As alternative to manually writing test files, you can use `textmate-grammar-snap` to generate snapshots for the provied source files including tests for all scopes.
-The resulting  `.snap` files should be commited to version control alongside the test sources.
-
-After making changes to a grammar, rerun the tool and review the diff.
-If the changes are expected, update the snapshots:
-```sh
-textmate-grammar-snap --updateSnapshot ...
-```
 
 
 ## Language configuration via package.json
