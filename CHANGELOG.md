@@ -1,4 +1,10 @@
 # Changelog
+## 0.5.1
+_unreleased_
+
+- Performance improvments by refactoring internal state handling and lazy inits
+
+
 ## 0.5.0
 _2026-03-08_
 

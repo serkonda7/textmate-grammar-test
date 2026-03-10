@@ -33,18 +33,6 @@ export class TestRunner {
 			const { tokens, ruleStack: new_state } = grammar.tokenizeLine(src_line, prev_state)
 			prev_state = new_state
 
-			for (const token of tokens) {
-				const scopes = token.scopes
-				for (let index = scopes.length - 1; index >= 0; index--) {
-					const scope = scopes[index].replaceAll(/\s+/g, '')
-					if (scope) {
-						scopes[index] = scope
-					} else {
-						scopes.splice(index, 1)
-					}
-				}
-			}
-
 			scope_asserts.forEach(({ from, to, scopes: requiredScopes, excludes: excludedScopes }) => {
 				const asserted_tokens = find_overlapping_tokens(tokens, from, to)
 
@@ -56,14 +44,20 @@ export class TestRunner {
 
 				// Check each asserted token
 				asserted_tokens.forEach((token) => {
-					const unexpected = get_unexpected_scopes(excludedScopes, token.scopes)
-					const missing = get_missing_scopes(requiredScopes, token.scopes)
+					// Check each token matches the required and excluded scopes.
+					// Clean whitespace and filter empty
+					const actualScopes = token.scopes
+						.map((s) => s.replaceAll(/\s+/g, ''))
+						.filter((s) => s.length > 0)
+
+					const unexpected = get_unexpected_scopes(excludedScopes, actualScopes)
+					const missing = get_missing_scopes(requiredScopes, actualScopes)
 
 					// Add failure if any scopes are missing or unexpected
 					if (missing.length || unexpected.length) {
 						failures.push({
 							missing: missing,
-							actual: token.scopes,
+							actual: actualScopes,
 							unexpected: unexpected,
 							line: line_nr - 1,
 							srcLineText: src_line,

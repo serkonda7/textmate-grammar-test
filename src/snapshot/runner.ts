@@ -21,7 +21,9 @@ export class SnapshotRunner {
 		const scope = this.filenameToScope(path.basename(testFile))
 		if (scope.length === 0) {
 			console.log(chalk.red('ERROR') + " can't run testcase: " + testFile)
-			console.log('No scope is associated with the file.')
+			console.log(
+				'No scope is associated with the file. Specify with --scope, or add it to your package.json.',
+			)
 			return ExitCode.Failure
 		}
 

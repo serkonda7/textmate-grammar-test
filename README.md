@@ -63,7 +63,6 @@ npx textmate-grammar-snap --updateSnapshot "tests/**/*.foo"
 
 
 ## 🧩 Unit Testing Syntax
-<!-- TODO example -->
 <!-- TODO small collapsible glossar -->
 
 
