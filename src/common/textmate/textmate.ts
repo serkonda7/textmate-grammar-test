@@ -6,9 +6,6 @@ import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { ExtensionManifest, Grammar } from './types.ts'
 
-// Map file extensions to scopes
-const extension_to_scope = new Map<string, string>()
-
 export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI --grammar
@@ -50,53 +47,77 @@ export function register_grammars(
 		return err(new Error('no grammars found in package.json'))
 	}
 
-	// TODO: further optimization as filenameToScope is only used in snapshot tests
-
-	// Map grammar languages to scopes
-	const lang_to_scope = new Map<string, string>()
-	for (const grammar of grammars) {
-		lang_to_scope.set(grammar.language, grammar.scopeName)
-	}
-
-	// Map filenames to scopes
+	const extension_to_scope = new Map<string, string>()
 	const filename_to_scope = new Map<string, string>()
-	if (Array.isArray(contrib_langs)) {
-		for (const lang of contrib_langs) {
-			if (typeof lang.id !== 'string') {
-				continue
-			}
-			const scope = lang_to_scope.get(lang.id)
+	let initialized = false
 
-			if (!scope) {
-				// TODO: return warning
-				continue
+	// filename_to_scope is only required for snaphsot tests. Fill it only on use
+	const lazy_init = () => {
+		if (initialized) return
+		initialized = true
+
+		if (Array.isArray(contrib_langs)) {
+			// Map grammar languages to scopes
+			const lang_to_scope = new Map<string, string>()
+			for (const grammar of grammars) {
+				lang_to_scope.set(grammar.language, grammar.scopeName)
 			}
 
-			if (Array.isArray(lang.extensions)) {
-				for (const ext of lang.extensions) {
-					extension_to_scope.set(ext.toLowerCase(), scope)
+			for (const lang of contrib_langs) {
+				if (typeof lang.id !== 'string') {
+					continue
 				}
-			}
+				const scope = lang_to_scope.get(lang.id)
 
-			if (Array.isArray(lang.filenames)) {
-				for (const filename of lang.filenames) {
-					filename_to_scope.set(filename.toLowerCase(), scope)
+				if (!scope) {
+					// TODO: return warning
+					continue
+				}
+
+				if (Array.isArray(lang.extensions)) {
+					for (const ext of lang.extensions) {
+						const lowerExt = ext.toLowerCase()
+						if (!extension_to_scope.has(lowerExt)) {
+							extension_to_scope.set(lowerExt, scope)
+						}
+					}
+				}
+
+				if (Array.isArray(lang.filenames)) {
+					for (const filename of lang.filenames) {
+						const lowerFilename = filename.toLowerCase()
+						if (!filename_to_scope.has(lowerFilename)) {
+							filename_to_scope.set(lowerFilename, scope)
+						}
+					}
 				}
 			}
 		}
 	}
 
-	const registry = createRegistry(grammars)
+	const registry = createRegistry(grammars, extension_to_scope)
 
 	return ok({
 		registry,
-		filenameToScope: (filename: string) =>
-			force_scope ||
-			filename_to_scope.get(filename.toLowerCase()) ||
-			[...extension_to_scope].find((extensionScope) =>
-				filename.toLowerCase().endsWith(extensionScope[0]),
-			)?.[1] ||
-			'',
+		filenameToScope: (filename: string) => {
+			if (force_scope) {
+				return force_scope
+			}
+
+			lazy_init()
+			const lower_filename = filename.toLowerCase()
+
+			// Precedence:
+			// 1. Exact filename match (e.g., "package.json")
+			// 2. Extension match by checking if the filename ends with a registered extension (e.g., ".ts")
+			return (
+				filename_to_scope.get(lower_filename) ||
+				[...extension_to_scope].find((extensionScope) =>
+					lower_filename.endsWith(extensionScope[0]),
+				)?.[1] ||
+				''
+			)
+		},
 	})
 }
 
@@ -111,7 +132,10 @@ function grammars_from_paths(paths: string[]): Grammar[] {
 		}))
 }
 
-export function createRegistry(gs: Grammar[]): tm.Registry {
+export function createRegistry(
+	gs: Grammar[],
+	extension_to_scope: Map<string, string> = new Map(),
+): tm.Registry {
 	const onig_lib = createOnigurumaLib()
 
 	const grammars = gs.map((grammar) => ({
@@ -119,12 +143,13 @@ export function createRegistry(gs: Grammar[]): tm.Registry {
 		content: fs.readFileSync(grammar.path, 'utf-8'),
 	}))
 
-	return createRegistryFromGrammars(grammars, onig_lib)
+	return createRegistryFromGrammars(grammars, onig_lib, extension_to_scope)
 }
 
 function createRegistryFromGrammars(
 	grammars: { grammar: Grammar; content: string }[],
 	onig_lib: Promise<tm.IOnigLib>,
+	extension_to_scope: Map<string, string> = new Map(),
 ): tm.Registry {
 	const grammar_map = new Map<string, tm.IRawGrammar>()
 	const injection_map = new Map<string, string[]>()
