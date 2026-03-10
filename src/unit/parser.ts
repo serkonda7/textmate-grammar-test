@@ -193,9 +193,15 @@ export class AssertionParser {
 		return err(new SyntaxError(ERR_ASSERT_PARSE))
 	}
 
+	/**
+	 * Parse scopes and prohibited scopes (exclusions).
+	 * Format: scope.a scope.b ! prohibited.scope.c prohibited.scope.d
+	 */
 	private parse_scopes_and_exclusions(remaining: string): { scopes: string[]; excludes: string[] } {
 		const [scopes_part, excludes_part] = remaining.split(/\s+!\s+/, 2)
 
+		// Extract all scope names using the SCOPE_REGEX.
+		// matchAll returns an iterator of matches, which we spread into an array and map to the first capture group.
 		const scopes = scopes_part ? [...scopes_part.matchAll(SCOPE_REGEX)].map((m) => m[0]) : []
 		const excludes = excludes_part ? [...excludes_part.matchAll(SCOPE_REGEX)].map((m) => m[0]) : []
 

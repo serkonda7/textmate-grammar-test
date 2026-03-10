@@ -44,6 +44,8 @@ export class TestRunner {
 
 				// Check each asserted token
 				asserted_tokens.forEach((token) => {
+					// Check each token matches the required and excluded scopes.
+					// Clean whitespace and filter empty
 					const actualScopes = token.scopes
 						.map((s) => s.replaceAll(/\s+/g, ''))
 						.filter((s) => s.length > 0)

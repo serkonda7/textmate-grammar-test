@@ -18,6 +18,8 @@ export async function getVSCodeTokens(
 		const { tokens, ruleStack: nextRuleStack } = grammar.tokenizeLine(line, ruleStack)
 		ruleStack = nextRuleStack
 
+		// Clear whitespace and and filter empty scopes.
+		// We create new token objects to avoid mutating the read-only tokens from vscode-textmate.
 		const processedTokens = tokens.map((token) => ({
 			...token,
 			scopes: token.scopes.map((s) => s.replaceAll(/\s+/g, '')).filter((s) => s.length > 0),
