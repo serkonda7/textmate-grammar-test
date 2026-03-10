@@ -38,8 +38,6 @@ if (!RegExp.escape) {
 // Parser logic
 //
 
-type AssertPos = { from: number; to: number }
-
 /**
  * Parse header into metadata.
  *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
@@ -124,30 +122,23 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 }
 
 export class AssertionParser {
-	private comment_offset: number
-	private line: string = ''
-	private pos: number = 0
+	constructor(private readonly comment_length: number) {}
 
-	constructor(comment_length: number) {
-		this.comment_offset = comment_length
-	}
+	parse_line(line: string): Result<ScopeAssertion, SyntaxError> {
+		let pos = 0
 
-	parse_line(_line: string): Result<ScopeAssertion, SyntaxError> {
-		this.line = _line
-		this.pos = 0
+		// Skip comment token and whitespace around
+		pos = this.skip_whitespace(line, pos)
+		pos += this.comment_length
+		pos = this.skip_whitespace(line, pos)
 
-		// Skip comment token and spaces around it
-		this.skip_whitespace()
-		this.pos += this.comment_offset
-		this.skip_whitespace()
-
-		const assert_range = this.parse_assertion_range()
-		if (assert_range.error) {
-			return err(assert_range.error)
+		const rangeResult = this.parse_assertion_range(line, pos)
+		if (rangeResult.error) {
+			return err(rangeResult.error)
 		}
 
-		const { from, to } = assert_range.value
-		const { scopes, excludes } = this.parse_scopes_and_exclusions()
+		const { from, to, nextPos } = rangeResult.value
+		const { scopes, excludes } = this.parse_scopes_and_exclusions(line.slice(nextPos))
 
 		if (scopes.length === 0 && excludes.length === 0) {
 			return err(new SyntaxError(ERR_ASSERT_NO_SCOPES))
@@ -156,62 +147,57 @@ export class AssertionParser {
 		return ok({ from, to, scopes, excludes })
 	}
 
-	private skip_whitespace(): void {
-		while (this.line[this.pos].match(/^\s$/)) {
-			this.pos++
+	private skip_whitespace(line: string, pos: number): number {
+		while (pos < line.length && /\s/.test(line[pos])) {
+			pos++
 		}
+		return pos
 	}
 
-	private parse_assertion_range(): Result<AssertPos, SyntaxError> {
-		const start = this.pos
-
-		const c = this.line[this.pos]
-		this.pos++
+	private parse_assertion_range(
+		line: string,
+		pos: number,
+	): Result<{ from: number; to: number; nextPos: number }, SyntaxError> {
+		const start = pos
+		const c = line[pos]
 
 		if (c === '^') {
-			while (this.line[this.pos] === '^') {
-				this.pos++
+			let current = pos
+			while (line[current] === '^') {
+				current++
 			}
-
-			return ok({ from: start, to: this.pos })
+			return ok({ from: start, to: current, nextPos: current })
 		}
 
 		if (c === '<') {
+			let current = pos + 1
 			let nr_tildas = 0
-			while (this.line[this.pos] === '~') {
-				this.pos++
+			while (line[current] === '~') {
+				current++
 				nr_tildas++
 			}
 
 			let nr_dashes = 0
-			while (this.line[this.pos] === '-') {
-				this.pos++
+			while (line[current] === '-') {
+				current++
 				nr_dashes++
 			}
 
 			return ok({
 				from: nr_tildas,
 				to: nr_tildas + nr_dashes,
+				nextPos: current,
 			})
 		}
 
 		return err(new SyntaxError(ERR_ASSERT_PARSE))
 	}
 
-	private parse_scopes_and_exclusions(): { scopes: string[]; excludes: string[] } {
-		const remaining_line = this.line.slice(this.pos)
-		const [scopes_part, excludes_part] = remaining_line.split(/\s+!\s+/, 2)
+	private parse_scopes_and_exclusions(remaining: string): { scopes: string[]; excludes: string[] } {
+		const [scopes_part, excludes_part] = remaining.split(/\s+!\s+/, 2)
 
-		let scopes: string[] = []
-		let excludes: string[] = []
-
-		if (scopes_part) {
-			scopes = [...scopes_part.matchAll(SCOPE_REGEX)].map((m) => m[0])
-		}
-
-		if (excludes_part) {
-			excludes = [...excludes_part.matchAll(SCOPE_REGEX)].map((m) => m[0])
-		}
+		const scopes = scopes_part ? [...scopes_part.matchAll(SCOPE_REGEX)].map((m) => m[0]) : []
+		const excludes = excludes_part ? [...excludes_part.matchAll(SCOPE_REGEX)].map((m) => m[0]) : []
 
 		return { scopes, excludes }
 	}

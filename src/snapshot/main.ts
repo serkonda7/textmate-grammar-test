@@ -14,25 +14,20 @@ export async function getVSCodeTokens(
 
 	let ruleStack = tm.INITIAL
 
-	return source.split(/\n|\r\n/).map((line: string) => {
-		const { tokens, ruleStack: ruleStack1 } = grammar.tokenizeLine(line, ruleStack)
-		ruleStack = ruleStack1
+	const tokenizedLines = source.split(/\n|\r\n/).map((line: string) => {
+		const { tokens, ruleStack: nextRuleStack } = grammar.tokenizeLine(line, ruleStack)
+		ruleStack = nextRuleStack
 
-		for (const token of tokens) {
-			const scopes = token.scopes
-			for (let index = scopes.length - 1; index >= 0; index--) {
-				const scope = scopes[index].replaceAll(/\s+/g, '')
-				if (scope) {
-					scopes[index] = scope
-				} else {
-					scopes.splice(index, 1)
-				}
-			}
-		}
+		const processedTokens = tokens.map((token) => ({
+			...token,
+			scopes: token.scopes.map((s) => s.replaceAll(/\s+/g, '')).filter((s) => s.length > 0),
+		}))
 
 		return <TokenizedLine>{
 			line: line,
-			tokens: tokens,
+			tokens: processedTokens,
 		}
 	})
+
+	return tokenizedLines
 }
