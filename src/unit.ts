@@ -74,8 +74,6 @@ async function main(): Promise<ExitCode> {
 		results.push(result)
 	}
 
-	reporter.reportSuiteResult()
-
 	return results.every((x) => x === ExitCode.Success) ? ExitCode.Success : ExitCode.Failure
 }
 

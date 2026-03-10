@@ -8,7 +8,6 @@ export interface Reporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void
 	reportParseError(filename: string, error: any): void
 	reportGrammarTestError(filename: string, testCase: GrammarTestFile, reason: any): void
-	reportSuiteResult(): void
 }
 
 const Padding = '  '
@@ -32,10 +31,25 @@ function handleParseError(filename: string, error: any): void {
 	console.log(error)
 }
 
-class ConsoleCompactReporter implements Reporter {
+abstract class BaseConsoleReporter implements Reporter {
+	reportParseError = handleParseError
+	reportGrammarTestError = handleGrammarTestError
+
+	abstract reportTestResult(
+		filename: string,
+		testCase: GrammarTestFile,
+		failures: TestFailure[],
+	): void
+
+	protected reportSuccess(filename: string): void {
+		console.log(chalk.green(SYMBOLS.ok) + ' ' + chalk.whiteBright(filename) + ' run successfuly.')
+	}
+}
+
+class ConsoleCompactReporter extends BaseConsoleReporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void {
 		if (failures.length === 0) {
-			console.log(chalk.green(SYMBOLS.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
+			this.reportSuccess(filename)
 		} else {
 			failures.forEach((failure) => {
 				console.log(
@@ -58,18 +72,12 @@ class ConsoleCompactReporter implements Reporter {
 		}
 		return res
 	}
-
-	reportParseError = handleParseError
-
-	reportGrammarTestError = handleGrammarTestError
-
-	reportSuiteResult(): void {}
 }
 
-class ConsoleFullReporter implements Reporter {
+class ConsoleFullReporter extends BaseConsoleReporter {
 	reportTestResult(filename: string, testCase: GrammarTestFile, failures: TestFailure[]): void {
 		if (failures.length === 0) {
-			console.log(chalk.green(SYMBOLS.ok) + ' ' + chalk.whiteBright(filename) + ` run successfuly.`)
+			this.reportSuccess(filename)
 		} else {
 			console.log(chalk.red(SYMBOLS.err + ' ' + filename + ' failed'))
 			failures.forEach((failure) => {
@@ -82,12 +90,6 @@ class ConsoleFullReporter implements Reporter {
 			console.log('')
 		}
 	}
-
-	reportParseError = handleParseError
-
-	reportGrammarTestError = handleGrammarTestError
-
-	reportSuiteResult(): void {}
 }
 
 function printAssertionLocation(
@@ -127,11 +129,11 @@ function printSourceLine(
 
 	const trimLeft = failure.end > termWidth ? Math.max(0, failure.start - 8) : 0
 
-	const line1 = failure.srcLineText.substr(trimLeft)
-	const accents1 = accents.substr(trimLeft)
+	const line1 = failure.srcLineText.slice(trimLeft)
+	const accents1 = accents.slice(trimLeft)
 
-	sink(padding + colorizer.gray(pos) + line1.substr(0, termWidth))
-	sink(padding + ' '.repeat(pos.length) + accents1.substr(0, termWidth))
+	sink(padding + colorizer.gray(pos) + line1.slice(0, termWidth))
+	sink(padding + ' '.repeat(pos.length) + accents1.slice(0, termWidth))
 }
 
 function printReason(
