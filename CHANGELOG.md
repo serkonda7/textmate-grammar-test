@@ -1,4 +1,11 @@
 # Changelog
+## 0.6.0
+_2026-03-12_
+
+### Breaking Changes in 0.6.0
+- snap: add trailing newline to output
+
+
 ## 0.5.1
 _2026-03-10_
 
@@ -9,10 +16,11 @@ _2026-03-10_
 _2026-03-08_
 
 ### Breaking Changes in 0.5.0
-- snapshot remove printing diff to terminal
+- snapshot: remove printing diff to terminal
   - Use git or your editor to check the diff of updated .snap files
+  - In CI upload the snap files as artifact if needed
 - unit: Remove `--xunit-report` and `--xunit-format`
-  - On GitHub no usage of this feature was observable
+  - No usage of this feature was observable in public GitHub repos
 
 
 ## 0.4.2
@@ -46,8 +54,11 @@ _2026-02-03_
 ## 0.3.3
 _2026-01-16_
 
-- unit: Fix incorrect EOL error for entire lines that only have the root scope
+### Breaking Changes in 0.4.0
 - snap: Adjust `.snap` file format to pass unit tests
+
+### Other changes
+- unit: Fix incorrect EOL error for entire lines that only have the root scope
 - Dependency updates
 
 
