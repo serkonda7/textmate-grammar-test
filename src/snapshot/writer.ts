@@ -11,7 +11,7 @@ export function renderSnapshot(tokenized_line: TokenizedLine[], scope: string): 
 		snap.push(...render_tokens(tokens)) // For every token write a assertion line
 	}
 
-	return snap.join('\n')
+	return snap.join('\n') + '\n'
 }
 
 /**
