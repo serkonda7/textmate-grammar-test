@@ -23,6 +23,7 @@ Migration is straightforward and should only take a few minutes:
 - Replace occurrences of
   - `vscode-tmgrammar-test` -> `textmate-grammar-test`
   - `vscode-tmgrammar-snap` -> `textmate-grammar-snap`
+- Snapshot testing: run once with `--updateSnapshot` to apply minor .snap format changes
 - Newer versions include a few minor breaking changes. For migration notes see:
   - [0.3.0](CHANGELOG.md#breaking-changes-in-030)
   - [0.5.0](CHANGELOG.md#breaking-changes-in-050)
