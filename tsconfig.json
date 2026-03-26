@@ -1,6 +1,6 @@
 {
 "compilerOptions": {
-    "target": "es2022",
+    "target": "esnext",
     "module": "preserve",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
@@ -8,6 +8,10 @@
     "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
+    "types": [
+      "bun",
+      "node"
+    ]
   },
   "include": [
     "src/**/*",
