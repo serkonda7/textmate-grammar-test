@@ -11,9 +11,11 @@ import {
 // String definitions
 //
 
+const HEADER_VERSION = 'v1'
 const ERR_INVALID_HEADER = 'Invalid header'
 const ERR_INVALID_HEADER_MSG =
-	'Expected format: <comment token> SYNTAX TEST v1 "<scopeName>" "description"'
+	`Expected format: <comment token> SYNTAX TEST ${HEADER_VERSION} "<scopeName>" "description"`
+const WARN_HEADER_NO_VERSION = `"SYNTAX TEST ${HEADER_VERSION}" is missing the version`
 const ERR_EMPTY_TEST = 'Expected non-empty test'
 const ERR_ASSERT_NO_SCOPES = 'Assertion requires a scope'
 const ERR_ASSERT_PARSE = 'Cannot parse assertion'
@@ -43,7 +45,7 @@ if (!RegExp.escape) {
 
 /**
  * Parse header into metadata.
- *   Header format: <comment token> SYNTAX TEST "<scopeName>" "description"
+ *   Header format: <comment token> SYNTAX TEST v1 "<scopeName>" "description"
  */
 export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	const match = HEADER_REGEX.exec(line)
@@ -55,7 +57,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 
 	// Warn if no explicit version present
 	if (!match.groups.version) {
-		console.warn('SYNTAX TEST header missing version "v1"')
+		console.warn(WARN_HEADER_NO_VERSION)
 	}
 
 	return ok({
