@@ -13,7 +13,7 @@ import {
 
 const ERR_INVALID_HEADER = 'Invalid header'
 const ERR_INVALID_HEADER_MSG =
-	'Expected format: <comment token> SYNTAX TEST "<scopeName>" "description"'
+	'Expected format: <comment token> SYNTAX TEST v1 "<scopeName>" "description"'
 const ERR_EMPTY_TEST = 'Expected non-empty test'
 const ERR_ASSERT_NO_SCOPES = 'Assertion requires a scope'
 const ERR_ASSERT_PARSE = 'Cannot parse assertion'
@@ -25,7 +25,10 @@ const ERR_ASSERT_PARSE = 'Cannot parse assertion'
 const R_COMMENT = '(?<comment>\\S+)' // non-whitespace characters
 const R_SCOPE = '"(?<scope>[^"]+)"' // quoted string
 const R_DESC = '(?:\\s+"(?<desc>[^"]+)")?' // optional: space and quoted string
-const HEADER_REGEX = new RegExp(`^${R_COMMENT}\\s+SYNTAX\\s+TEST\\s+${R_SCOPE}${R_DESC}\\s*$`)
+const R_VERSION = '(?:\\s+v(?<version>\\d+))?' // optional: space and v<digits>
+const HEADER_REGEX = new RegExp(
+	`^${R_COMMENT}\\s+SYNTAX\\s+TEST${R_VERSION}\\s+${R_SCOPE}${R_DESC}\\s*$`,
+)
 
 const SCOPE_REGEX = /[^.\s]+(?:\.[^.\s]+)*/g
 
@@ -48,6 +51,11 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 	// No header matched
 	if (!match?.groups) {
 		return err(new SyntaxError(ERR_INVALID_HEADER, { cause: ERR_INVALID_HEADER_MSG }))
+	}
+
+	// Warn if no explicit version present
+	if (!match.groups.version) {
+		console.warn('SYNTAX TEST header missing version "v1"')
 	}
 
 	return ok({
