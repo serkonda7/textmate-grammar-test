@@ -1,4 +1,4 @@
--- SYNTAX TEST "source.dhall"
+-- SYNTAX TEST v1 "source.dhall"
 -- simple test
 
 

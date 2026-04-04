@@ -1,4 +1,4 @@
--- SYNTAX TEST "source.dhall"
+-- SYNTAX TEST v1 "source.dhall"
 -- simple test
 
 
@@ -20,7 +20,3 @@ in  { home       = "/home/${user}"
 --                          ^^^^   meta.label.dhall
 }
 -- <- keyword.operator.record.end.dhall
-
-
-
-
