@@ -13,8 +13,7 @@ import {
 
 const HEADER_VERSION = 'v1'
 const ERR_INVALID_HEADER = 'Invalid header'
-const ERR_INVALID_HEADER_MSG =
-	`Expected format: <comment token> SYNTAX TEST ${HEADER_VERSION} "<scopeName>" "description"`
+const ERR_INVALID_HEADER_MSG = `Expected format: <comment token> SYNTAX TEST ${HEADER_VERSION} "<scopeName>" "description"`
 const WARN_HEADER_NO_VERSION = `"SYNTAX TEST ${HEADER_VERSION}" is missing the version`
 const ERR_EMPTY_TEST = 'Expected non-empty test'
 const ERR_ASSERT_NO_SCOPES = 'Assertion requires a scope'
