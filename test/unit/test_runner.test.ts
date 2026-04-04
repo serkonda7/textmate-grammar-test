@@ -33,3 +33,18 @@ test('line end', async () => {
 	expect(res.failures[0].line).toEqual(2)
 	expect(res.failures[1].line).toEqual(5)
 })
+
+test('scopes in wrong order', async () => {
+	const res = unwrap(await runner.test_file(read_data('order_wrong.testlang')))
+
+	expect(res.failures).toHaveLength(1)
+	expect(res.failures[0]).toEqual({
+		missing: ['source.xy'],
+		actual: ['source.xy', 'constant.int.xy'],
+		unexpected: [],
+		line: 2,
+		srcLineText: 'var x = 123',
+		start: 8,
+		end: 11,
+	})
+})
