@@ -93,6 +93,21 @@ let count: number = 1
 ```
 
 
+### Assert multiple disjoint tokens on one line
+Multiple separate caret groups can appear on the same assertion line, sharing the same scope list.
+This is useful when several tokens on a line all carry the same scope:
+```ts
+let x = y + z
+//  ^   ^ ^ ^ variable.other.readwrite.ts
+```
+
+Exclusions are also shared across all groups:
+```ts
+    / not a comment
+//  ^             ^ source.ts ! comment.line.double-slash.ts
+```
+
+
 ### Prevent specific scopes
 To ensure a token does not receive an unexpected scope,
 use `!` (surrounded by spaces):
