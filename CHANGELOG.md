@@ -1,7 +1,10 @@
 # Changelog
-## Unreleased
+## 0.7.0
+_unreleased_
 
-- unit: Restore support for multiple disjoint caret assertions on one line, e.g. `^^  ^^^ source.xy`
+- unit: Change recommended file header format to `<comment token> SYNTAX TEST v1 "<scope>" "comment"`
+- unit: Restore support for multiple caret assertions on one line, e.g. `^^  ^^^ source.xy`
+
 
 ## 0.6.0
 _2026-03-12_
@@ -58,7 +61,7 @@ _2026-02-03_
 ## 0.3.3
 _2026-01-16_
 
-### Breaking Changes in 0.4.0
+### Breaking Changes in 0.3.3
 - snap: Adjust `.snap` file format to pass unit tests
 
 ### Other changes
@@ -79,8 +82,8 @@ _2026-01-05_
 ### Breaking Changes in 0.3.0
 - Negative scope assertions now use `!` (before: `-`)
 - Failure exit code is now `1` (before: `-1`)
-- Removed undocumented support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`
-  - Workaround: split into multiple lines
+- ~~Removed undocumented support for multiple assertions in one line, e.g. `^^  ^^^ source.xy`~~
+  - _Reverted in 0.7.0_
 - Removed `--version` flag. You can check this in your package.json
 - Fix incomplete EOL check if assertion starts on token
 

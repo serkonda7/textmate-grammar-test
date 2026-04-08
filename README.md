@@ -92,19 +92,14 @@ let count: number = 1
 //         ^^^^^^ meta.type.annotation.ts meta.var-single-variable.expr.ts meta.var.expr.ts
 ```
 
-
-### Assert multiple disjoint tokens on one line
-Multiple separate caret groups can appear on the same assertion line, sharing the same scope list.
-This is useful when several tokens on a line all carry the same scope:
+Or you assert the same scopes for multiple tokens in one line:
 ```ts
 let x = y + z
-//  ^   ^ ^ ^ variable.other.readwrite.ts
-```
+//  ^   ^   ^ variable.other.readwrite.ts
 
-Exclusions are also shared across all groups:
-```ts
-    / not a comment
-//  ^             ^ source.ts ! comment.line.double-slash.ts
+// Also works with negative assertions:
+let x = y + z
+//  ^   ^   ^ variable.other.readwrite.ts ! keyword.operator.arithmetic.ts
 ```
 
 
