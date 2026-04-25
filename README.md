@@ -86,7 +86,7 @@ let count: number = 1
 ```
 
 You can also assert multiple scopes on the same token.
-Scopes must be ordered from most general to most specifc:
+Scopes must be ordered from most general to most specific:
 ```ts
 let count: number = 1
 //         ^^^^^^ meta.type.annotation.ts meta.var-single-variable.expr.ts meta.var.expr.ts
@@ -134,52 +134,12 @@ x = "b"
 ```
 
 
-
-
 ## Language configuration via package.json
 Needed information about the grammars is read from the `package.json` contribution points `contributes.grammars` and `contributes.languages`.
 
 If it's not in your project root, provide the path with the `--config` option.
 
 You can also pass the path to a custom json file imitating the structure.
-
-
-## Setup VSCode unit test task
-<!-- TODO test and rework this section -->
-You can setup a vscode unit test task for convenience:
-
-```json
-{
-  "label": "Run tests",
-  "type": "shell",
-  "command": "textmate-grammar-test -c -g testcase/dhall.tmLanguage.json '**/*.dhall'",
-  "group": "test",
-  "presentation": {
-    "reveal": "always",
-    "panel":"new",
-  },
-  "problemMatcher": {
-    "owner": "textmate-grammar-test",
-    "fileLocation": [
-      "relative",
-      "${workspaceFolder}",
-    ],
-    "pattern": [
-      {
-        "regexp": "^(ERROR)\\s([^:]+):(\\d+):(\\d+):(\\d+)\\s(.*)$",
-        "severity": 1,
-        "file": 2,
-        "line": 3,
-        "column": 4,
-        "endColumn": 5,
-        "message": 6,
-      },
-    ],
-  },
-},
-```
-
-Notice the `-c` option that will output messages in a handy format for the problemMatcher.
 
 
 ## 📜 License

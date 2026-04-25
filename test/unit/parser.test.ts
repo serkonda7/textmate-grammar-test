@@ -14,6 +14,15 @@ describe('parseHeader', () => {
 		})
 	})
 
+	test('parse versioned header', () => {
+		const res = parseHeader('# SYNTAX TEST v3 "scala"')
+		expect(res.value).toEqual({
+			comment_token: '#',
+			scope: 'scala',
+			description: '',
+		})
+	})
+
 	test('description and longer comment token', () => {
 		const res = parseHeader('-- SYNTAX TEST "sql" "some description"')
 		expect(res.value).toEqual({
