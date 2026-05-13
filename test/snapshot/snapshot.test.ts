@@ -1,5 +1,4 @@
 import { expect, test } from 'bun:test'
-import { unwrap } from '@serkonda7/ts-result'
 import { register_grammars } from '../../src/common/textmate/textmate.ts'
 import { getVSCodeTokens, renderSnapshot } from '../../src/snapshot/index.ts'
 import { REGISTRY, read_data } from '../testutil.ts'
@@ -18,9 +17,11 @@ test('report OK', async () => {
 
 test('force use of specific scope', async () => {
 	const src = read_data('snap/scope_flag.any')
-	const reg = unwrap(
-		register_grammars('package.json', ['test/data/testlang.tmLanguage.json'], 'source.xy'),
-	)
+	const reg = register_grammars(
+		'package.json',
+		['test/data/testlang.tmLanguage.json'],
+		'source.xy',
+	).unwrap()
 
 	const scope = reg.filenameToScope('.any')
 	const tokens = await getVSCodeTokens(reg.registry, scope, src)
@@ -40,7 +41,7 @@ test('multiple grammars for same file extension', async () => {
 })
 
 async function json_grammars_test_helper(grammar: string, in_file: string) {
-	const reg = unwrap(register_grammars('test/data/json_jsonc/package.json', [grammar]))
+	const reg = register_grammars('test/data/json_jsonc/package.json', [grammar]).unwrap()
 	const src = read_data(in_file)
 	const scope = reg.filenameToScope('.json')
 	const tokens = await getVSCodeTokens(reg.registry, scope, src)

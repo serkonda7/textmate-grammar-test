@@ -1,4 +1,4 @@
-import { err, ok, type Result } from '@serkonda7/ts-result'
+import { Result } from 'better-result'
 import tm from 'vscode-textmate'
 import { parse_file } from './index.ts'
 import { find_overlapping_tokens, get_missing_scopes, get_unexpected_scopes } from './scopes.ts'
@@ -7,11 +7,11 @@ import type { TestFailure, TestResult } from './types.ts'
 export class TestRunner {
 	constructor(private registry: tm.Registry) {}
 
-	async test_file(file_content: string): Promise<Result<TestResult>> {
+	async test_file(file_content: string): Promise<Result<TestResult, Error>> {
 		// Parse file
 		const test_case_r = parse_file(file_content)
-		if (test_case_r.error) {
-			return err(test_case_r.error)
+		if (test_case_r.isErr()) {
+			return Result.err(test_case_r.error)
 		}
 
 		const test_case = test_case_r.value
@@ -19,7 +19,7 @@ export class TestRunner {
 		// Load grammar
 		const grammar = await this.registry.loadGrammar(test_case.metadata.scope)
 		if (!grammar) {
-			return err(new Error(`Could not load scope ${test_case.metadata.scope}`))
+			return Result.err(new Error(`Could not load scope ${test_case.metadata.scope}`))
 		}
 
 		let prev_state = tm.INITIAL
@@ -69,7 +69,7 @@ export class TestRunner {
 			})
 		}
 
-		return ok({
+		return Result.ok({
 			test_case,
 			failures,
 		})

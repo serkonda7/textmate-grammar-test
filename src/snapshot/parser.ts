@@ -1,4 +1,4 @@
-import { err, ok, type Result } from '@serkonda7/ts-result'
+import { Result } from 'better-result'
 import type tm from 'vscode-textmate'
 import { SRC_PREFIX, TEST_PREFIX, TEST_PREFIX_LEN, type TokenizedLine } from './types.ts'
 
@@ -24,7 +24,7 @@ export function parseSnap(text: string): Result<TokenizedLine[], Error> {
 
 		// This should never happen in valid snapshot files
 		if (!src_line.startsWith(SRC_PREFIX)) {
-			return err(new Error(`Expected source line starting with '${SRC_PREFIX}'`))
+			return Result.err(new Error(`Expected source line starting with '${SRC_PREFIX}'`))
 		}
 
 		// Get token tests for this source line
@@ -56,7 +56,7 @@ export function parseSnap(text: string): Result<TokenizedLine[], Error> {
 		})
 	}
 
-	return ok(tokenized_lines)
+	return Result.ok(tokenized_lines)
 }
 
 function extract_scopes(line: string, scopes_idx: number): string[] {
