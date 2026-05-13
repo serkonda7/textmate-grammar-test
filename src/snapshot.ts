@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { unwrap } from '@serkonda7/ts-result'
 import chalk from 'chalk'
 import { program } from 'commander'
 import { globSync } from 'glob'
@@ -50,9 +49,11 @@ async function main(): Promise<ExitCode> {
 		return ExitCode.Failure
 	}
 
-	const { registry, filenameToScope } = unwrap(
-		register_grammars(options.config, options.grammar, options.scope),
-	)
+	const { registry, filenameToScope } = register_grammars(
+		options.config,
+		options.grammar,
+		options.scope,
+	).unwrap()
 
 	const runner = new SnapshotRunner(registry, filenameToScope)
 	const results: ExitCode[] = []

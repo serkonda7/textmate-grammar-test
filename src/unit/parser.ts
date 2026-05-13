@@ -1,4 +1,4 @@
-import { err, ok, type Result } from '@serkonda7/ts-result'
+import { Result } from 'better-result'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
@@ -51,7 +51,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 
 	// No header matched
 	if (!match?.groups) {
-		return err(new SyntaxError(ERR_INVALID_HEADER, { cause: ERR_INVALID_HEADER_MSG }))
+		return Result.err(new SyntaxError(ERR_INVALID_HEADER, { cause: ERR_INVALID_HEADER_MSG }))
 	}
 
 	// Warn if no explicit version present
@@ -59,7 +59,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 		console.warn(WARN_HEADER_NO_VERSION)
 	}
 
-	return ok({
+	return Result.ok({
 		comment_token: match.groups.comment,
 		scope: match.groups.scope,
 		description: match.groups.desc ?? '',
@@ -70,12 +70,12 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 	const lines = str.split(/\r\n|\n/)
 
 	if (lines.length <= 1) {
-		return err(new Error(ERR_EMPTY_TEST))
+		return Result.err(new Error(ERR_EMPTY_TEST))
 	}
 
 	const metadata = parseHeader(lines[0])
-	if (metadata.error) {
-		return err(metadata.error)
+	if (metadata.isErr()) {
+		return Result.err(metadata.error)
 	}
 
 	const { comment_token } = metadata.value
@@ -97,8 +97,8 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 		// Scope assertion line
 		if (is_assertion(line)) {
 			const assertions = assert_parser.parse_line_assertions(line)
-			if (assertions.error) {
-				return err(assertions.error)
+			if (assertions.isErr()) {
+				return Result.err(assertions.error)
 			}
 
 			scope_assertions.push(...assertions.value)
@@ -124,7 +124,7 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 		)
 	}
 
-	return ok({
+	return Result.ok({
 		metadata: metadata.value,
 		test_lines: lineAssertions,
 	})
@@ -135,11 +135,11 @@ export class AssertionParser {
 
 	parse_line(line: string): Result<ScopeAssertion, SyntaxError> {
 		const assertions = this.parse_line_assertions(line)
-		if (assertions.error) {
-			return err(assertions.error)
+		if (assertions.isErr()) {
+			return Result.err(assertions.error)
 		}
 
-		return ok(assertions.value[0])
+		return Result.ok(assertions.value[0])
 	}
 
 	parse_line_assertions(line: string): Result<ScopeAssertion[], SyntaxError> {
@@ -155,16 +155,16 @@ export class AssertionParser {
 
 		if (line[pos] === '^') {
 			const caretRanges = this.parse_caret_assertion_ranges(line, pos)
-			if (caretRanges.error) {
-				return err(caretRanges.error)
+			if (caretRanges.isErr()) {
+				return Result.err(caretRanges.error)
 			}
 
 			ranges = caretRanges.value.ranges
 			nextPos = caretRanges.value.nextPos
 		} else {
 			const rangeResult = this.parse_assertion_range(line, pos)
-			if (rangeResult.error) {
-				return err(rangeResult.error)
+			if (rangeResult.isErr()) {
+				return Result.err(rangeResult.error)
 			}
 
 			ranges = [{ from: rangeResult.value.from, to: rangeResult.value.to }]
@@ -174,10 +174,10 @@ export class AssertionParser {
 		const { scopes, excludes } = this.parse_scopes_and_exclusions(line.slice(nextPos))
 
 		if (scopes.length === 0 && excludes.length === 0) {
-			return err(new SyntaxError(ERR_ASSERT_NO_SCOPES))
+			return Result.err(new SyntaxError(ERR_ASSERT_NO_SCOPES))
 		}
 
-		return ok(ranges.map(({ from, to }) => ({ from, to, scopes, excludes })))
+		return Result.ok(ranges.map(({ from, to }) => ({ from, to, scopes, excludes })))
 	}
 
 	private skip_whitespace(line: string, pos: number): number {
@@ -199,7 +199,7 @@ export class AssertionParser {
 			while (line[current] === '^') {
 				current++
 			}
-			return ok({ from: start, to: current, nextPos: current })
+			return Result.ok({ from: start, to: current, nextPos: current })
 		}
 
 		if (c === '<') {
@@ -216,14 +216,14 @@ export class AssertionParser {
 				nr_dashes++
 			}
 
-			return ok({
+			return Result.ok({
 				from: nr_tildas,
 				to: nr_tildas + nr_dashes,
 				nextPos: current,
 			})
 		}
 
-		return err(new SyntaxError(ERR_ASSERT_PARSE))
+		return Result.err(new SyntaxError(ERR_ASSERT_PARSE))
 	}
 
 	private parse_caret_assertion_ranges(
@@ -235,8 +235,8 @@ export class AssertionParser {
 
 		while (line[current] === '^') {
 			const rangeResult = this.parse_assertion_range(line, current)
-			if (rangeResult.error) {
-				return err(rangeResult.error)
+			if (rangeResult.isErr()) {
+				return Result.err(rangeResult.error)
 			}
 
 			ranges.push({
@@ -246,13 +246,13 @@ export class AssertionParser {
 
 			const nextRangePos = this.skip_whitespace(line, rangeResult.value.nextPos)
 			if (line[nextRangePos] !== '^') {
-				return ok({ ranges, nextPos: rangeResult.value.nextPos })
+				return Result.ok({ ranges, nextPos: rangeResult.value.nextPos })
 			}
 
 			current = nextRangePos
 		}
 
-		return ok({ ranges, nextPos: current })
+		return Result.ok({ ranges, nextPos: current })
 	}
 
 	/**

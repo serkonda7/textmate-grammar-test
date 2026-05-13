@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { err, ok, type Result } from '@serkonda7/ts-result'
+import { Result } from 'better-result'
 import { globSync } from 'glob'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
@@ -10,10 +10,13 @@ export function register_grammars(
 	package_json_path: string,
 	extra_grammar_paths: string[], // Optionally added via CLI --grammar
 	force_scope?: string, // Optionally added via CLI --scope
-): Result<{
-	registry: tm.Registry
-	filenameToScope: (filename: string) => string
-}> {
+): Result<
+	{
+		registry: tm.Registry
+		filenameToScope: (filename: string) => string
+	},
+	Error
+> {
 	const grammars: Grammar[] = []
 
 	const json = JSON.parse(fs.readFileSync(package_json_path, 'utf-8')) as ExtensionManifest
@@ -44,7 +47,7 @@ export function register_grammars(
 	grammars.push(...grammars_from_paths(extra_grammar_paths))
 
 	if (grammars.length === 0) {
-		return err(new Error('no grammars found in package.json'))
+		return Result.err(new Error('no grammars found in package.json'))
 	}
 
 	const extension_to_scope = new Map<string, string>()
@@ -97,7 +100,7 @@ export function register_grammars(
 
 	const registry = createRegistry(grammars, extension_to_scope)
 
-	return ok({
+	return Result.ok({
 		registry,
 		filenameToScope: (filename: string) => {
 			if (force_scope) {
