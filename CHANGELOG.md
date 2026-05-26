@@ -1,6 +1,6 @@
 # Changelog
 ## 0.7.0
-_unreleased_
+_2026-05-26_
 
 - unit: Change recommended file header format to `<comment token> SYNTAX TEST v1 "<scope>" "comment"`
 - unit: Restore support for multiple caret assertions on one line, e.g. `^^  ^^^ source.xy`
