@@ -18,15 +18,15 @@ describe('unit test', async () => {
 	it('should report OK for test without errors', () => {
 		return exec(
 			`node ${root}/dist/unit.js ` +
-				`--grammar ${root}/test/resources/dhall.tmLanguage.json ` +
-				`${__dirname}/resources/unit-ok-scenario/success.dhall`,
+				`--grammar ${root}/test/data/testlang.tmLanguage.json ` +
+				`${__dirname}/resources/unit-ok-scenario/success.testlang`,
 			{
 				cwd: root,
 			},
 		).then(({ stdout, stderr }) => {
 			expect(normalize(stdout.trim())).toEqual(
 				normalize(
-					`✓ ${root}/test/functional/resources/unit-ok-scenario/success.dhall run successfuly.`,
+					`✓ ${root}/test/functional/resources/unit-ok-scenario/success.testlang run successfuly.`,
 				),
 			)
 			expect(stderr).toEqual('')

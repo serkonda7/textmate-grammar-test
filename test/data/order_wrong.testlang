@@ -1,4 +1,4 @@
-# SYNTAX TEST "source.xy" "Expected scopes in wrong order"
+# SYNTAX TEST v1 "source.xy" "Expected scopes in wrong order"
 
 var x = 123
 #       ^^^ constant.int.xy source.xy

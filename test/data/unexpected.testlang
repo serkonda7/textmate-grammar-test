@@ -1,4 +1,4 @@
-# SYNTAX TEST "source.xy"
+# SYNTAX TEST v1 "source.xy"
 
   var n = 4
 #    ^^^ ! source.xy

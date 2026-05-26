@@ -1,0 +1,15 @@
+# SYNTAX TEST v1 "source.xy"
+
+var x = "foo"
+# <--- keyword.control.xy
+#       ^^^^^ source.xy string.xy ! constant.int.xy
+
+if (true) {
+  var y = 4
+# <~~--- keyword.control.xy
+# ^^^ keyword.control.xy
+}
+
+var s = "hi @{name}"
+#       ^^^^^^^^^^^^ string.xy
+#           ^^^^^^^ variable.interpolation.xy

@@ -4,6 +4,7 @@ _unreleased_
 
 - unit: Change recommended file header format to `<comment token> SYNTAX TEST v1 "<scope>" "comment"`
 - unit: Restore support for multiple caret assertions on one line, e.g. `^^  ^^^ source.xy`
+- deps: replace ts-result with better-result
 
 
 ## 0.6.0

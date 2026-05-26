@@ -5,7 +5,7 @@ import { read_data } from '../testutil.ts'
 
 describe('parseHeader', () => {
 	test('one char comment token', () => {
-		const res = parseHeader('# SYNTAX TEST "scala"')
+		const res = parseHeader('# SYNTAX TEST v1 "scala"')
 		expect(res.unwrap()).toEqual({
 			comment_token: '#',
 			scope: 'scala',
@@ -23,7 +23,7 @@ describe('parseHeader', () => {
 	})
 
 	test('description and longer comment token', () => {
-		const res = parseHeader('-- SYNTAX TEST "sql" "some description"')
+		const res = parseHeader('-- SYNTAX TEST v1 "sql" "some description"')
 		expect(res.unwrap()).toEqual({
 			comment_token: '--',
 			description: 'some description',
@@ -32,7 +32,7 @@ describe('parseHeader', () => {
 	})
 
 	test('header errors', () => {
-		const res = parseHeader('SYNTAX TEST "scala"')
+		const res = parseHeader('SYNTAX TEST v1 "scala"')
 		expect(res.isErr() ? res.error : null).toBeInstanceOf(SyntaxError)
 	})
 })
@@ -52,7 +52,7 @@ describe('parseTestFile', () => {
 	})
 
 	test('multiple assertions in one line', () => {
-		const res = parse_file('# SYNTAX TEST "source.xy"\nfoo bar\n# ^^  ^^^ source.xy\n').unwrap()
+		const res = parse_file('# SYNTAX TEST v1 "source.xy"\nfoo bar\n# ^^  ^^^ source.xy\n').unwrap()
 		expect(res.test_lines).toHaveLength(1)
 		expect(res.test_lines[0]?.scope_asserts).toStrictEqual([
 			{
