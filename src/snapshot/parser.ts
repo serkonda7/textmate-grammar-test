@@ -1,5 +1,6 @@
 import { Result } from 'better-result'
 import type tm from 'vscode-textmate'
+import { splitLines } from '../common/textmate/index.ts'
 import { SRC_PREFIX, TEST_PREFIX, TEST_PREFIX_LEN, type TokenizedLine } from './types.ts'
 
 /**
@@ -9,7 +10,7 @@ import { SRC_PREFIX, TEST_PREFIX, TEST_PREFIX_LEN, type TokenizedLine } from './
 export function parseSnap(text: string): Result<TokenizedLine[], Error> {
 	const tokenized_lines: TokenizedLine[] = []
 
-	const lines = text.split(/\n|\r\n/)
+	const lines = splitLines(text)
 
 	let i = 0
 

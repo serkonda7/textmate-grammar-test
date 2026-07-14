@@ -1,4 +1,5 @@
 import { Result } from 'better-result'
+import { splitLines } from '../common/textmate/index.ts'
 import {
 	type FileMetadata,
 	type GrammarTestFile,
@@ -67,7 +68,7 @@ export function parseHeader(line: string): Result<FileMetadata, SyntaxError> {
 }
 
 export function parse_file(str: string): Result<GrammarTestFile, Error> {
-	const lines = str.split(/\r\n|\n/)
+	const lines = splitLines(str)
 
 	if (lines.length <= 1) {
 		return Result.err(new Error(ERR_EMPTY_TEST))

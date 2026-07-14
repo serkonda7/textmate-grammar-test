@@ -1,4 +1,10 @@
 # Changelog
+## 0.8.0
+_unreleased_
+
+- fix handling of crlf and lf line endings
+
+
 ## 0.7.0
 _2026-05-26_
 

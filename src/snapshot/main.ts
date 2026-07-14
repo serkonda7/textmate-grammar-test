@@ -1,4 +1,5 @@
 import tm from 'vscode-textmate'
+import { splitLines } from '../common/textmate/index.ts'
 import type { TokenizedLine } from './types.ts'
 
 export async function getVSCodeTokens(
@@ -14,7 +15,7 @@ export async function getVSCodeTokens(
 
 	let ruleStack = tm.INITIAL
 
-	const tokenizedLines = source.split(/\n|\r\n/).map((line: string) => {
+	const tokenizedLines = splitLines(source).map((line: string) => {
 		const { tokens, ruleStack: nextRuleStack } = grammar.tokenizeLine(line, ruleStack)
 		ruleStack = nextRuleStack
 
