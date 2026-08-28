@@ -2,7 +2,7 @@
 
 import chalk from 'chalk'
 import { program } from 'commander'
-import { globSync } from 'glob'
+import { globSync } from 'tinyglobby'
 import { array_opt, ExitCode } from './common/cli/index.ts'
 import { register_grammars } from './common/textmate/index.ts'
 import { SnapshotRunner } from './snapshot/index.ts'

@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { Result } from 'better-result'
-import { globSync } from 'glob'
+import { globSync } from 'tinyglobby'
 import tm from 'vscode-textmate'
 import { createOnigurumaLib } from './oniguruma.ts'
 import type { ExtensionManifest, Grammar } from './types.ts'
