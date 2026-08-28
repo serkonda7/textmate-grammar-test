@@ -2,7 +2,7 @@
 
 import chalk from 'chalk'
 import { program } from 'commander'
-import glob from 'fast-glob'
+import { globSync } from 'tinyglobby'
 import { array_opt, ExitCode } from './common/cli/index.ts'
 import { register_grammars } from './common/textmate/index.ts'
 import { SnapshotRunner } from './snapshot/index.ts'
@@ -40,7 +40,7 @@ program
 async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 
-	const rawTestCases = program.args.flatMap((x) => glob.globSync(x))
+	const rawTestCases = program.args.flatMap((x) => globSync(x))
 	const testCases = rawTestCases.filter((x) => !x.endsWith('.snap'))
 
 	// Early exit if no test cases found

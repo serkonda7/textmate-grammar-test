@@ -3,7 +3,7 @@
 import * as fs from 'node:fs'
 import chalk from 'chalk'
 import { program } from 'commander'
-import glob from 'fast-glob'
+import { globSync } from 'tinyglobby'
 import { array_opt, ExitCode } from './common/cli'
 import { createConsoleReporter } from './common/reporter/index.ts'
 import { register_grammars } from './common/textmate/index.ts'
@@ -41,7 +41,7 @@ program
 async function main(): Promise<ExitCode> {
 	const options = program.opts<CliOptions>()
 
-	const test_cases = program.args.flatMap((x) => glob.globSync(x))
+	const test_cases = program.args.flatMap((x) => globSync(x))
 
 	// Early exit if no test cases found
 	if (test_cases.length === 0) {
