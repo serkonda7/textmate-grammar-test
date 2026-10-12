@@ -1,8 +1,9 @@
 # Changelog
-## 0.8.0
-_unreleased_
+## 0.7.1
+_2026-10-12_
 
-- fix handling of crlf and lf line endings
+- Fix handling of crlf and lf line endings
+- Fix multiline grammar state (0.3.0 regression) [GH-115](https://github.com/serkonda7/textmate-grammar-test/pull/115)
 
 
 ## 0.7.0
