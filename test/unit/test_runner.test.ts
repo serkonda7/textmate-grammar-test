@@ -14,6 +14,11 @@ test('OK on whitespace scopes', async () => {
 	expect(res.failures).toHaveLength(0)
 })
 
+test('carry grammar state across lines without assertions', async () => {
+	const res = (await runner.test_file(read_data('state_across_lines.testlang'))).unwrap()
+	expect(res.failures).toHaveLength(0)
+})
+
 test('report missing scopes', async () => {
 	const res = (await runner.test_file(read_data('missing.testlang'))).unwrap()
 	expect(res.failures[0].missing).toEqual(['string.xy', 'variable.interpolation.xy'])

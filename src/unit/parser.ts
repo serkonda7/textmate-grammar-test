@@ -106,8 +106,9 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 			continue
 		}
 
-		// Store previous line assertion
-		if (scope_assertions.length > 0) {
+		// Store previous source line, even without assertions,
+		// so the runner carries grammar state across it
+		if (src_line_nr > 0 || scope_assertions.length > 0) {
 			lineAssertions.push(
 				new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 			)
@@ -118,8 +119,8 @@ export function parse_file(str: string): Result<GrammarTestFile, Error> {
 		scope_assertions = []
 	}
 
-	// Handle remaining assertions at EOF
-	if (scope_assertions.length > 0) {
+	// Handle last source line at EOF
+	if (src_line_nr > 0 || scope_assertions.length > 0) {
 		lineAssertions.push(
 			new_line_assertion(lines[src_line_nr], src_line_nr + 1, scope_assertions.slice()),
 		)
