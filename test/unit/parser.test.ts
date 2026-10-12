@@ -53,7 +53,8 @@ describe('parseTestFile', () => {
 
 	test('multiple assertions in one line', () => {
 		const res = parse_file('# SYNTAX TEST v1 "source.xy"\nfoo bar\n# ^^  ^^^ source.xy\n').unwrap()
-		expect(res.test_lines).toHaveLength(1)
+		// 'foo bar' and the empty line after the trailing newline
+		expect(res.test_lines).toHaveLength(2)
 		expect(res.test_lines[0]?.scope_asserts).toStrictEqual([
 			{
 				from: 2,
@@ -75,11 +76,12 @@ describe('parseTestFile', () => {
 		expect(res.metadata.comment_token).toBe('#')
 		expect(res.metadata.description.length).toBeGreaterThan(5)
 
-		// Source lines with assertions
-		expect(res.test_lines).toHaveLength(4)
+		// All source lines are kept, 4 of them have assertions
+		expect(res.test_lines).toHaveLength(13)
+		expect(res.test_lines.filter((l) => l.scope_asserts.length > 0)).toHaveLength(4)
 
-		// Number of assertions on last source line
-		expect(res.test_lines.at(-1)?.scope_asserts).toHaveLength(3)
+		// Number of assertions on last asserted source line
+		expect(res.test_lines.at(-2)?.scope_asserts).toHaveLength(3)
 	}
 })
 

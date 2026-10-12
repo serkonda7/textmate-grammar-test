@@ -1,0 +1,4 @@
+# SYNTAX TEST v1 "source.xy" "Grammar state carries across lines without assertions"
+var s = "multi
+line string"
+# <---- string.xy
