@@ -11,13 +11,17 @@ const __dirname = dirname(__filename)
 
 const exec = util.promisify(child_process.exec)
 
+// fs.globSync emits an ExperimentalWarning on Node < 22.17. Suppress it so the
+// stderr assertion stays meaningful; remove once engines.node is >= 22.17.
+const NODE = 'node --disable-warning=ExperimentalWarning'
+
 // FIXME: assertions and done()
 describe('unit test', async () => {
 	const root = process.cwd()
 
 	it('should report OK for test without errors', () => {
 		return exec(
-			`node ${root}/dist/unit.js ` +
+			`${NODE} ${root}/dist/unit.js ` +
 				`--grammar ${root}/test/data/testlang.tmLanguage.json ` +
 				`${__dirname}/resources/unit-ok-scenario/success.testlang`,
 			{
@@ -35,7 +39,7 @@ describe('unit test', async () => {
 
 	it('should report Unexpected scopes', () => {
 		return exec(
-			`node ${root}/dist/unit.js  ` +
+			`${NODE} ${root}/dist/unit.js  ` +
 				`--grammar ${root}/test/resources/dhall.tmLanguage.json ` +
 				`${__dirname}/resources/unit-report-unexpected-scopes/unexpected.scopes.test.dhall`,
 			{
